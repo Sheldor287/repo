@@ -1,0 +1,637 @@
+Notebook Transfer:
+
+import pandas as pd
+import numpy as np
+from lifelines import CoxTimeVaryingFitter, KaplanMeierFitter
+
+def build_features(df):
+    """
+    df columns:
+    - car_id
+    - month
+    - mileage
+    - repair_cost
+    - major_failure (0/1)
+    """
+    df = df.sort_values(["car_id", "month"])
+
+    df["cost_6mo"] = (
+        df.groupby("car_id")["repair_cost"]
+          .rolling(6, min_periods=1).sum()
+          .reset_index(level=0, drop=True)
+    )
+
+    df["cost_slope"] = (
+        df.groupby("car_id")["repair_cost"]
+          .rolling(6)
+          .apply(lambda x: np.polyfit(range(len(x)), x, 1)[0]
+                 if len(x) > 2 else 0)
+          .reset_index(level=0, drop=True)
+    )
+
+    df["fail_rate"] = (
+        df.groupby("car_id")["major_failure"]
+          .rolling(12, min_periods=1).mean()
+          .reset_index(level=0, drop=True)
+    )
+
+    return df
+
+def economic_eol_flag(df, value_func, tau=0.7):
+    """
+    value_func: callable(t) -> vehicle value
+    """
+    df["econ_ratio"] = df["cost_6mo"] / df["month"].map(value_func)
+    df["econ_eol"] = (df["econ_ratio"] > tau).astype(int)
+    return df
+
+
+def fit_mechanical_hazard(df):
+    """
+    Requires:
+    - start, stop
+    - event_mech (1 if mechanical death)
+    """
+    ctv = CoxTimeVaryingFitter()
+    ctv.fit(
+        df,
+        id_col="car_id",
+        start_col="start",
+        stop_col="stop",
+        event_col="event_mech",
+        formula="cost_slope + fail_rate + mileage"
+    )
+    return ctv
+
+def combined_eol_probability(h_mech, p_econ):
+    """
+    Competing risks approximation
+    """
+    return 1 - (1 - h_mech) * (1 - p_econ)
+
+
+
+
+##################################################3
+
+
+MARKDOWN
+## Assumptions
+- Cars have health $H_t$
+- Observed maintenance events and costs
+- A vehicle value curve exists
+- There exists two competeting EOL factors (mechanical, cost)
+    - Mechanical = increased failure rate, repairs needed
+    - Economic = Rolling repair costs exceed value of vehicle
+
+### Global Variables 
+
+| Term | Definition |
+|------|------|
+| $H_t$ | Vehicle health $\in (0,1]$|
+| $D_t$ | Total deterioration $\in (0, 1]$|
+| $f_t$ | Total failure |
+| $\tau$| failure tolerence $\in (0, 1]$|
+| $\phi$| Decision maker tolerence for cost $\in (0, 1]$|
+| $\epsilon, \xi$| Noise/error of model|
+
+### Global Model
+For each vehicle $i$, for $t$ months $H_{i, t} \in (0, 1]$ 
+
+Mileage $m_{i,t} \sim \mathcal{N}(\mu_i, \sigma^2_i)$
+
+Latent deterioration $D_{i,t} = 1 - H_{i, t}$
+
+Observed EOL: Min $(\tau^{m}, \tau^{c})$
+
+### Maintainance Variables
+
+| Term | Definition |
+|------|------|
+| $h_{min}$ | Infinum of vehicle performance |
+| $m_t$ | Monthly milage| 
+| $p_t$ | Probability of failure at $t$ |
+| $\alpha$ | Baseline failure param (log-odds) |
+| $\gamma_t$ | Failure sensitivity given $D_t$ |
+| $\beta_1$ | wear per mile |
+| $\beta_2$ | damage severity of total failure  |
+
+### Maintainance Model0.1
+
+Failure process: $f_{i,t} \sim$ Bernoulli $(p_{i, t})$ 
+
+Hazard Func: $\frac{1}{1+e^{-(\alpha+\gamma D_{i,t})}}$
+
+Mechanical Health: $H_{t+1} = H_t -\beta_1m_t - \beta_2f_t - \epsilon_t$
+
+Mechanical EOL: $\tau_i^{m} = inf\{t: H_{i,t} \leq h_{min}\}$
+
+### Cost Variables
+
+| Term | Definition |
+|------|------|
+| $c_t$ | Repair cost   |
+| $V_t$ | Vehicle value |
+| $\lambda$ | Market value decay |
+| $\mathcal{F_t}$| Data observed until $t$| 
+| $K$ | fixed time horizon, Ex: $[t, t+12]$ | 
+| $c_0$ | Baseline month maintance costs | 
+| $c_f$ | Costs due to total failure |
+| $c_d$ | Costs due to deterioration | 
+
+### Cost Model0.1
+
+Monthly Repair Cost: $c_{i, t} = c_0 + c_ff_{i,t} + c_dD_{i,t} + \xi_{i, t}$
+
+Vehicle Value (Deterministic): $V_{i,t} = V_{i, 0}e^{-\lambda t}$
+
+Rolling Expected Cost: $\tilde{C}_{i,t} = \mathbb{E} \left( \displaystyle\sum_{k=t+1}^{t+K} c_{i, k} | \mathcal{F}_t \right) \approx K(c_0 + c_dD_{i,t})$: total costs given all observed data for a time interval $K$
+
+Economic EOL: $\tau_i^c= inf\{t: \tilde{C}_{i,t} \geq \phi V_{i,t}\}$
+
+
+
+
+##############################
+
+Sim
+
+# Data Sim
+rng = np.random.default_rng(123)
+
+
+def simulate_car(
+    car_id,
+    T=180,                  # months
+    H0=1.0,                 # starting condition
+    base_mileage=1000,      # starting mileage
+    value0=25000,           # starting vehicle value
+    dep_rate=0.015,         # monthly depreciation rate --> SME informed? 
+    tau=0.7                 # stakeholder tolerance
+):
+    
+    # State variables
+    rows = []
+    H = H0
+    alive = True
+    cost_hist = []
+
+    for t in range(1, T + 1):
+        if not alive:
+            break
+
+        # Usage
+        mileage = rng.normal(base_mileage, 200)
+        mileage = max(mileage, 300)
+
+        # Change in failure probability --> Notational to get data
+        p_fail = np.clip(0.02 + 0.25 * (1 - H), 0, 0.8)
+        major_fail = rng.random() < p_fail
+
+        # Repair cost
+        base_cost = rng.gamma(2, 80)
+        fail_cost = rng.gamma(2, 1200) if major_fail else 0
+        repair_cost = base_cost + fail_cost
+
+        # Health degradation
+        H -= 0.00008 * mileage
+        H -= 0.06 * major_fail
+        H -= rng.normal(0, 0.005)
+        H = max(H, 0)
+
+        # Vehicle value
+        value = value0 * np.exp(-dep_rate * t)
+
+        cost_hist.append(repair_cost)
+        cost_6mo = sum(cost_hist[-6:])
+
+        # Mechanical EOL
+        mech_eol = H < 0.1
+
+        # Economic EOL
+        econ_eol = cost_6mo > tau * value
+
+        if mech_eol or econ_eol:
+            alive = False
+
+        rows.append({
+            "car_id": car_id,
+            "month": t,
+            "mileage": mileage,
+            "health": H,
+            "major_failure": int(major_fail),
+            "repair_cost": repair_cost,
+            "cost_6mo": cost_6mo,
+            "value": value,
+            "mech_eol": int(mech_eol),
+            "econ_eol": int(econ_eol),
+            "eol": int(mech_eol or econ_eol)
+        })
+
+    return pd.DataFrame(rows)
+
+
+def simulate_fleet(n_cars=200):
+    dfs = []
+    for i in range(n_cars):
+        tau = rng.uniform(0.5, 0.9)
+        value0 = rng.uniform(18000, 35000)
+        base_mileage = rng.normal(1100, 250)
+
+        df = simulate_car(
+            car_id=i,
+            tau=tau,
+            value0=value0,
+            base_mileage=base_mileage
+        )
+        dfs.append(df)
+
+    return pd.concat(dfs, ignore_index=True)
+
+fleet_df = simulate_fleet(300)
+
+
+
+##########################################
+
+
+
+import statsmodels.api as sm
+from lifelines import CoxPHFitter, KaplanMeierFitter
+import matplotlib.pyplot as plt
+# Analysis 
+
+def get_additional_features(df_fleet, K=6):
+    df_fleet = df_fleet.copy()
+    df_fleet['rolling_cost'] = df_fleet.groupby('car_id')['repair_cost'].rolling(K, min_periods=1).sum().reset_index(0, drop=True)
+    df_fleet['cost_ratio'] = df_fleet['rolling_cost'] / df_fleet['value']
+    df_fleet['failure_rate'] = df_fleet.groupby('car_id')['major_failure'].rolling(K, min_periods=1).mean().reset_index(0, drop=True)
+    return df_fleet
+
+def cost_ols(df_fleet, features=['major_failure', 'failure_rate'], pred_feature='repair_cost'):
+    X = df_fleet[features]
+    X = sm.add_constant(X)
+    y = df_fleet[pred_feature]
+    model = sm.OLS(y, X).fit()
+    return model
+
+def estimate_hazard(df_fleet, features=['major_failure'], pred_feature='failure_rate'):
+    X = df_fleet[features]
+    X = sm.add_constant(X)
+    y = df_fleet[pred_feature]
+    model = sm.Logit(y, X).fit()
+    return model
+
+def get_eol_times(df_fleet):
+    eol_times = df_fleet.groupby('car_id')['month'].max().reset_index()
+    eol_times = eol_times.merge(
+        df_fleet[['car_id', 'eol']].reset_index(), on='car_id'
+    )
+    eol_times.rename(columns={'month': 'duration', 'eol': 'event'}, inplace=True)
+    return eol_times
+
+def get_dflast(df_fleet):
+    df_last = df_fleet.groupby('car_id').last().reset_index()
+    df_last['event'] = df_last['eol']
+    return df_last
+
+def km_cox_models(eol_times, df_fleet, covariates=['failure_rate', 'cost_ratio']):
+    kmf = KaplanMeierFitter()
+    kmf.fit(eol_times['duration'], event_observed=eol_times['event'])
+    kmf.plot_survival_function(title='Fleet Survival Curve', xlabel='Months', ylabel='Survival Probability')
+
+    df_last = get_dflast(df_fleet)
+    cox_data = df_last[['duration', 'event'] + covariates]
+
+    cph = CoxPHFitter()
+    cph.fit(cox_data, duration_col='duration', event_col='event')
+    cph.print_summary()
+    return kmf, cph, df_last
+
+def plot_risk_checks(df_last):
+    plt.scatter(df_last['failure_rate'], df_last['cost_ratio'], c=df_last['event'], cmap='coolwarm')
+    plt.xlabel('Failure Rate Proxy (D_t)')
+    plt.ylabel('Cost Ratio (Rolling Cost / Value)')
+    plt.title('Mechanical vs Economic Pressure on Fleet')
+    plt.colorbar(label='EOL Observed')
+    plt.show()
+    return True
+
+
+
+########################################################
+
+
+
+
+import networkx as nx
+import pyomo.environ as pyo
+import matplotlib.pyplot as plt
+import random, time
+
+def descendants(G, source):
+    seen = set()
+    stack = [source]
+    while stack:
+        node = stack.pop()
+        for neighbor in G.neighbors(node):
+            if neighbor not in seen:
+                seen.add(neighbor)
+                stack.append(neighbor)
+        print('stack', stack)
+    seen.discard(source)
+    return seen
+
+
+def reachability_intersection_source_sink(G, pairs):
+    """
+    Given a DiGraph G, and a list of (start, end) node pairs,
+    return the set of nodes that lie on some path from each start to end.
+    Done via DFS (see above)
+
+    When considering s --> ... and t --> ..., the intersection of the two
+    sets is the entire subgraph. 
+    
+    Returns: Set of nodes in the intersection
+    """
+    intersect_sets = []
+
+    for s, t in pairs:
+        # Nodes reachable from source
+        reachable_from_s = set(nx.descendants(G, s)) | {s}
+        # Nodes that can reach sink (reverse graph)
+        reachable_to_t = set(nx.descendants(G.reverse(), t)) | {t}
+        # Nodes on some path from s -> t
+        path_nodes = reachable_from_s & reachable_to_t
+        intersect_sets.append(path_nodes)
+    
+    # Intersection across all source-sink pairs
+    return set.intersection(*intersect_sets)
+
+def edges_within_subset(G, nodes):
+    """
+    Return all edges given a set of nodes
+    """
+    nodes_set = set(nodes)
+    return [(u, v) for u, v in G.edges() if u in nodes_set and v in nodes_set]
+
+
+def build_residual_graph(G, flow):
+    R = nx.DiGraph()
+    for (i, j) in G.edges:
+        cap = G[i][j]["capacity"]
+        f = flow[(i, j)]
+
+        if cap - f > 1e-9:
+            # Forward residual 
+            R.add_edge(i, j, capacity=cap - f)
+        else:
+            # Backward residual
+            R.add_edge(j, i, capacity=f)
+    return R
+
+def get_ST_sets(G:nx.DiGraph, flow: dict, s):
+    R = build_residual_graph(G, flow)
+    S = set(nx.dfs_preorder_nodes(R, source=s))
+    T = set(G.nodes) - S
+    return R, S, T
+
+G = nx.gnp_random_graph(20, 0.4, directed=True)
+pairs = [(2, 6)]
+common_nodes = reachability_intersection_source_sink(G, pairs)
+edges = edges_within_subset(G, common_nodes)
+subG = G.subgraph(common_nodes)
+edges = list(subG.edges())
+nx.draw(subG, node_size=300, with_labels=True)
+plt.show()
+
+for u, v in G.edges:
+    G[u][v]["capacity"] = 1
+
+
+
+
+
+###############################################################
+
+
+def max_flow(G: nx.DiGraph, s, t):
+    model = pyo.ConcreteModel()
+    # Sets, Params, Vars
+    model.N = pyo.Set(initialize=list(G.nodes))
+    model.A = pyo.Set(initialize=list(G.edges), dimen=2)
+    cap = {(i, j): G[i][j].get('capacity') for (i, j) in G.edges}
+    model.cap = pyo.Param(model.A,initialize=cap,within=pyo.NonNegativeReals)
+    model.x = pyo.Var(
+        model.A, domain=pyo.NonNegativeReals,
+        initialize=lambda m, i,j: random.uniform(0, m.cap[i,j]) 
+    )
+
+    # Objective: Maximize flow through the graph 
+    def max_flow_obj(m):
+        outflow = sum(m.x[s, j] for (s2, j) in m.A if s2 == s)
+        inflow = sum(m.x[i, s] for (i, s2) in m.A if s2 == s)
+        return outflow - inflow
+    
+    # Constraint: Capacity 
+    def capacity_UB(m, i, j):
+        return m.x[i, j] <= m.cap[i, j]
+
+    # Constraint: Flow Balance
+    def flow_balance(m, v):
+        if v == s or v == t:
+            return pyo.Constraint.Skip
+
+        inflow = sum(m.x[i, v] for (i, v2) in m.A if v2 == v)
+        outflow = sum(m.x[v, j] for (v2, j) in m.A if v2 == v)
+        return inflow - outflow == 0
+    
+    model.obj = pyo.Objective(rule=max_flow_obj, sense=pyo.maximize)
+    model.capacity = pyo.Constraint(model.A, rule=capacity_UB)
+    model.flow_conservation = pyo.Constraint(model.N,rule=flow_balance)
+    return model
+
+def optimal_face_dimension(R):
+    # weakly connected components --> Need to be to consider cycles
+    components = nx.number_weakly_connected_components(R)
+    V = R.number_of_nodes()
+    E = R.number_of_edges()
+    return E - V + components
+
+
+def num_SCC(R):
+    # Count of Strongly Connected Components --> A residual graph cycle indicator
+    return nx.number_strongly_connected_components(R)
+
+def do_alt_optima_exist(R):
+    return not nx.is_directed_acyclic_graph(R)
+
+def classify_arcs(G, flow):
+    _, S, T = get_ST_sets(subG, flow, s=10)
+    cut_edges = [(i, j) for (i, j) in subG.edges if i in S and j in T]
+    for (i, j) in G.edges:
+        if flow[(i,j)] == G[i][j]['capacity'] and (i,j) in cut_edges:
+            category = "essential"
+        elif flow[(i,j)] > 0:
+            category = "flexible"
+        else:
+            category = "never used"
+
+model = max_flow(subG, s=7, t=8)
+results = pyo.SolverFactory('appsi_highs').solve(model, tee=True)
+results.write()
+flow = {(i, j): pyo.value(model.x[i, j]) for (i, j) in model.A}
+
+R, S, T = get_ST_sets(subG, flow, s=10)
+do_alt_optima_exist(R)
+
+
+essential_edges = [(i, j) for (i, j) in subG.edges if i in S and j in T]
+essential_nodes = list(set(u for (u, v) in essential_edges) | set(v for (u, v) in essential_edges))
+
+#sum(G[u][v]["capacity"] for (u, v) in cut_edges)
+
+
+
+
+############################################333
+
+
+
+import pyomo.environ as pyo
+import time
+
+def all_max_flow(model, solver_name='appsi_highs', max_iter=1000, tol=1e-6):
+    alternative_supports = []  # store support patterns only
+    objective_values = []
+    total_start = time.time()
+
+    # Sets of used edges to conserve memory
+    always_used = None
+    never_used = None
+
+    for t in range(max_iter):
+        if t % 100 == 0 and t > 0:
+            time_100 = time.time()
+            print(f"Iteration {t}, Total Time: {time_100 - total_start:.2f} seconds")
+        results = pyo.SolverFactory(solver_name).solve(model)
+
+        # Break --> All optimal solutions found
+        if results.solver.termination_condition != pyo.TerminationCondition.optimal:
+            break
+
+        # Identify support edges
+        support_edges = tuple(sorted(e for e in model.A if pyo.value(model.x[e]) > tol))
+        if not support_edges:
+            break
+
+        # Store support instead of full flow
+        alternative_supports.append(support_edges)
+        objective_values.append(pyo.value(model.obj))
+
+        # Update essential edges --> Essential for large graphs
+        if t == 0:
+            always_used = set(support_edges)
+            never_used = set(model.A) - set(support_edges)
+        else:
+            always_used &= set(support_edges)
+            never_used &= set(model.A) - set(support_edges)
+
+        # Add constraint to exclude current support
+        constraint_name = f'exclude_flow_{t}'
+        model.add_component(
+            constraint_name,
+            pyo.Constraint(expr=sum(model.x[e] for e in support_edges) <= len(support_edges) - tol)
+        )
+
+    end_time = time.time()
+    print(f"Total time for {t+1} iterations: {end_time - total_start:.2f} seconds")
+
+    return alternative_supports, objective_values
+
+
+
+model = max_flow(subG, s=10, t=11)
+results = pyo.SolverFactory('appsi_highs')
+flow = {(i, j): pyo.value(model.x[i, j]) for (i, j) in model.A}
+#alternative_flows, obj_values = all_max_flow(model)
+
+
+
+
+
+
+
+###########################3
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import weibull_min
+from matplotlib.gridspec import GridSpec
+
+# --- Parameters ---
+x = np.linspace(0, 7, 200)        # X axis for Weibull
+lambda_vals = np.linspace(1, 5, 100)  # Lambda varying over "time"
+k = 2  # fixed shape parameter
+
+# --- Meshgrid ---
+X, LAMBDA = np.meshgrid(x, lambda_vals)
+
+# --- Weibull PDF with time-varying scale ---
+Y = weibull_min.pdf(X, c=k, scale=LAMBDA)
+
+# --- Projections ---
+proj_XY = np.trapz(Y, lambda_vals, axis=0)   # integrate over lambda
+proj_LAMBDA_Y = np.trapz(Y, x, axis=1)      # integrate over x
+
+# --- Layout ---
+fig = plt.figure(figsize=(10, 8))
+gs = GridSpec(
+    2, 2,
+    width_ratios=[4, 1.5],
+    height_ratios=[4, 1.5],
+    wspace=0.15,
+    hspace=0.30
+)
+
+# --- Main 3D plot ---
+ax3d = fig.add_subplot(gs[0, 0], projection="3d")
+mappable = ax3d.plot_surface(LAMBDA, X, Y, cmap="viridis")
+ax3d.set_xlabel("Lambda (scale)", labelpad=10)
+ax3d.set_ylabel("t", labelpad=10)
+ax3d.set_title(r"Time Dependent Weibull with Parameteric $\lambda(t)$ ")
+ax3d.view_init(elev=25, azim=-60)
+
+# --- Right projection: (X, Y) ---
+ax_right = fig.add_subplot(gs[0, 1])
+ax_right.plot(proj_XY, x)
+ax_right.set_title("Standard Weibull Distribution")
+
+# --- Bottom projection: (Lambda, Y) ---
+ax_bottom = fig.add_subplot(gs[1, 0])
+# Use peak density for convex behavior
+peak_density = (k / lambda_vals) * ( ( (k-1)/(k) )**(k-1) ) * np.exp(-( (k-1)/k )**k)  # approx peak
+ax_bottom.plot(lambda_vals, peak_density)
+ax_bottom.set_xlabel("Lambda (scale)")
+ax_bottom.set_ylabel("Peak density")
+ax_bottom.set_title(r"Example $\lambda(t)$")
+
+# --- Bottom-right contour ---
+ax_br = fig.add_subplot(gs[1, 1])
+ax_br.contourf(LAMBDA, X, Y, levels=30, cmap="viridis")
+ax_br.set_xlabel("Lambda")
+ax_br.set_ylabel("t")
+ax_br.set_title("Contour Plot")
+
+plt.savefig("weibull_time_varying_scale.png", dpi=300)
+plt.show()
+
+
+
+
+
+
+
+
+
+
+

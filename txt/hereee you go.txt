@@ -1,0 +1,939 @@
+"""Change file label information here"""
+
+# Availability File
+filename = "RR_SP_Data.xlsx"
+score_column_name = 'SP'
+date_column_name = 'Date'
+SV_column_name = 'SV'
+ST_column_name = 'ST'
+
+filename2 = "GTA_Data.xlsx"
+right_col_name = "Number of Right Tags"
+total_col_name = "Total Number of Tags"
+
+filename3 = "GDD_Data.xlsx"
+start_col_name = "Time Loaded"
+end_col_name = "Time Delivered"
+
+
+"""Output File Infromation"""
+output_dir = 'DESscores'
+os.makedirs(output_dir, exist_ok=True)
+
+GTA_stat_log_file_name = 'GTA_statistics_log.xlsx'
+GTA_aggregate_log_file_name = 'GTA_aggregate_log.xlsx'
+RRSP_stat_log_file_name = 'RRSP_statistics_log.xlsx'
+RRSP_aggregate_log_file_name = 'RRSP_aggregate_log.xlsx'
+RRSP_main = 'All_RRSP_data.xlsx'
+GTA_main = 'All_GTA_data.xlsx'
+
+
+
+"""Change plot field information here"""
+REQ_LVL_RRSP = 85
+REQ_LVL_GTA = 80
+REQ_LVL_GDD = 5
+title_text = 'Average Quarterly Performance'
+cat_text = 'RRSP_Quarter'
+
+
+import os, heapq, math
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+from collections import Counter, defaultdict
+from scipy.stats import weibull_min
+from tqdm import tqdm
+# Get the total file path
+file_path = os.getcwd() + '/' + filename
+file_path2 = os.getcwd() + '/' + filename2
+file_path3 = os.getcwd() + '/' + filename3
+
+df = pd.read_excel(file_path)
+gta = pd.read_excel(file_path2)
+gta['Score'] = gta[right_col_name]/gta[total_col_name]
+gdd = pd.read_excel(file_path3)
+gdd['Score']=(gdd['Time Delivered'] - gdd['Time Loaded']).dt.total_seconds()/60
+
+# Split the data by each SV,ST
+all_dfs = {(key1, key2): group.reset_index(drop=True)for (key1, key2), group in df.groupby([SV_column_name, ST_column_name], dropna=False)}
+all_gta = {(key1, key2): group.reset_index(drop=True)for (key1, key2), group in gta.groupby([SV_column_name, ST_column_name], dropna=False)}
+all_gdd = {(key1, key2): group.reset_index(drop=True)for (key1, key2), group in gdd.groupby([SV_column_name, ST_column_name], dropna=False)}
+# Get columns for each
+date_groups = {(sv, st): all_dfs[(sv, st)][date_column_name] for sv, st in all_dfs.keys()}
+score_groups = {(sv, st): all_dfs[(sv, st)][score_column_name] for sv, st in all_dfs.keys()}
+gta_scores = {(sv, st): all_gta[(sv, st)]['Score'] for sv, st in all_gta.keys()}
+gdd_scores = {(sv, st): all_gdd[(sv, st)]['Score'] for sv, st in all_gdd.keys()}
+
+sample_score = score_groups[('SV-10', 'Carbon Fiber Skid')]
+# Get data parameters 
+get_params = lambda m, v: ((((1-m)*m**2)/v)-m, (((1-m)**2)*m)/v + m -1) 
+get_lmda = lambda a, mu: a*mu/(1-a)
+get_k_weibull = lambda data: weibull_min.fit(sample_score, floc=0)[0]
+
+mu=9.004 # From Req Docs
+rrsp_beta_mv =  {(sv, st): (np.mean(score_groups[(sv,st)]), np.var(score_groups[(sv,st)], ddof=1)) for sv, st in score_groups.keys()}
+rrsp_params = {(sv, st): get_params(rrsp_beta_mv[(sv, st)][0], rrsp_beta_mv[(sv, st)][1]) for sv, st in score_groups.keys()}
+mean_var_params = {(sv, st): (np.mean(gta_scores[(sv,st)]), np.var(gta_scores[(sv,st)], ddof=1)) for sv, st in all_gta.keys()}
+beta_params = {(sv, st): get_params(mean_var_params[(sv, st)][0], mean_var_params[(sv, st)][1]) for sv, st in all_gta.keys()}
+Ao_means = {(sv, st): np.mean(score_groups[(sv,st)]) for sv, st in all_dfs.keys()}
+lmda = {k:get_lmda(a, mu) for k,a in Ao_means.items()}
+# Availability File
+filename = "RR_SP_Data.xlsx"
+score_column_name = 'SP'
+date_column_name = 'Date'
+SV_column_name = 'SV'
+ST_column_name = 'ST'
+
+filename2 = "GTA_Data.xlsx"
+right_col_name = "Number of Right Tags"
+total_col_name = "Total Number of Tags"
+
+filename3 = "GDD_Data.xlsx"
+start_col_name = "Time Loaded"
+end_col_name = "Time Delivered"
+
+df = pd.read_excel(r"C:\Users\Drew\Downloads\Microsoft Downloads\rrsp.xlsx")
+gta = pd.read_excel(r"C:\Users\Drew\Downloads\Microsoft Downloads\gta.xlsx")
+gta['Score'] = gta[right_col_name]/gta[total_col_name]
+gdd = pd.read_excel(r"C:\Users\Drew\Downloads\Microsoft Downloads\gdd.xlsx")
+gdd['Score']=(gdd['Time Delivered'] - gdd['Time Loaded']).dt.total_seconds()/60
+
+# Split the data by each SV,ST
+all_dfs = {(key1, key2): group.reset_index(drop=True)for (key1, key2), group in df.groupby([SV_column_name, ST_column_name], dropna=False)}
+all_gta = {(key1, key2): group.reset_index(drop=True)for (key1, key2), group in gta.groupby([SV_column_name, ST_column_name], dropna=False)}
+all_gdd = {(key1, key2): group.reset_index(drop=True)for (key1, key2), group in gdd.groupby([SV_column_name, ST_column_name], dropna=False)}
+# Get columns for each
+date_groups = {(sv, st): all_dfs[(sv, st)][date_column_name] for sv, st in all_dfs.keys()}
+score_groups = {(sv, st): all_dfs[(sv, st)][score_column_name] for sv, st in all_dfs.keys()}
+gta_scores = {(sv, st): all_gta[(sv, st)]['Score'] for sv, st in all_gta.keys()}
+gdd_scores = {(sv, st): all_gdd[(sv, st)]['Score'] for sv, st in all_gdd.keys()}
+
+sample_score = score_groups[('SV-10', 'Carbon Fiber Skid')]
+# Get data parameters 
+get_params = lambda m, v: ((((1-m)*m**2)/v)-m, (((1-m)**2)*m)/v + m -1) 
+get_lmda = lambda a, mu: a*mu/(1-a)
+get_k_weibull = lambda data: weibull_min.fit(sample_score, floc=0)[0]
+
+mu=9.004 # From Req Docs
+rrsp_beta_mv =  {(sv, st): (np.mean(score_groups[(sv,st)]), np.var(score_groups[(sv,st)], ddof=1)) for sv, st in score_groups.keys()}
+rrsp_params = {(sv, st): get_params(rrsp_beta_mv[(sv, st)][0], rrsp_beta_mv[(sv, st)][1]) for sv, st in score_groups.keys()}
+mean_var_params = {(sv, st): (np.mean(gta_scores[(sv,st)]), np.var(gta_scores[(sv,st)], ddof=1)) for sv, st in all_gta.keys()}
+beta_params = {(sv, st): get_params(mean_var_params[(sv, st)][0], mean_var_params[(sv, st)][1]) for sv, st in all_gta.keys()}
+Ao_means = {(sv, st): np.mean(score_groups[(sv,st)]) for sv, st in all_dfs.keys()}
+lmda = {k:get_lmda(a, mu) for k,a in Ao_means.items()}def get_next_repair(mu):
+    """Generates an exponentially distributed repair time."""
+    return np.random.exponential(mu)
+
+def get_next_arrival_time(op_time_now, scale, k):
+    """Calculates the next arrival time on the OPERATIONAL clock using inversion."""
+    E = np.random.exponential(1.0)
+    term = E + (op_time_now / scale) ** k
+    next_op_time = scale * (term ** (1/k))
+    return next_op_time
+
+def run_test(v, a, b, state_max):
+    """
+    If there is an acceptable number of available systems when a test is conducted, 
+    then results are not punished, but if there are fewer than an acceptable number available, 
+    test scores are recorded are 0's are given for all short
+    """
+    test_size = np.random.randint(3, 5)
+    if v >= 5:
+        score = np.sum(np.random.binomial(test_size, a/(a+b), size=5))/(5*test_size)
+    else:
+        score = np.sum(np.random.binomial(test_size, a/(a+b), size=5)[:v])/(5*test_size)
+    return score
+    
+def test_log_at_interval(time_log, state_log, total_time, interval, state_max, a, b):
+    time_log = np.array(time_log)
+    state_log = np.array(state_log)
+    test_times = np.arange(interval, total_time+1, interval)
+    idxs = np.searchsorted(time_log, test_times, side='right') - 1
+    states_at_test_times = state_log[idxs]
+    test_time_state = dict(zip(test_times, states_at_test_times))        
+    return {k: run_test(v, a, b, state_max) for k, v in test_time_state.items()}
+
+def get_monthly_Ao(time_log, state_log, total_time, interval_size=720, threshold=5):
+
+    # Ensure logs are numpy arrays for efficient processing
+    time_log = np.array(time_log)
+    state_log = np.array(state_log)
+
+    # Generate the end times for each interval
+    interval_end_times = np.arange(interval_size, total_time + 1, interval_size)
+    
+    # If the last interval end time doesn't align with total_time, add total_time
+    if total_time not in interval_end_times:
+         interval_end_times = np.append(interval_end_times, total_time)
+
+
+    proportions_dict = {}
+
+    for i, interval_end in enumerate(interval_end_times):
+        interval_start = interval_end - interval_size if i > 0 else 0
+        # For the very first interval, the start is 0
+        if i == 0:
+            interval_start = 0
+
+        # Adjust the start for subsequent intervals based on the previous end time
+        if i > 0:
+            interval_start = interval_end_times[i-1]
+
+        actual_interval_duration = interval_end - interval_start
+        duration_above_threshold = 0
+
+        # Create pairs of (start_time, end_time) for each state's duration
+        event_times = np.append(time_log, total_time)
+
+        for j in range(len(state_log)):
+            # Check if the state is above the threshold
+            if state_log[j] > threshold:
+                event_start_time = event_times[j]
+                event_end_time = event_times[j + 1]
+
+                # Determine the overlap between the event's duration and the current interval
+                overlap_start = max(event_start_time, interval_start)
+                overlap_end = min(event_end_time, interval_end)
+                
+                duration = overlap_end - overlap_start
+
+                if duration > 0:
+                    duration_above_threshold += duration
+        
+        # Calculate the proportion for the current interval
+        if actual_interval_duration > 0:
+            proportion = duration_above_threshold / actual_interval_duration
+            proportions_dict[interval_end] = proportion
+        else:
+            proportions_dict[interval_end] = 0.0
+            
+    return proportions_dict
+
+
+def sim(total_time, state_max, lmda, k, mu):
+    """Wall = Main Clock; Op Clock = Clock for Breaks """
+    # Initial Params
+    wall_time = 0 # 
+    op_time = 0
+    state = state_max
+    
+    arrival_op_times = []
+    repair_wall_times = []
+    time_log = [0]
+    state_log = [state_max]
+
+    # Initialize failures for all components
+    for _ in range(state_max):
+        next_arrival = get_next_arrival_time(op_time, lmda, k)
+        heapq.heappush(arrival_op_times, next_arrival)
+
+    while wall_time < total_time:
+
+        
+        # Get next failure time
+        next_arrival_wall_time = float('inf')
+        if arrival_op_times and state > 0:
+            # The time to the next failure on the operational clock
+            op_time_to_arrival = arrival_op_times[0] - op_time
+            if op_time_to_arrival >= 0:
+                # Convert operational time to wall time
+                next_arrival_wall_time = wall_time + op_time_to_arrival
+
+        # Get next times from heap
+        next_repair_wall_time = repair_wall_times[0] if repair_wall_times else float('inf')
+        next_event_time = min(next_arrival_wall_time, next_repair_wall_time)
+        if next_event_time == float('inf') or next_event_time > total_time:
+            break
+
+        # Op --> There exists an operational component
+        if state > 0:
+            op_time += (next_event_time - wall_time)
+        wall_time = next_event_time
+        
+        is_arrival = (next_arrival_wall_time == next_event_time)
+        is_repair = (next_repair_wall_time == next_event_time)
+
+        # Update state information
+        if is_arrival:
+            state -= 1
+            heapq.heappop(arrival_op_times)
+            repair_duration = get_next_repair(mu)
+            heapq.heappush(repair_wall_times, wall_time + repair_duration)
+
+        elif is_repair:
+            state += 1
+            heapq.heappop(repair_wall_times)
+            next_arrival = get_next_arrival_time(op_time, lmda, k)
+            heapq.heappush(arrival_op_times, next_arrival)
+
+        # Log the state change
+        time_log.append(wall_time)
+        state_log.append(state)
+
+    return time_log, state_log
+
+def plot_quarterly_performance(results, title_q_text, output_path, sample_run_scores=None, REQ_LVL=85):
+    sorted_quarters = sorted(results.keys())
+    avg_scores = [results[q]['mean_score'] for q in sorted_quarters]
+    idx_array = np.array(sorted_quarters)
+    fig, ax = plt.subplots(figsize=(14, 7))
+    if sample_run_scores:
+        sample_quarters = sorted(sample_run_scores.keys())
+        sample_scores = [sample_run_scores[q] for q in sample_quarters]
+
+
+        """ If you want to change plot text change here:"""
+        
+        ax.plot(sample_quarters, np.array(sample_scores) * 100,
+                marker='.', linestyle='--', color='grey', alpha=0.4, label='Sample NHPP Simulation Run')
+    ax.plot(idx_array, np.array(avg_scores) * 100, 
+            marker='o', markersize=6, linestyle='-', color='blue', label='Average Score Across All Runs')
+    ax.set_title(title_q_text, fontsize=16, fontweight='bold')
+    ax.set_xlabel('Time', fontsize=12, fontweight='bold') # Changed label to be more general
+    ax.set_ylabel('Performance Score (%)', fontsize=12, fontweight='bold')
+
+
+
+    
+    ax.axhline(y=REQ_LVL, color='r', linestyle='--', label=f'Requirement Level: {REQ_LVL}%')
+    ax.grid(True, which='both', linestyle='--', linewidth=0.5)
+    ax.set_ylim(0, 105)
+    ax.set_xlim(left=0.5, right=max(idx_array) + 0.5)
+    
+
+    max_quarter = max(idx_array)
+    year_tick_locations = np.arange(4, max_quarter + 1, 4)
+    year_tick_labels = [f'Year {int(q/4)}' for q in year_tick_locations]
+    ax.set_xticks(year_tick_locations)
+    ax.set_xticklabels(year_tick_labels)
+    ax.xaxis.set_minor_locator(mticker.MultipleLocator(1))
+    
+    ax.legend(loc='lower left')
+    
+    # Save the plot
+    fig.tight_layout()
+    fig.savefig(output_path)
+    plt.close(fig) # Close the figure to free memory
+    print(f"Saved quarterly performance plot to: {output_path}")
+        
+def quarterly_data_sim(N):
+    hours=24*360*15
+    state_max = 6
+    MTTR = 9.004
+    Q = {}
+    with tqdm(total=len(score_groups)*N) as pbar:
+        for s in score_groups:
+            scale=lmda[s]
+            a, b = rrsp_params[s][0], rrsp_params[s][1]
+            full_time_log = {}
+            full_state_log = {}
+            full_test_log = {}
+            for n in range(N):
+                k = 1 + np.random.lognormal(-1, 1)
+                time_log, state_log = sim(hours, state_max, scale, k, MTTR)
+                test_log = test_log_at_interval(time_log, state_log, hours, 24*90, state_max, a, b)
+                full_time_log[n] = time_log
+                full_state_log[n] = state_log
+                full_test_log[n] = test_log
+                pbar.update(1)
+            Q[s] = {'time': full_time_log, 'state': full_state_log, 'test':full_test_log}
+    return Q
+
+def monthly_data_sim(N):
+    hours=24*360*15
+    state_max = 6
+    MTTR = 9.004
+    M = {}
+    with tqdm(total=len(score_groups)*N) as pbar:
+        for s in score_groups:
+            scale=lmda[s]
+            full_time_log = {}
+            full_state_log = {}
+            full_test_log = {}
+            for n in range(N):
+                k = 1 + np.random.lognormal(-1, 1)
+                time_log, state_log = sim(hours, state_max, scale, k, MTTR)
+                test_log = get_monthly_Ao(time_log, state_log, hours)
+                full_time_log[n] = time_log
+                full_state_log[n] = state_log
+                full_test_log[n] = test_log
+                pbar.update(1)
+            M[s] = {'time': full_time_log, 'state': full_state_log, 'test':full_test_log}
+    return M
+
+def create_aggregate_state_log(Q, time_step=24):
+    aggregated_dfs = {}
+
+    for s_group, data in Q.items():
+
+        max_time = 0
+        num_runs = len(data['time'])
+        for n in range(num_runs):
+            if data['time'][n][-1] > max_time:
+                max_time = data['time'][n][-1]
+        
+
+        time_grid = np.arange(0, max_time + time_step, time_step)
+        resampled_runs = []
+
+
+        for n in range(num_runs):
+            time_log = data['time'][n]
+            state_log = data['state'][n]
+            
+
+            indices = np.searchsorted(time_log, time_grid, side='right') - 1
+            
+
+            indices[indices < 0] = 0
+            resampled_state = np.array(state_log)[indices]
+            resampled_runs.append(resampled_state)
+
+        # --- 3. Aggregate Across All Runs ---
+        all_runs_stacked = np.vstack(resampled_runs)
+        
+        # Calculate statistics down the columns (axis=0)
+        mean_state = np.mean(all_runs_stacked, axis=0)
+        std_state = np.std(all_runs_stacked, axis=0)
+        q25_state = np.quantile(all_runs_stacked, 0.25, axis=0)
+        q75_state = np.quantile(all_runs_stacked, 0.75, axis=0)
+
+        df = pd.DataFrame({
+            'mean_state': mean_state,
+            'std_state': std_state,
+            'q25_state': q25_state, # 25th percentile (lower bound of IQR)
+            'q75_state': q75_state  # 75th percentile (upper bound of IQR)
+        }, index=time_grid)
+        
+        df.index.name = 'Time (Hours)'
+        aggregated_dfs[s_group] = df
+
+    return aggregated_dfs
+
+def analyze_simulation_data(Q):
+
+    aggregated_stats = {}
+    for s_group, data in Q.items():
+        run_avg_states = []
+        test_scores_by_time = {}
+        num_runs = len(data['time'])
+
+        for n in range(num_runs):
+            time_log = data['time'][n]
+            state_log = data['state'][n]
+            test_log = data['test'][n]
+
+            # time weighted average
+            time_diffs = np.diff(time_log)
+            time_weighted_state_sum = np.sum(state_log[:-1] * time_diffs)
+            total_time_in_run = time_log[-1] - time_log[0]
+            
+            if total_time_in_run > 0:
+                avg_state = time_weighted_state_sum / total_time_in_run
+                run_avg_states.append(avg_state)
+
+            # 2. collect all runs
+            for test_time, score in test_log.items():
+                if test_time not in test_scores_by_time:
+                    test_scores_by_time[test_time] = []
+                test_scores_by_time[test_time].append(score)
+
+        state_stats = {'mean_avg_state': np.mean(run_avg_states),'std_dev_avg_state': np.std(run_avg_states)}
+        
+        # Calculate mean and std dev for test scores at each interval
+        test_stats = {}
+        for test_time, scores in sorted(test_scores_by_time.items()):
+            test_stats[test_time] = {
+                'mean_score': np.mean(scores),
+                'std_dev_score': np.std(scores)
+            }
+        aggregated_stats[s_group] = {'state_statistics': state_stats,'test_score_statistics': test_stats}
+    return aggregated_stats
+
+def generate_and_save_plots(Q, title_text, cat_text):
+    """
+    Iterates through the simulation data (Q), aggregates test scores, and generates
+    and saves a quarterly performance plot for each score group.
+    """
+    # The directory where all plots will be saved.
+    base_plot_dir = "plots"
+    os.makedirs(base_plot_dir, exist_ok=True)
+    
+    if not Q:
+        return
+
+    for s_group, data in Q.items():
+        print(f'Getting {s_group}')
+        
+        num_runs = len(data['time'])
+        if num_runs == 0:
+            continue
+
+        # --- Aggregate test scores across all runs ---
+        test_scores_by_time = defaultdict(list)
+        for n in range(num_runs):
+            for test_time, score in data['test'][n].items():
+                test_scores_by_time[test_time].append(score)
+        
+        # Calculate average score for each test time (quarter)
+        avg_test_scores = {}
+        hours_per_quarter = 24 * 90 
+        for test_time, scores in test_scores_by_time.items():
+            quarter_num = int(round(test_time / hours_per_quarter))
+            if quarter_num > 0:
+                 avg_test_scores[quarter_num] = {
+                     'mean_score': np.mean(scores)
+                 }
+        
+        # Use the first run as a sample
+        sample_scores_dict = {}
+        if data['test']:
+            first_run_scores = data['test'][0]
+            for test_time, score in first_run_scores.items():
+                quarter_num = int(round(test_time / hours_per_quarter))
+                if quarter_num > 0:
+                    sample_scores_dict[quarter_num] = score
+
+        # --- Generate and save the plot ---
+        if avg_test_scores:
+            # Define output path directly in the 'plots' folder
+            plot_path = os.path.join(base_plot_dir, f"{s_group}_{cat_text}.png")
+            title = f"{title_text} for '{s_group}'"
+            
+            # Call the plotting function with the sample run data
+            plot_quarterly_performance(avg_test_scores, title, plot_path, sample_run_scores=sample_scores_dict)
+        else:
+            print(f"No test data found for group '{s_group}'")
+
+def write_agg_results(aggregated_results, output_path):
+    with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
+    
+        for s_group, data in aggregated_results.items():
+            sheet_name_str = "_".join(map(str, s_group))
+            if len(sheet_name_str) > 31:
+                sheet_name_str = sheet_name_str[:31]
+        
+            test_stats_dict = data['test_score_statistics']
+            df_to_save = pd.DataFrame.from_dict(test_stats_dict, orient='index')
+            df_to_save.index.name = 'Quarter'
+            df_to_save.to_excel(writer, sheet_name=sheet_name_str, index=True)
+        print(f"Successfully saved to {output_path}")
+
+def write_state_dfs(aggregate_state_dfs, output_path):
+    with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
+        for s_group, data in aggregate_state_dfs.items():
+            sheet_name_str = "_".join(map(str, s_group))
+            if len(sheet_name_str) > 31:
+                sheet_name_str = sheet_name_str[:31]
+            data.to_excel(writer, sheet_name=sheet_name_str, index=True)
+        print(f"Successfully saved to {output_path}")
+
+
+def write_sim_to_excel(simulation_data, filename="simulation_results.xlsx"):
+
+    try:
+        with pd.ExcelWriter(filename, engine='openpyxl') as writer:
+            for score_group, data in simulation_data.items():
+                num_simulations = len(data['time'])
+                all_dfs = []
+                for n in range(num_simulations):
+                    df_sim = pd.DataFrame({f'run_{n}_time': data['time'].get(n, []),f'run_{n}_state': data['state'].get(n, [])})
+                    test_log = data['test'].get(n, [])
+                    if isinstance(test_log, dict):
+                        df_test = pd.DataFrame(test_log.items(), columns=[f'run_{n}_test_key', f'run_{n}_test_value'])
+                    else:
+                        df_test = pd.DataFrame(test_log, columns=[f'run_{n}_test_log'])
+                    df_combined = pd.concat([df_sim, df_test], axis=1)
+                    all_dfs.append(df_combined)
+                final_df = pd.concat(all_dfs, axis=1)
+                sheet_name = str(score_group)[:31]
+                final_df.to_excel(writer, sheet_name=sheet_name, index=False)
+        print(f"Successfully wrote simulation results to '{filename}'")
+    except Exception as e:
+        print(f"An error occurred while writing to Excel: {e}")import numpy as np
+import pandas as pd
+
+output_dir = 'DESscores'
+os.makedirs(output_dir, exist_ok=True)
+
+GTA_stat_log_file_name = 'GTA_statistics_log.xlsx'
+GTA_aggregate_log_file_name = 'GTA_aggregate_log.xlsx'
+RRSP_stat_log_file_name = 'RRSP_statistics_log.xlsx'
+RRSP_aggregate_log_file_name = 'RRSP_aggregate_log.xlsx'
+RRSP_main = 'All_RRSP_data.xlsx'
+GTA_main = 'All_GTA_data.xlsx'
+
+output_path1 = os.path.join(output_dir, GTA_stat_log_file_name)
+output_path2 = os.path.join(output_dir, GTA_aggregate_log_file_name)
+output_path3 = os.path.join(output_dir, RRSP_stat_log_file_name)
+output_path4 = os.path.join(output_dir, RRSP_aggregate_log_file_name)
+output_RRSP = os.path.join(output_dir, RRSP_main)
+output_GTA = os.path.join(output_dir, GTA_main)
+
+Q = quarterly_data_sim(1)
+M = monthly_data_sim(1)
+aggregated_results_Q = analyze_simulation_data(Q)
+aggregated_results_M = analyze_simulation_data(M)
+aggregate_state_dfs_Q = create_aggregate_state_log(Q, time_step=24)
+aggregate_state_dfs_M = create_aggregate_state_log(M, time_step=24)
+
+import numpy as np
+import pandas as pd
+
+output_dir = 'DESscores'
+os.makedirs(output_dir, exist_ok=True)
+
+GTA_stat_log_file_name = 'GTA_statistics_log.xlsx'
+GTA_aggregate_log_file_name = 'GTA_aggregate_log.xlsx'
+RRSP_stat_log_file_name = 'RRSP_statistics_log.xlsx'
+RRSP_aggregate_log_file_name = 'RRSP_aggregate_log.xlsx'
+RRSP_main = 'All_RRSP_data.xlsx'
+GTA_main = 'All_GTA_data.xlsx'
+
+output_path1 = os.path.join(output_dir, GTA_stat_log_file_name)
+output_path2 = os.path.join(output_dir, GTA_aggregate_log_file_name)
+output_path3 = os.path.join(output_dir, RRSP_stat_log_file_name)
+output_path4 = os.path.join(output_dir, RRSP_aggregate_log_file_name)
+output_RRSP = os.path.join(output_dir, RRSP_main)
+output_GTA = os.path.join(output_dir, GTA_main)
+
+Q = quarterly_data_sim(1)
+M = monthly_data_sim(1)
+aggregated_results_Q = analyze_simulation_data(Q)
+aggregated_results_M = analyze_simulation_data(M)
+aggregate_state_dfs_Q = create_aggregate_state_log(Q, time_step=24)
+aggregate_state_dfs_M = create_aggregate_state_log(M, time_step=24)
+
+import numpy as np
+import pandas as pd
+
+output_dir = 'DESscores'
+os.makedirs(output_dir, exist_ok=True)
+
+GTA_stat_log_file_name = 'GTA_statistics_log.xlsx'
+GTA_aggregate_log_file_name = 'GTA_aggregate_log.xlsx'
+RRSP_stat_log_file_name = 'RRSP_statistics_log.xlsx'
+RRSP_aggregate_log_file_name = 'RRSP_aggregate_log.xlsx'
+RRSP_main = 'All_RRSP_data.xlsx'
+GTA_main = 'All_GTA_data.xlsx'
+
+output_path1 = os.path.join(output_dir, GTA_stat_log_file_name)
+output_path2 = os.path.join(output_dir, GTA_aggregate_log_file_name)
+output_path3 = os.path.join(output_dir, RRSP_stat_log_file_name)
+output_path4 = os.path.join(output_dir, RRSP_aggregate_log_file_name)
+output_RRSP = os.path.join(output_dir, RRSP_main)
+output_GTA = os.path.join(output_dir, GTA_main)
+
+Q = quarterly_data_sim(1)
+M = monthly_data_sim(1)
+aggregated_results_Q = analyze_simulation_data(Q)
+aggregated_results_M = analyze_simulation_data(M)
+aggregate_state_dfs_Q = create_aggregate_state_log(Q, time_step=24)
+aggregate_state_dfs_M = create_aggregate_state_log(M, time_step=24)
+import numpy as np
+import pandas as pd
+
+output_dir = 'DESscores'
+os.makedirs(output_dir, exist_ok=True)
+
+GTA_stat_log_file_name = 'GTA_statistics_log.xlsx'
+GTA_aggregate_log_file_name = 'GTA_aggregate_log.xlsx'
+RRSP_stat_log_file_name = 'RRSP_statistics_log.xlsx'
+RRSP_aggregate_log_file_name = 'RRSP_aggregate_log.xlsx'
+RRSP_main = 'All_RRSP_data.xlsx'
+GTA_main = 'All_GTA_data.xlsx'
+
+output_path1 = os.path.join(output_dir, GTA_stat_log_file_name)
+output_path2 = os.path.join(output_dir, GTA_aggregate_log_file_name)
+output_path3 = os.path.join(output_dir, RRSP_stat_log_file_name)
+output_path4 = os.path.join(output_dir, RRSP_aggregate_log_file_name)
+output_RRSP = os.path.join(output_dir, RRSP_main)
+output_GTA = os.path.join(output_dir, GTA_main)
+
+Q = quarterly_data_sim(1)
+M = monthly_data_sim(1)
+aggregated_results_Q = analyze_simulation_data(Q)
+aggregated_results_M = analyze_simulation_data(M)
+aggregate_state_dfs_Q = create_aggregate_state_log(Q, time_step=24)
+aggregate_state_dfs_M = create_aggregate_state_log(M, time_step=24)
+import numpy as np
+import pandas as pd
+
+output_dir = 'DESscores'
+os.makedirs(output_dir, exist_ok=True)
+
+GTA_stat_log_file_name = 'GTA_statistics_log.xlsx'
+GTA_aggregate_log_file_name = 'GTA_aggregate_log.xlsx'
+RRSP_stat_log_file_name = 'RRSP_statistics_log.xlsx'
+RRSP_aggregate_log_file_name = 'RRSP_aggregate_log.xlsx'
+RRSP_main = 'All_RRSP_data.xlsx'
+GTA_main = 'All_GTA_data.xlsx'
+
+output_path1 = os.path.join(output_dir, GTA_stat_log_file_name)
+output_path2 = os.path.join(output_dir, GTA_aggregate_log_file_name)
+output_path3 = os.path.join(output_dir, RRSP_stat_log_file_name)
+output_path4 = os.path.join(output_dir, RRSP_aggregate_log_file_name)
+output_RRSP = os.path.join(output_dir, RRSP_main)
+output_GTA = os.path.join(output_dir, GTA_main)
+
+Q = quarterly_data_sim(1)
+M = monthly_data_sim(1)
+aggregated_results_Q = analyze_simulation_data(Q)
+aggregated_results_M = analyze_simulation_data(M)
+aggregate_state_dfs_Q = create_aggregate_state_log(Q, time_step=24)
+aggregate_state_dfs_M = create_aggregate_state_log(M, time_step=24)
+
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import numpy as np
+import warnings
+from matplotlib import cm
+from matplotlib.colors import ListedColormap
+import numpy as np
+
+
+warnings.filterwarnings('ignore')
+SV_column_name = 'SV'
+ST_column_name = 'ST'
+n_bins = 20  # number of bins for days
+
+SV_list = df[SV_column_name].unique()
+ST_list = df[ST_column_name].unique()
+
+# assign consistent colors to each ST
+
+base_cmap = cm.get_cmap('gist_rainbow', 20) 
+colors = base_cmap(np.arange(20))
+np.random.shuffle(colors)
+
+    
+st_color_dict = dict(zip(ST_list, colors))
+
+# grid layout
+n_sv = len(SV_list)
+n_cols = 2
+n_rows = int(np.ceil(n_sv / n_cols))
+
+fig, axes = plt.subplots(n_rows, n_cols, figsize=(12, 4*n_rows), sharex=True, sharey=True)
+axes = axes.flatten()
+
+# collect handles for legend
+all_handles = {}
+for i, sv in enumerate(SV_list):
+    ax = axes[i]
+    subset_sv = df[df[SV_column_name] == sv]
+    
+    for st in ST_list:
+        subset_st = subset_sv[subset_sv[ST_column_name] == st]
+        if subset_st.empty:
+            continue
+        
+        subset_st = subset_st.copy()
+        subset_st["x_bin"] = pd.qcut(subset_st["num_days"], n_bins, duplicates='drop')
+        quant_df = subset_st.groupby("x_bin")["Score"].quantile([0.25,0.5,0.75]).unstack()
+        quant_df.columns = ["q25","q50","q75"]
+        quant_df["x_center"] = quant_df.index.map(lambda b: b.mid)
+        
+        color = st_color_dict[st]
+        line, = ax.plot(quant_df["x_center"], quant_df["q50"], color=color)
+        ax.fill_between(quant_df["x_center"], quant_df["q25"], quant_df["q75"], alpha=0.2, color=color)
+        
+        # store handle for legend
+        if st not in all_handles:
+            all_handles[st] = line
+    
+    ax.set_title(f"{sv}: All System Timing Scores")
+    ax.set_xlabel("Days since first observation")
+    ax.set_ylabel("Score")
+
+# remove unused axes
+for j in range(i+1, n_rows*n_cols):
+    fig.delaxes(axes[j])
+
+# one legend for all subplots
+fig.legend(all_handles.values(), all_handles.keys(), title="ST", bbox_to_anchor=(1.05, 0.95), loc="upper left")
+plt.tight_layout()
+plt.show()import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+
+pd.set_option('display.width', 1000)
+SV_column_name = 'SV'
+ST_column_name = 'ST'
+
+results_list = []
+
+# loop over SVs
+for sv in df[SV_column_name].unique():
+    subset_sv = df[df[SV_column_name] == sv]
+    
+    # you could include multiple predictors; here we just use num_days
+    model = smf.rlm("Score ~ num_days", data=subset_sv).fit()
+    
+    # store key statistics
+    results_list.append({
+        "SV": sv,
+        "coef_num_months": 30*model.params.get("num_days", float("nan")),
+        "intercept": model.params.get("Intercept", float("nan")),
+        "std_err": model.bse.get("num_days", float("nan")),
+        "p_value": model.pvalues.get("num_days", float("nan")),
+    })
+
+
+ols_table = pd.DataFrame(results_list)
+print('Aggregate OLS:\n\n', ols_table, '\n\n')
+
+SV_column_name = 'SV'
+ST_column_name = 'ST'
+
+results_list = []
+
+
+for (sv, st), group in df.groupby([SV_column_name, ST_column_name]):
+
+
+    model = smf.rlm("Score ~ num_days", data=group).fit()
+    ci = model.conf_int().loc["num_days"]
+    
+    results_list.append({
+        "SV": sv,
+        "ST": st,
+        "coef_num_months": 30*model.params.get("num_days", float("nan")),
+        "intercept": model.params.get("Intercept", float("nan")),
+        "std_err": model.bse.get("num_days", float("nan")),
+        "p_value": model.pvalues.get("num_days", float("nan")),
+        "L 95% CI": ci[0],
+        "U 95% CI": ci[1]
+    })
+
+# convert to DataFrame
+ols_table = pd.DataFrame(results_list).sort_values(by='p_value', ascending=True)
+print('Granular OLS Sorted by P-value:\n\n',ols_table)
+print('\nNegative coef --> Improvement in performance over time')
+print('P-value > 0.05 --> No strong evidence to support there is change over time')Aggregate OLS:
+
+       SV  coef_num_months  intercept   std_err   p_value
+0   SV-6         0.003327   5.414222  0.000902  0.902182
+1  SV-44         0.015492   4.978996  0.000872  0.553894
+2  SV-10         0.027642   5.520447  0.001038  0.374723
+3  SV-24         0.027642   5.520447  0.001038  0.374723
+4  SV-21         0.027642   5.520447  0.001038  0.374723
+5  SV-15         0.027642   5.520447  0.001038  0.374723 
+
+
+Granular OLS Sorted by P-value:
+
+        SV                 ST  coef_num_months  intercept   std_err   p_value  L 95% CI  U 95% CI
+10  SV-44        Wooden Skid         0.065686   4.767968  0.001812  0.227013 -0.001363  0.005742
+13   SV-6            Compass        -0.067099   6.294726  0.001954  0.252472 -0.006067  0.001594
+12   SV-6              Clock         0.033064   4.588694  0.001724  0.522732 -0.002278  0.004482
+0   SV-10  Carbon Fiber Skid         0.027642   5.520447  0.001802  0.609186 -0.002611  0.004454
+1   SV-10     Present Loader         0.027642   5.520447  0.001802  0.609186 -0.002611  0.004454
+2   SV-15  Carbon Fiber Skid         0.027642   5.520447  0.001802  0.609186 -0.002611  0.004454
+3   SV-15     Present Loader         0.027642   5.520447  0.001802  0.609186 -0.002611  0.004454
+4   SV-21  Carbon Fiber Skid         0.027642   5.520447  0.001802  0.609186 -0.002611  0.004454
+5   SV-21     Present Loader         0.027642   5.520447  0.001802  0.609186 -0.002611  0.004454
+6   SV-24  Carbon Fiber Skid         0.027642   5.520447  0.001802  0.609186 -0.002611  0.004454
+7   SV-24   Heads-up Display         0.027642   5.520447  0.001802  0.609186 -0.002611  0.004454
+9   SV-44     Wooden Chassis         0.018799   4.967739  0.001725  0.716378 -0.002754  0.004007
+8   SV-44          Roof Rope        -0.017779   5.095413  0.001770  0.737752 -0.004062  0.002876
+11   SV-6          Astrolabe         0.014498   5.299110  0.001733  0.780394 -0.002914  0.003881
+
+Negative coef --> Improvement in performance over time
+P-value > 0.05 --> No strong evidence to support there is change over timeimport pandas as pd
+import numpy as np
+import statsmodels.formula.api as smf
+import matplotlib.pyplot as plt
+from scipy.stats import boxcox
+import statsmodels.api as sm
+
+SV_column_name = 'SV'
+ST_column_name = 'ST'
+
+results_list = []
+qq_residuals = []
+
+for (sv, st), group in df.groupby([SV_column_name, ST_column_name]):
+
+    # Apply a Boxcox transformation to account for high variance 
+    y = group["Score"].values
+    y_shifted = y - y.min() + 1e-6  
+    y_boxcox, lambda_bc = boxcox(y_shifted)
+    
+    group_bc = group.copy()
+    group_bc["Score_boxcox"] = y_boxcox
+
+    # RLM 
+    model_bc = smf.rlm("Score_boxcox ~ num_days", data=group_bc).fit()
+
+    # Get inverse transformed data for results display
+    x0 = 0
+    x1 = 30  # 30 days
+    y0_pred = model_bc.predict(pd.DataFrame({"num_days": [x0]}))[0]
+    y1_pred = model_bc.predict(pd.DataFrame({"num_days": [x1]}))[0]
+
+    # This logic is required as a part of the mathematical function
+    if lambda_bc == 0:
+        y0_orig = np.exp(y0_pred)
+        y1_orig = np.exp(y1_pred)
+    else:
+        y0_orig = np.power(y0_pred * lambda_bc + 1, 1/lambda_bc) + y.min() - 1e-6
+        y1_orig = np.power(y1_pred * lambda_bc + 1, 1/lambda_bc) + y.min() - 1e-6
+
+    delta_30days = y1_orig - y0_orig  
+
+
+    ci_boxcox = model_bc.conf_int().loc["num_days"]
+    results_list.append({
+        "SV": sv,
+        "ST": st,
+        "delta_30days": delta_30days,
+        "intercept_boxcox": model_bc.params["Intercept"],
+        "std_err_boxcox": model_bc.bse["num_days"],
+        "p_value_boxcox": model_bc.pvalues["num_days"],
+        "L 95% CI (boxcox)": ci_boxcox[0],
+        "U 95% CI (boxcox)": ci_boxcox[1],
+        "lambda_bc": lambda_bc
+    })
+
+
+    qq_residuals.append((f"{sv}-{st}", model_bc.resid))
+
+
+results_df = pd.DataFrame(results_list).sort_values(by='p_value_boxcox', ascending=True)
+print("Granular RLM + Box-Cox Results:\n")
+print(results_df)
+
+
+n_plots = len(qq_residuals)
+n_cols = 4
+n_rows = (n_plots + n_cols - 1) // n_cols
+
+plt.figure(figsize=(4*n_cols, 4*n_rows))
+for i, (label, resid) in enumerate(qq_residuals, start=1):
+    ax = plt.subplot(n_rows, n_cols, i)
+    sm.qqplot(resid, line='45', ax=ax)
+    ax.set_title(label)
+plt.tight_layout()
+plt.show()Granular RLM + Box-Cox Results:
+
+       SV                 ST  delta_30days  intercept_boxcox  std_err_boxcox  p_value_boxcox  L 95% CI (boxcox)  U 95% CI (boxcox)  lambda_bc
+10  SV-44        Wooden Skid      0.075660          2.443745        0.001148        0.190166          -0.000746           0.003754   0.648974
+13   SV-6            Compass     -0.077732          2.892674        0.001216        0.211232          -0.003903           0.000863   0.667358
+0   SV-10  Carbon Fiber Skid      0.035705          2.053079        0.001069        0.538095          -0.001437           0.002753   0.566340
+1   SV-10     Present Loader      0.035705          2.053079        0.001069        0.538095          -0.001437           0.002753   0.566340
+2   SV-15  Carbon Fiber Skid      0.035705          2.053079        0.001069        0.538095          -0.001437           0.002753   0.566340
+3   SV-15     Present Loader      0.035705          2.053079        0.001069        0.538095          -0.001437           0.002753   0.566340
+4   SV-21  Carbon Fiber Skid      0.035705          2.053079        0.001069        0.538095          -0.001437           0.002753   0.566340
+5   SV-21     Present Loader      0.035705          2.053079        0.001069        0.538095          -0.001437           0.002753   0.566340
+6   SV-24  Carbon Fiber Skid      0.035705          2.053079        0.001069        0.538095          -0.001437           0.002753   0.566340
+7   SV-24   Heads-up Display      0.035705          2.053079        0.001069        0.538095          -0.001437           0.002753   0.566340
+12   SV-6              Clock      0.029202          1.376866        0.000960        0.576303          -0.001345           0.002419   0.447392
+11   SV-6          Astrolabe      0.020322          2.009709        0.001096        0.721954          -0.001758           0.002538   0.585245
+8   SV-44          Roof Rope     -0.018228          2.847745        0.001191        0.751304          -0.002712           0.001957   0.696321
+9   SV-44     Wooden Chassis      0.006526          2.589633        0.001062        0.908019          -0.001959           0.002205   0.627911

@@ -1,0 +1,602 @@
+Max Flow Programs 
+
+def max_flow(G: nx.DiGraph, s, t):
+    model = pyo.ConcreteModel()
+    # Sets, Params, Vars
+    model.N = pyo.Set(initialize=list(G.nodes))
+    model.A = pyo.Set(initialize=list(G.edges), dimen=2)
+    cap = {(i, j): G[i][j].get('capacity') for (i, j) in G.edges}
+    model.cap = pyo.Param(model.A,initialize=cap,within=pyo.NonNegativeReals)
+    model.x = pyo.Var(
+        model.A, domain=pyo.NonNegativeReals,
+        initialize=lambda m, i,j: random.uniform(0, m.cap[i,j]) 
+    )
+
+    # Objective: Maximize flow through the graph 
+    def max_flow_obj(m):
+        outflow = sum(m.x[s, j] for (s2, j) in m.A if s2 == s)
+        inflow = sum(m.x[i, s] for (i, s2) in m.A if s2 == s)
+        return outflow - inflow
+    
+    # Constraint: Capacity 
+    def capacity_UB(m, i, j):
+        return m.x[i, j] <= m.cap[i, j]
+
+    # Constraint: Flow Balance
+    def flow_balance(m, v):
+        if v == s or v == t:
+            return pyo.Constraint.Skip
+
+        inflow = sum(m.x[i, v] for (i, v2) in m.A if v2 == v)
+        outflow = sum(m.x[v, j] for (v2, j) in m.A if v2 == v)
+        return inflow - outflow == 0
+    
+    model.obj = pyo.Objective(rule=max_flow_obj, sense=pyo.maximize)
+    model.capacity = pyo.Constraint(model.A, rule=capacity_UB)
+    model.flow_conservation = pyo.Constraint(model.N,rule=flow_balance)
+    return model
+
+def optimal_face_dimension(R):
+    # weakly connected components --> Need to be to consider cycles
+    components = nx.number_weakly_connected_components(R)
+    V = R.number_of_nodes()
+    E = R.number_of_edges()
+    return E - V + components
+
+
+def num_SCC(R):
+    # Count of Strongly Connected Components --> A residual graph cycle indicator
+    return nx.number_strongly_connected_components(R)
+
+def do_alt_optima_exist(R):
+    return not nx.is_directed_acyclic_graph(R)
+
+def classify_arcs(G, flow):
+    _, S, T = get_ST_sets(subG, flow, s=10)
+    cut_edges = [(i, j) for (i, j) in subG.edges if i in S and j in T]
+    for (i, j) in G.edges:
+        if flow[(i,j)] == G[i][j]['capacity'] and (i,j) in cut_edges:
+            category = "essential"
+        elif flow[(i,j)] > 0:
+            category = "flexible"
+        else:
+            category = "never used"
+
+model = max_flow(subG, s=7, t=8)
+results = pyo.SolverFactory('appsi_highs').solve(model, tee=True)
+results.write()
+flow = {(i, j): pyo.value(model.x[i, j]) for (i, j) in model.A}
+
+R, S, T = get_ST_sets(subG, flow, s=10)
+do_alt_optima_exist(R)
+
+
+essential_edges = [(i, j) for (i, j) in subG.edges if i in S and j in T]
+essential_nodes = list(set(u for (u, v) in essential_edges) | set(v for (u, v) in essential_edges))
+
+#sum(G[u][v]["capacity"] for (u, v) in cut_edges)
+
+
+
+
+
+###################################
+
+
+import pyomo.environ as pyo
+import time
+
+def all_max_flow(model, solver_name='appsi_highs', max_iter=1000, tol=1e-6):
+    alternative_supports = []  # store support patterns only
+    objective_values = []
+    total_start = time.time()
+
+    # Sets of used edges to conserve memory
+    always_used = None
+    never_used = None
+
+    for t in range(max_iter):
+        if t % 100 == 0 and t > 0:
+            time_100 = time.time()
+            print(f"Iteration {t}, Total Time: {time_100 - total_start:.2f} seconds")
+        results = pyo.SolverFactory(solver_name).solve(model)
+
+        # Break --> All optimal solutions found
+        if results.solver.termination_condition != pyo.TerminationCondition.optimal:
+            break
+
+        # Identify support edges
+        support_edges = tuple(sorted(e for e in model.A if pyo.value(model.x[e]) > tol))
+        if not support_edges:
+            break
+
+        # Store support instead of full flow
+        alternative_supports.append(support_edges)
+        objective_values.append(pyo.value(model.obj))
+
+        # Update essential edges --> Essential for large graphs
+        if t == 0:
+            always_used = set(support_edges)
+            never_used = set(model.A) - set(support_edges)
+        else:
+            always_used &= set(support_edges)
+            never_used &= set(model.A) - set(support_edges)
+
+        # Add constraint to exclude current support
+        constraint_name = f'exclude_flow_{t}'
+        model.add_component(
+            constraint_name,
+            pyo.Constraint(expr=sum(model.x[e] for e in support_edges) <= len(support_edges) - tol)
+        )
+
+    end_time = time.time()
+    print(f"Total time for {t+1} iterations: {end_time - total_start:.2f} seconds")
+
+    return alternative_supports, objective_values
+
+
+
+model = max_flow(subG, s=10, t=11)
+results = pyo.SolverFactory('appsi_highs')
+flow = {(i, j): pyo.value(model.x[i, j]) for (i, j) in model.A}
+#alternative_flows, obj_values = all_max_flow(model)
+
+
+
+
+##################################################
+
+
+import networkx as nx
+from collections import deque
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
+import random, copy, math
+import numpy as np
+from sklearn.cluster import KMeans
+
+
+
+
+
+def bfs(residual, s, t):
+    parent = {s: None}
+    q = deque([s])
+
+    added_nodes = [] 
+    
+    while q:
+        u = q.popleft()
+        for v in residual[u]:
+            if v not in parent and residual[u][v]['capacity'] > 0:
+                parent[v] = u
+                added_nodes.append(v)  
+                if v == t:
+                    return parent, added_nodes
+                q.append(v)
+    return None, added_nodes
+
+
+def ford_fulkerson_steps(G, s, t):
+    residual = nx.DiGraph()
+    for u, v, data in G.edges(data=True):
+        residual.add_edge(u, v, capacity=data['capacity'])
+        residual.add_edge(v, u, capacity=0)
+
+    steps = []
+    flow = 0
+
+    while True:
+        parent, added_nodes = bfs(residual, s, t)
+        if parent is None:
+            break
+        removed_nodes = list(parent.keys())
+
+        path = []
+        bottleneck = float('inf')
+        v = t
+        while v != s:
+            u = parent[v]
+            path.append((u, v))
+            bottleneck = min(bottleneck, residual[u][v]['capacity'])
+            v = u
+        path.reverse()
+
+        for u, v in path:
+            residual[u][v]['capacity'] -= bottleneck
+            residual[v][u]['capacity'] += bottleneck
+
+        flow += bottleneck
+
+        steps.append({
+            'path': path,
+            'flow': bottleneck,
+            'residual': copy.deepcopy(residual),
+            'total_flow': flow,
+            'added_nodes': added_nodes,
+            'removed_nodes': removed_nodes
+        })
+
+    return steps
+
+
+
+def draw_step(G, step, pos, step_num):
+    plt.figure(figsize=(7, 5))
+
+    residual = step['residual']
+    path_edges = set(step['path'])
+
+    edge_labels = {}
+    edge_colors = []
+
+    for u, v in G.edges():
+        cap = residual[u][v]['capacity']
+        edge_labels[(u, v)] = cap
+        edge_colors.append('red' if (u, v) in path_edges else 'black')
+
+    nx.draw(
+        G, pos,
+        with_labels=True,
+        edge_color=edge_colors,
+        node_size=2000,
+        node_color='lightgray',
+        width=2
+    )
+
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+
+    plt.show()
+    return True
+
+
+prev_path_nodes = set()  # start empty
+
+
+def ensure_st_path_directed(G, s, t, cap_range=(5, 10)):
+    if not nx.has_path(G, s, t):
+        # Use BFS/DFS on undirected version to find a path
+        UG = G.to_undirected()
+        path = nx.shortest_path(UG, s, t)
+        for u, v in zip(path[:-1], path[1:]):
+            # Add edge in the "correct" direction if missing
+            if not G.has_edge(u, v):
+                G.add_edge(u, v, capacity=random.randint(*cap_range))
+            # Also optionally add reverse edge to keep BFS exploring options
+            if not G.has_edge(v, u):
+                G.add_edge(v, u, capacity=0)
+    return G
+
+def layered_layout(G, s, t):
+    levels = {}
+    visited = {s}
+    queue = [(s, 0)]
+
+    while queue:
+        node, level = queue.pop(0)
+        levels[node] = level
+        for neighbor in G.successors(node):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append((neighbor, level + 1))
+
+    pos = {}
+    layer_counts = {}
+    for node, level in levels.items():
+        layer_counts[level] = layer_counts.get(level, 0) + 1
+
+    layer_positions = {}
+    for level, count in layer_counts.items():
+        xs = list(range(count))
+        layer_positions[level] = xs
+
+    layer_indices = {}
+    for node, level in levels.items():
+        idx = layer_positions[level].pop(0)
+        pos[node] = (level, idx)
+
+    return pos
+
+def update(frame):
+    global prev_path_nodes
+    ax.clear()
+    step = steps[frame]
+
+    # Current augmenting path nodes
+    current_path_nodes = set(u for edge in step['path'] for u in edge)
+
+    # Compute added / removed nodes
+    added_nodes = current_path_nodes - prev_path_nodes
+    removed_nodes = prev_path_nodes - current_path_nodes
+
+    # Update previous path nodes for next iteration
+    prev_path_nodes = current_path_nodes.copy()
+
+    # Draw the network nodes
+    nx.draw_networkx_nodes(G, pos, node_size=300, node_color='lightgray', ax=ax)
+    nx.draw_networkx_nodes(G, pos, nodelist=added_nodes, node_color='cyan', node_size=400, ax=ax, label='Added node')
+    nx.draw_networkx_nodes(G, pos, nodelist=removed_nodes, node_color='orange', node_size=400, ax=ax, label='Removed node')
+    nx.draw_networkx_nodes(G, pos, nodelist=[s], node_color='lightgreen', node_size=500, ax=ax, label='Source (s)')
+    nx.draw_networkx_nodes(G, pos, nodelist=[t], node_color='salmon', node_size=500, ax=ax, label='Sink (t)')
+    nx.draw_networkx_labels(G, pos, ax=ax)
+
+    # Draw edges (forward, reverse, augmenting)
+    path_edges = set(step['path'])
+    forward_edges = [(u, v) for u, v in G.edges() if (u, v) not in path_edges]
+    reverse_edges = [(u, v) for u, v in step['residual'].edges() if (u, v) not in G.edges() and step['residual'][u][v]['capacity'] > 0]
+
+    nx.draw_networkx_edges(G, pos, edgelist=forward_edges, edge_color='black', width=2, ax=ax)
+    nx.draw_networkx_edges(G, pos, edgelist=reverse_edges, edge_color='mediumblue', style='dashed', width=2, ax=ax)
+    nx.draw_networkx_edges(G, pos, edgelist=list(path_edges), edge_color='red', width=3, ax=ax)
+
+    # Draw edge labels
+    edge_labels = {(u, v): step['residual'][u][v]['capacity'] for u, v in G.edges()}
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, ax=ax)
+
+    # Flow info text
+    flow_text_str = (
+        f"Step: {frame+1}\n"
+        f"Increased Flow: {step['flow']} | Total Flow: {step['total_flow']}\n"
+        f"Added nodes: {list(added_nodes)}\n"
+        f"Removed nodes: {list(removed_nodes)}"
+    )
+    ax.text(0.015, 0.72, flow_text_str, transform=ax.transAxes, fontsize=10,
+            verticalalignment='bottom', bbox=dict(boxstyle="round,pad=0.4", fc="white", alpha=0.85))
+
+    ax.set_title("Ford–Fulkerson (Edmonds–Karp)")
+    ax.axis('off')
+    ax.legend(handles=legend_elements, loc='upper left', frameon=True, framealpha=0.85, fontsize=10)
+    return True
+
+
+
+def generate_multipartite_graph(layer_sizes, edge_prob=0.5, directed=True):
+    """
+    Generate a k-partite graph.
+    
+    Parameters
+    ----------
+    layer_sizes : list[int]
+        Number of nodes in each layer.
+    edge_prob : float
+        Probability of an edge between nodes in consecutive layers.
+    directed : bool
+        Whether the graph is directed (default True)
+    
+    Returns
+    -------
+    G : networkx.DiGraph or Graph
+        Multipartite graph with 'subset' attribute per node.
+    """
+    G = nx.DiGraph() if directed else nx.Graph()
+    
+    node_counter = 0
+    layers = []
+    
+    for subset, size in enumerate(layer_sizes):
+        layer_nodes = list(range(node_counter, node_counter + size))
+        for n in layer_nodes:
+            G.add_node(n, subset=subset)
+        layers.append(layer_nodes)
+        node_counter += size
+    
+    # Connect nodes between consecutive layers
+    for i in range(len(layers)-1):
+        for u in layers[i]:
+            for v in layers[i+1]:
+                if random.random() < edge_prob:
+                    G.add_edge(u, v)
+    
+    return G
+
+layer_sizes = [1, 2, 5, 3, 3, 1]  
+G = generate_multipartite_graph(layer_sizes, edge_prob=0.8)
+
+pos = nx.multipartite_layout(G, subset_key='subset', align='vertical', scale=2)
+
+subset0 = [n for n, d in G.nodes(data=True) if d['subset']==0]
+subsetk = [n for n, d in G.nodes(data=True) if d['subset']==len(layer_sizes)-1]
+s = random.choice(subset0)
+t = random.choice(subsetk)
+
+G = ensure_st_path_directed(G, s, t)
+for u, v in G.edges():
+    G[u][v]['capacity'] = random.randint(5, 10)
+
+
+steps = ford_fulkerson_steps(G, s, t)
+if not steps:
+    raise ValueError("No augmenting path found — animation aborted.")
+
+fig, ax = plt.subplots(figsize=(14, 11))
+legend_elements = [
+    Line2D([0], [0], color='red', lw=2, label='Augmenting path'),
+    Line2D([0], [0], color='black', lw=2, label='Forward edge'),
+    Line2D([0], [0], color='blue', lw=2, linestyle='--', label='Reverse edge'),
+    Patch(facecolor='lightgreen', label='Source (s)'),
+    Patch(facecolor='salmon', label='Sink (t)'),
+    Patch(facecolor='cyan', label='Added node'),
+    Patch(facecolor='orange', label='Removed node')
+]
+ani = FuncAnimation(
+    fig,
+    update,
+    frames=len(steps),
+    interval=1500,
+    repeat=False
+)
+ani.save(
+    "ford_fulkerson_steps.gif",
+    writer="pillow",
+    fps=0.2
+)
+plt.show()
+
+
+
+from scipy.stats import gamma
+
+def log_prior(k, lam):
+    if k <= 0 or lam <= 0:
+        return -np.inf
+    return (
+        gamma.logpdf(k, a=2, scale=1) +
+        gamma.logpdf(lam, a=2, scale=1)
+    )
+
+def log_likelihood(k, lam, data):
+    if k <= 0 or lam <= 0:
+        return -np.inf
+    
+    return np.sum(
+        np.log(k/lam) +
+        (k-1)*np.log(data/lam) -
+        (data/lam)**k
+    )
+
+def log_posterior(theta, data):
+    k, lam = theta
+    return log_likelihood(k, lam, data) + log_prior(k, lam)
+
+
+def metropolis_2d(data, n_samples=10000, proposal_sd=0.1):
+    
+    samples = np.zeros((n_samples, 2))
+    
+    theta_current = np.array([2.0, 10.0])
+    
+    for i in range(n_samples):
+        
+        # multiplicative log-normal proposal
+        proposal = theta_current * np.exp(
+            np.random.normal(0, proposal_sd, size=2)
+        )
+        
+        log_ratio = (
+            log_posterior(proposal, data)
+            - log_posterior(theta_current, data)
+        )
+        
+        if np.log(np.random.rand()) < log_ratio:
+            theta_current = proposal
+            
+        samples[i] = theta_current
+    
+    return samples
+
+
+samples = metropolis_2d(data)
+
+burn = 2000
+posterior = samples[burn:]
+
+k_post = posterior[:,0]
+lam_post = posterior[:,1]
+
+t_grid = np.linspace(0.01, data.max()*1.5, 200)
+R_samples = np.zeros((len(k_post), len(t_grid)))
+
+for i in range(len(k_post)):
+    k = k_post[i]
+    lam = lam_post[i]
+    R_samples[i,:] = np.exp(-(t_grid/lam)**k)
+
+R_lower = np.percentile(R_samples, 2.5, axis=0)
+R_median = np.percentile(R_samples, 50, axis=0)
+R_upper = np.percentile(R_samples, 97.5, axis=0)
+
+plt.figure()
+
+plt.fill_between(t_grid, R_lower, R_upper, alpha=0.3)
+plt.plot(t_grid, R_median, label="Posterior median")
+
+# True reliability curve (since we simulated)
+R_true = np.exp(-(t_grid/lam_true)**k_true)
+plt.plot(t_grid, R_true, linestyle='--', label="True")
+
+plt.xlabel("Time")
+plt.ylabel("Reliability R(t)")
+plt.legend()
+plt.title("Posterior Reliability Curve with 95% Bands")
+plt.show()
+
+
+print("Posterior mean k:", k_post.mean())
+print("True k:", k_true)
+
+print("Posterior mean λ:", lam_post.mean())
+print("True λ:", lam_true)
+
+plt.figure()
+plt.hist(k_post, bins=40, density=True)
+plt.axvline(k_true)
+plt.title("Posterior of k")
+plt.show()
+
+plt.figure()
+plt.hist(lam_post, bins=40, density=True)
+plt.axvline(lam_true)
+plt.title("Posterior of λ")
+plt.show()
+
+
+
+
+plt.figure()
+plt.scatter(k_post, lam_post, alpha=0.2, s=5)
+plt.xlabel("k")
+plt.ylabel("λ")
+plt.title("Joint Posterior")
+plt.show()
+
+
+
+
+
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import chi2
+from scipy.stats import multivariate_normal
+
+mean = np.mean(posterior, axis=0)
+cov = np.cov(posterior.T)
+
+levels = [
+    chi2.ppf(0.50, df=2),
+    chi2.ppf(0.90, df=2),
+    chi2.ppf(0.95, df=2)
+]
+
+
+k_grid = np.linspace(k_post.min(), k_post.max(), 200)
+lam_grid = np.linspace(lam_post.min(), lam_post.max(), 200)
+
+K, L = np.meshgrid(k_grid, lam_grid)
+pos = np.dstack((K, L))
+
+rv = multivariate_normal(mean, cov)
+Z = rv.pdf(pos)
+
+plt.figure()
+plt.scatter(k_post, lam_post, alpha=0.1, s=5)
+
+plt.contour(K, L, Z,
+            levels=sorted(np.max(Z)*np.exp(-np.array(levels)/2)),
+            colors=['red','orange','green'])
+
+plt.xlabel("k")
+plt.ylabel("lambda")
+plt.title("Joint Posterior Credible Regions (Gaussian Approx)")
+plt.show()
+
+
+
+
+
+
+
+
