@@ -7,8 +7,9 @@ def mcf_obj(m):
 
 def mf_obj(m):
     S = [n for n in m.nodes if m.demand < 0]
+    T = [n for n in m.nodes if m.demand > 0]
     outflow = sum(sum(m.x[s, j] for (s2, j) in m.A if s2 == s) for s in S)
-    inflow = sum(sum(m.x[i, s] for (i, s2) in m.A if s2 == s) for s in S)
+    inflow = sum(sum(m.x[i, t] for (i, t2) in m.A if t2 == t) for t in T)
     return outflow - inflow
 
 def edge_cap_rule(m, u, v):

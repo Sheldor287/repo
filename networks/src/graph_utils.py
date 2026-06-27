@@ -126,6 +126,8 @@ def assign_properties(G, layer_sizes, constant_capacity=False, layer_role_assign
         G.nodes[n]['probability1'] = np.random.uniform(0.6, 1)
         G.nodes[n]['probability2'] = np.random.uniform(0.6, 1)
         G.nodes[n]['cost'] = np.random.randint(1, 10)
+        G.nodes[n]['loc_region'] = (-5,5)
+        G.nodes[n]['loc'] = (np.random.uniform(-5, 5), np.random.uniform(-5,5))
         if G.nodes[n]['layer'] in [3, 4]:
                 G.nodes[n]['probability1'] = 0.99
                 G.nodes[n]['probability2'] = 0.99
