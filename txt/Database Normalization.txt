@@ -1,0 +1,84 @@
+Primary key: A set of columns that serve as unique identification 
+
+First Normal Form:
+
+-NO: using row order to convey information
+-NO: mixing data types in the same column 
+-NO: tables without primary keys (pseudo unique id)
+-NO: repeated groups (string text that specify a variable number of quantities)
+
+
+Second Normal Form:
+
+-NO: deletion, update, insertion anomalies 
+-- Deletion: When a row is updated {value --> 0}, the row is deleted. This is problem when there are other columns that are independent of that deletion 
+-- Update: When a row is updated, if there is a common value for one element of the primary key, the other portions of the primary key are at risk for not getting updated
+-- Insertion: A row is not able to be recorded due to insufficient information on one component of the primary key 
+----> How do non-key attributes relate to the primary key?
+
+-YES: Each non-key attribute fully depends on the primary key. There are no partial dependencies for components of the primary key
+
+
+Third Normal Form:
+
+-NO: transitive dependencies 
+-- Suppose there are three columns in a table: {unique_id, col1, col2}, where col1 and col2 are directly related by a look-up table; 
+    then, there exists the dependence relation: unique_id --> col1 --> col2. This is transitive dependency. 
+        -- To fix: table1: {unique_id, col1}, table2: {col1, col2}
+
+-YES: The table should depend on the primary key, and there should not any non-key attribute that is not dependent on the key. 
+
+
+Fourth Normal Form:
+
+- NO: primary keys with multiple components such that an update to a component requires multiple insertions. 
+- YES: each table has single component primary keys
+
+
+Fifth Normal Form:
+
+- NO: Can the tables cannot be logically conjoined by a smaller set of tables. 
+        -- The table cannot be cleanly split into k>2 in m>1 operations without creating false combinations 
+
+
+Sixth Normal Form:
+
+- In fifth NF but table cannot logically have NULL as a value.
+
+
+############ Key Definitions #############
+
+PRIMARY KEY:
+What is a unique identifier of a database row? It's critical to have a singular identifier. 
+Primary key --> A respected primary key (100% reliable indicator for state); Primary key cannot contain "NULL" in a value.
+(Composite/Compound primary key is a key made up of multiple values)
+
+CANDIDATE KEY:
+In the example of US states, state_name could be the primary key of that database. It is a unique identifier:
+state_code and state_name: **candidate keys**
+We might think that state capital could be a primary key, but state capitals are more subject to change than a state name. Therefore, state capital is not a candidate key. 
+Candidate keys: must inhabit uniqueness across time. 
+
+SUPERKEY:
+Inexperienced designer can set a primary key to multiple columns, such that there exists the potential to create a duplicate candidate key with additional data.
+
+ALTERNATE KEY:
+With an existing primary key, how can we enforce stability for a given column?: Alternate Key
+
+FOREIGN KEY: 
+Given two tables and a relation between the tables on a primary key, if there exists a key that is not in the primary table, 
+    then a foreign key call states that every value of the key of table2 that corresponds to a key in table1 exist in table1.
+    --> Inner join does not result in loss of data. 
+
+Def: A foreign key is a non-primary key on table2, but is a primary key on table1
+
+SURROGATE KEY VS NATURAL KEY:
+    - A surrogate key is a "stand-in" value for a known value in the context of a specific database. 
+    - A natural key (business key) is an interpretable value for a key. 
+    -- Surrogate keys are determined arbitrarily, and indeterminate from information outside the database. 
+    -- Example: ISBN is a natural key for books, but if the database includes e-books and hard-copy books, then ISBN will not distinguish between the two. 
+            Surrogate keys allow a distinction between the two types of books. 
+            Published surrogate keys --> natural keys
+
+INTELLIGENT KEYS:
+    - Keys that are composed by a series of inherited attributes from the item hierarchy. 

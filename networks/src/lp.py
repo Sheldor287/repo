@@ -16,9 +16,9 @@ def edge_cap_rule(m, u, v):
     return m.x[u, v] <= m.capacity[u, v]
 
 def edge_flow_rule(m, n):
-    inflow = sum(m.x[u, v] for (u, v) in m.edges if v == n)
-    outflow = sum(m.x[u, v] for (u, v) in m.edges if u == n)
-    return inflow - outflow == m.demand[n]
+    outflow = sum(m.x[u, v] for (u, v) in m.edges if v == n)
+    inflow = sum(m.x[u, v] for (u, v) in m.edges if u == n)
+    return outflow - inflow == m.demand[n]
 
 def preprocess_demand_imbalance(G):
     total_supply = sum(G.nodes[n]['demand'] for n in G.nodes() if G.nodes[n]['demand'] < 0)
@@ -45,7 +45,7 @@ def preprocess_demand_imbalance(G):
 # MCF
 def standard_min_cost_flow(G):
     """ Minimize cost of total travel over the graph """
-    # Create artifical nodes if needed
+    # Create artificial nodes if needed
     G = preprocess_demand_imbalance(G)
 
     # Sets & params
@@ -72,7 +72,7 @@ def standard_min_cost_flow(G):
 
 def standard_max_flow(G):
     """ Maximize total flow over the graph """
-    # Create artifical nodes if needed
+    # Create artificial nodes if needed
     G = preprocess_demand_imbalance(G)
 
     # Sets & params

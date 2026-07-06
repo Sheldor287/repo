@@ -95,7 +95,7 @@ def layered_layout(G, s, t):
 
     return pos
 
-def assign_properties(G, layer_sizes, constant_capacity=False, layer_role_assign=None):
+def assign_properties(G, layer_sizes, constant_capacity=False, layer_role_assign=None, solid_layers=[2,3,4]):
     # Metaparameters
     largest_layer = max(layer_sizes)
     layers = [list(range(sum(layer_sizes[:i]), sum(layer_sizes[:i+1]))) for i in range(len(layer_sizes))]
@@ -128,7 +128,7 @@ def assign_properties(G, layer_sizes, constant_capacity=False, layer_role_assign
         G.nodes[n]['cost'] = np.random.randint(1, 10)
         G.nodes[n]['loc_region'] = (-5,5)
         G.nodes[n]['loc'] = (np.random.uniform(-5, 5), np.random.uniform(-5,5))
-        if G.nodes[n]['layer'] in [3, 4]:
+        if G.nodes[n]['layer'] in solid_layers:
                 G.nodes[n]['probability1'] = 0.99
                 G.nodes[n]['probability2'] = 0.99
                 G.nodes[n]['power'] = power
@@ -140,7 +140,7 @@ def assign_properties(G, layer_sizes, constant_capacity=False, layer_role_assign
             else:
                 G.nodes[n]['role'] = layer_role_assign[G.nodes[n]['layer']]
                 G.nodes[n]['power'] = np.random.choice(power, size=2, replace=False).tolist()
-            print(f"node: {n}, power: {G.nodes[n]['power']}, roles: {G.nodes[n]['role']}")
+            #print(f"node: {n}, power: {G.nodes[n]['power']}, roles: {G.nodes[n]['role']}")
     
 
     # Rewrite graph edges based on power and role attributes 
@@ -150,7 +150,7 @@ def assign_properties(G, layer_sizes, constant_capacity=False, layer_role_assign
             for v in layers[i + 1]:
                 for role in roles:
                     for p in power:
-                        if G.nodes[u]['layer'] in [2,3,4]:
+                        if G.nodes[u]['layer'] in solid_layers:
                             G.add_edge(u, v, role=role, power=p, capacity=10, probability=0.99)
                             continue
                         if (role in G.nodes[u]['role']) and (role in G.nodes[v]['role']) and (p in G.nodes[u]['power']) and (p in G.nodes[v]['power']):
