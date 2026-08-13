@@ -1,0 +1,100 @@
+from dataclasses import dataclass
+from typing import Optional
+import numpy as np
+import pandas as pd
+from scipy import stats
+
+@dataclass
+class DataSet:
+    continuous: Optional[np.ndarray] = None
+    discrete: Optional[np.ndarray] = None
+    categorical: Optional[pd.Series] = None
+
+class DataAnalyzer:
+
+    def __init__(self, data: DataSet):
+        self.data = data
+
+    def fit_distribution(self, distribution, data_type="continuous"):
+        data = getattr(self.data, data_type)
+        if data is None:
+            return None
+        return distribution.fit(data)
+
+    def cdf(self, x, distribution, data_type="continuous"):
+        if data_type not in ["continuous", "discrete"]:
+            return None
+        params = self.fit_distribution(distribution,data_type=data_type)
+        return distribution.cdf(x, *params)
+
+    def summary(self, data_type="continuous"):
+        data = getattr(self.data, data_type)
+        if data is None:
+            return None
+        return {
+            "n": len(data),
+            "mean": np.mean(data),
+            "std": np.std(data),
+            "min": np.min(data),
+            "max": np.max(data),
+        }
+
+data1 = DataSet(
+    continuous=np.random.normal(10, 2, 1000)
+)
+
+data2 = DataSet(
+    continuous=np.array([1.2, 1.5, 2.1, 2.7, 3.4]),
+    discrete=np.array([1, 2, 2, 3, 4, 4, 4]),
+)
+
+data3 = DataSet(
+    continuous=np.array([1.2, 1.5, 2.1, 2.7, 3.4]),
+    discrete=np.array([1, 2, 2, 3, 4, 4, 4]),
+    categorical=pd.Series(["A", "B", "A", "C"])
+)
+
+analysis = DataAnalyzer(data3)
+analysis.cdf(x=2, distribution=stats.norm, data_type="categorical")
+# Returns None since categorical data is not supported for CDF calculation.
+
+
+If a beta distribution is coming from data where $\alpha_i+\beta_i=1$, then $\alpha + \beta = n+1$ assuming a non-informative prior, where $\alpha_0, \beta_0 = 1$. The log-likelihood is:
+
+$\ell(a,b)= n \ln\Gamma(a+b) - n\ln\Gamma(a) - n\ln\Gamma(b) + (a-1)\sum \ln x_i - (b-1)\sum \ln(1-x_i)$.
+
+By construction, $\hat{a} = n + 1 - \hat{b}$, and therefore only $\hat{a}$ need be estimated. Let $\psi(x)=\ln\Gamma(x), \phi_x=\sum \ln(x), \phi_{1-x}=\sum\ln(1-x)$  then finding the critical point of $\ell$ is:
+
+$\frac{d\ell}{da} = \phi_x - \phi_{1-x} - n\psi(a) + n\psi(n+1-a) \Longrightarrow \psi(a)-\psi(n+1-a) = \frac{1}{n}\left( \displaystyle\sum \ln x_i - \displaystyle\sum \ln (1-x_i) \right)$
+
+This becomes a root-finding problem, which is solvable via [Brent's Method](https://mathworld.wolfram.com/BrentsMethod.html)
+
+
+import numpy as np
+from scipy.special import digamma
+from scipy.optimize import brentq
+
+def constrained_beta_mle(x):
+    x = np.asarray(x)
+    n = len(x)
+    target = np.mean(np.log(x) - np.log1p(-x))
+    if np.any((x <= 0) | (x >= 1)):
+        return None, None
+
+    def equation(alpha):
+        beta = n + 1 - alpha
+        return digamma(alpha) - digamma(beta) - target
+
+    # alpha > 0 and beta > 0
+    eps = 1e-10
+    alpha_hat = brentq(equation,eps,n + 1 - eps)
+    beta_hat = n + 1 - alpha_hat
+    return alpha_hat, beta_hat
+
+x = np.random.beta(1, 100, size=300)
+
+alpha_hat, beta_hat = constrained_beta_mle(x)
+
+print(f'Estimated parameters: alpha = {alpha_hat}, beta = {beta_hat}')
+print(f'True parameters: {alpha_hat / (alpha_hat + beta_hat)*len(x)}, {beta_hat / (alpha_hat + beta_hat)*len(x)}')
+                                                            

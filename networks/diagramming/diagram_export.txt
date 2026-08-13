@@ -1,0 +1,634 @@
+import networkx as nx
+import matplotlib.pyplot as plt
+from matplotlib.patches import FancyBboxPatch, Ellipse, Polygon, RegularPolygon, PathPatch, FancyArrowPatch
+from shapes import draw_database
+import numpy as np
+
+nodes = {
+
+    "Mission": ["mission",],
+    "Context": ["leadership_vision","leadership_objectives","stakeholder_demands","stakeholder_questions","problem_statement",],
+    "Problem Definition": ["stakeholders","related_agents","questions","requirements","timeline",],
+    "Agent Properties": ["aor","assets","objectives","tasking",], # leave-unstaged
+    "Assessment": ["overall_assessment","input_data", "criteria_and_weighting","logic","analysis","modeling_and_sim","outputs","recommendations",],
+}
+
+stage_style = {
+    "Mission": {
+        "fillcolor": "#878787",
+        "shape": "pentagon",
+    },
+    "Context": {
+        "fillcolor": "#ADD8E6",
+        "shape": "box",
+    },
+    "Problem Definition": {
+        "fillcolor": "#90EE90",
+        "shape": "box",
+    },
+    "Agent Properties": {
+        "fillcolor": "#D1FFCA",
+        "shape": "box",
+    },
+    "Assessment": {
+        "fillcolor": "#F08080",
+        "shape": "box",
+    },
+}
+
+categories = {
+
+    "Drivers": ["mission","leadership_vision","leadership_objectives","stakeholder_demands","stakeholder_questions","problem_statement",],
+    "Demands": ["stakeholders","related_agents","questions","requirements","timeline",],
+    "Agent_Attributes": ["aor","assets","objectives","tasking",],
+    "Assessment": ["overall_assessment","criteria_and_weighting","input_data","logic","analysis","modeling_and_sim",],
+    "Deliverables": ["outputs","recommendations",],
+}
+
+G = nx.DiGraph()
+for stage, items in nodes.items():
+    for item in items:
+        category = [c for c, vals in categories.items()if item in vals][0]
+        G.add_node(item,stage=stage,category=category,**stage_style[stage])
+
+G.nodes()['input_data']['shape'] = 'database'
+relations = {
+    "context_flow": [
+        ("mission", "leadership_vision"), ("mission", "leadership_objectives"), ("leadership_vision", "leadership_objectives"), ("leadership_objectives", "leadership_vision"),
+        ("leadership_vision", "stakeholder_demands"), ("leadership_vision", "stakeholder_questions"),("leadership_objectives", "stakeholder_demands"),("leadership_objectives", "stakeholder_questions"),
+        ("stakeholder_demands", "stakeholder_questions"), ("stakeholder_questions","stakeholder_demands"), ("stakeholder_demands", "problem_statement"), ("stakeholder_questions","problem_statement"), 
+    ],
+    #"problem_definition": [("problem_statement", "stakeholders"),("problem_statement", "related_agents"),("problem_statement", "questions"),("problem_statement", "requirements"),("problem_statement", "timeline"),],
+    #"agent_properties": [(agent, prop) for agent in ["stakeholders","related_agents",] for prop in nodes["Agent Properties"]],
+    "problem_to_assessment": [(item, "overall_assessment")for item in nodes["Problem Definition"]],
+    #"context_to_assessment": [(item, "overall_assessment")for item in nodes["Context"]],
+    "assessment_structure": [("overall_assessment", item) for item in nodes["Assessment"] if item not in ["overall_assessment", "recommendations", "outputs"]],
+    "assessment_outputs": [(item, "outputs") for item in ["input_data","logic","criteria_and_weighting","analysis","modeling_and_sim",]],
+    "recommendations": [("outputs", "recommendations")],
+}
+
+for relation, edge_list in relations.items():
+    for u, v in edge_list:
+        G.add_edge(u,v,relation=relation)
+
+
+
+
+SCALE = 1.5
+NODE_WIDTH = 2 * SCALE
+NODE_HEIGHT = 1 * SCALE
+
+clusters = {
+    "Mission": {
+        "origin": (5*SCALE, 15*SCALE),
+        "layout": "single",
+    },
+    "Context": {
+        "origin": (5*SCALE, 12*SCALE),
+        "layout": "context",
+        "dx": 2.8*SCALE,
+    },
+    "Agent Properties": {
+        "origin": (0*SCALE, 5*SCALE),
+        "layout": "vertical",
+        "dy": 1.3*SCALE,
+    },
+    "Problem Definition": {
+        "origin": (4*SCALE, 5*SCALE),
+        "layout": "vertical",
+        "dy": 1.3*SCALE,
+    },
+    "Assessment": {
+        "origin": (8*SCALE, 3*SCALE),
+        "layout": "assessment",
+        "dy": 1.3*SCALE,
+    },
+}
+
+def build_positions(G, clusters):
+    x_space = 1.5
+    y_space = 1.4
+
+    pos = {}
+    for stage, cfg in clusters.items():
+        members = [n for n, d in G.nodes(data=True) if d["stage"] == stage]
+        x0, y0 = cfg["origin"]
+
+        if cfg["layout"] == "single":
+            pos[members[0]] = (x0, y0)
+
+        elif cfg["layout"] == "horizontal":
+            dx = cfg.get("dx", 2)
+            for i, node in enumerate(members):
+                pos[node] = (x0 + i*dx, y0)
+
+        elif cfg["layout"] == "vertical":
+            dy = cfg.get("dy", 1.5)
+            for i, node in enumerate(members):
+                pos[node] = (x0, y0 - i*dy)
+
+        elif cfg["layout"] == "assessment":
+
+            pos["overall_assessment"] = (x0,y0)
+            children = ["input_data","criteria_and_weighting","logic","analysis","modeling_and_sim",]
+
+
+            offsets = [
+                (x_space*NODE_WIDTH,2*y_space*NODE_HEIGHT),
+                (x_space*NODE_WIDTH,y_space*NODE_HEIGHT),
+                (x_space*NODE_WIDTH,0*NODE_HEIGHT),
+                (x_space*NODE_WIDTH,-1*y_space*NODE_HEIGHT),
+                (x_space*NODE_WIDTH,-2*y_space*NODE_HEIGHT),
+            ]
+
+            for node,(dx,dy) in zip(children,offsets):
+                pos[node]=(x0+dx,y0+dy)
+
+            pos["outputs"] = (x0+2*NODE_WIDTH*x_space,y0-y_space)
+            pos["recommendations"] = (x0+2*NODE_WIDTH*x_space,y0+y_space)
+
+        elif cfg["layout"] == "context":
+            pos["leadership_vision"] = (x0 - NODE_WIDTH*x_space/2, y0)
+            pos["leadership_objectives"] = (x0 + NODE_WIDTH*x_space/2, y0)
+            pos["stakeholder_demands"] = (x0 - NODE_WIDTH*x_space/2, y0-NODE_HEIGHT*y_space)
+            pos["stakeholder_questions"] = (x0 + NODE_WIDTH*x_space/2, y0-NODE_HEIGHT*y_space)
+            pos["problem_statement"] = (x0, y0-2*NODE_HEIGHT*y_space)
+
+        else:
+            raise ValueError(f"Unknown layout {cfg['layout']}")
+        
+    return pos
+
+
+def draw_clusters(ax,G,pos,pad=0.8*SCALE):
+
+    stages = {}
+    bounds = {}
+    for node,data in G.nodes(data=True):
+        stages.setdefault(data["stage"],[]).append(node)
+
+    for stage,nodes in stages.items():
+        if stage == 'Mission': continue
+
+        xs = [pos[n][0] for n in nodes]
+        ys = [pos[n][1] for n in nodes]
+        xmin = min(xs) - NODE_WIDTH/2 - pad
+        xmax = max(xs) + NODE_WIDTH/2 + pad
+
+        ymin = min(ys) - NODE_HEIGHT/2 - pad
+        ymax = max(ys) + NODE_HEIGHT/2 + pad
+        bounds[stage] = {"xmin": xmin,"xmax": xmax,"ymin": ymin,"ymax": ymax}
+
+        rect = FancyBboxPatch(
+            (xmin,ymin),
+            xmax-xmin,
+            ymax-ymin,
+            boxstyle="round,pad=0.2",
+            linewidth=2,
+            edgecolor="gray",
+            facecolor="none",
+        )
+
+        ax.add_patch(rect)
+        ax.text(xmin,ymax-0.3,stage,ha="left",fontsize=13,weight="bold",)
+    return bounds
+
+
+def edge_point(x1,y1,x2,y2):
+    dx=x2-x1
+    dy=y2-y1
+    angle=np.arctan2(dy,dx)
+    return (x1 + np.cos(angle)*NODE_WIDTH/2,y1 + np.sin(angle)*NODE_HEIGHT/2)
+
+def draw_edges(ax,G,pos):
+
+    for u,v in G.edges():
+        x1,y1 = pos[u]
+        x2,y2 = pos[v]
+        start = edge_point(x1,y1,x2,y2)
+        end = edge_point(x2,y2,x1,y1)
+
+        ax.annotate(
+            "",xy=end,xytext=start,
+            arrowprops=dict(arrowstyle="-|>",lw=2,color="black",),
+            zorder=3,
+        )
+
+
+def draw_nodes(ax, G, pos):
+
+    for node, data in G.nodes(data=True):
+        text_shift=0
+        x, y = pos[node]
+        shape = data.get("shape")
+
+        if shape.lower() == "pentagon":
+            box = RegularPolygon((x,y),numVertices=5,radius=NODE_WIDTH/1.5,orientation=0,facecolor=data["fillcolor"]
+                                 )
+        elif shape.lower() in ['db', 'bd', 'database']:
+            text_shift = 0.05
+            draw_database(ax, x, y+0.5, NODE_WIDTH, NODE_HEIGHT*1,1, facecolor=data['fillcolor'], edgecolor='black', lw='2', zorder=2, ry=0.5)
+
+        else:
+            box = FancyBboxPatch(
+                (x - NODE_WIDTH/2, y - NODE_HEIGHT/2),
+                NODE_WIDTH,
+                NODE_HEIGHT,
+                boxstyle="round,pad=0.08",
+                linewidth=2,
+                edgecolor="black",
+                facecolor=data["fillcolor"],
+                zorder=1,
+            )
+
+        ax.add_patch(box)
+        ax.text(x,y+text_shift*NODE_HEIGHT,node,ha="center",va="center",fontsize=10,fontweight="bold",zorder=3,)
+
+def draw_cluster_edge(ax, pos, source, target_point):
+
+    x1, y1 = pos[source]
+    x2, y2 = target_point
+    start = edge_point(x1, y1, x2, y2)
+    # target is not a node, so just terminate at the point
+    end = (x2, y2)
+
+    ax.annotate(
+        "",xy=end,xytext=start,
+        arrowprops=dict(arrowstyle="-|>",lw=2,color="black",),
+        zorder=4,
+    )
+
+def draw_fan(ax,source_nodes,target_nodes, pos,color="gray",alpha=0.25):
+    """ Drawn to map a node to set of nodes"""
+    t1, t2 = target_nodes[0], target_nodes[1]
+    target_x = pos[t1][0]+NODE_WIDTH/1.9
+    target_y_min = pos[t2][1]-NODE_HEIGHT/2
+    target_y_max = pos[t1][1]+NODE_HEIGHT/2
+
+    for node in source_nodes:
+        x, y = pos[node]
+        # source node right edge
+        source_x = x - NODE_WIDTH/2
+        # source vertical span
+        source_top = y + NODE_HEIGHT/2
+        source_bottom = y - NODE_HEIGHT/2
+        points = [(source_x, source_bottom),(source_x, source_top),(target_x, target_y_max),(target_x,target_y_min),]
+        fan = Polygon(points,closed=True,facecolor=color,edgecolor="none",alpha=alpha,zorder=0,)
+        ax.add_patch(fan)
+
+def draw_feedback_arrow(ax, start, end):
+
+    ax.annotate(
+        "",xy=end,xytext=start,
+        arrowprops=dict(arrowstyle="-|>",linestyle=":",linewidth=2,
+                        color="black",connectionstyle="arc3,rad=0.35"
+                        ),
+        zorder=5,
+    )
+
+pos = build_positions(G, clusters)
+fig,ax = plt.subplots(figsize=(16*SCALE,10*SCALE))
+
+bounds = draw_clusters(ax,G,pos)
+draw_fan(ax,["stakeholders","related_agents",], ["aor", "tasking"],pos,)
+draw_edges(ax,G,pos)
+
+problem_def_target = (
+    clusters["Problem Definition"]["origin"][0],
+    clusters["Problem Definition"]["origin"][1] + 1.5*SCALE
+)
+
+draw_cluster_edge(ax,pos,"problem_statement",problem_def_target)
+draw_nodes(ax,G,pos)
+
+draw_feedback_arrow(ax, (pos['recommendations'][0], pos["recommendations"][1]+1),(bounds["Context"]["xmax"]+0.2,bounds["Context"]["ymin"]+1))
+
+
+
+ax.relim()
+ax.autoscale_view()
+plt.axis('off')
+plt.show()
+
+import matplotlib.patches as patches
+from matplotlib.path import Path
+import numpy as np
+
+def draw_database(ax, x, y, width, height, rx=None, ry=None, **kwargs):
+
+    # Dimensions
+    rx = width / 2 if rx is None else rx
+    ry = height * 0.15 if ry is None else ry
+
+    KAPPA = 0.56
+
+    # Convert center coordinate into bottom/top
+    y_bottom = y - height / 1.9
+    y_top = y + height / 2
+
+    verts = [
+        # left side
+        (x - rx, y_bottom),
+        (x - rx, y_top),
+
+        # top ellipse (back half)
+        (x - rx, y_top + KAPPA*ry),
+        (x - KAPPA*rx, y_top + ry),
+        (x, y_top + ry),
+        (x + KAPPA*rx, y_top + ry),
+        (x + rx, y_top + KAPPA*ry),
+        (x + rx, y_top),
+
+        # right side
+        (x + rx, y_bottom),
+
+        # bottom ellipse
+        (x + rx, y_bottom - KAPPA*ry),
+        (x + KAPPA*rx, y_bottom - ry),
+        (x, y_bottom - ry),
+        (x - KAPPA*rx, y_bottom - ry),
+        (x - rx, y_bottom - KAPPA*ry),
+        (x - rx, y_bottom),
+
+        # close
+        (x - rx, y_bottom),
+    ]
+
+    codes = [
+        Path.MOVETO,
+        Path.LINETO,
+
+        Path.CURVE4,
+        Path.CURVE4,
+        Path.CURVE4,
+        Path.CURVE4,
+        Path.CURVE4,
+        Path.CURVE4,
+
+        Path.LINETO,
+
+        Path.CURVE4,
+        Path.CURVE4,
+        Path.CURVE4,
+        Path.CURVE4,
+        Path.CURVE4,
+        Path.CURVE4,
+
+        Path.CLOSEPOLY,
+    ]
+
+    body = patches.PathPatch(
+        Path(verts, codes),
+        **kwargs
+    )
+
+    ax.add_patch(body)
+
+
+    # Top ellipse front edge
+    top_front = [
+        (x + rx, y_top),
+        (x + rx, y_top - KAPPA*ry),
+        (x + KAPPA*rx, y_top - ry),
+        (x, y_top - ry),
+        (x - KAPPA*rx, y_top - ry),
+        (x - rx, y_top - KAPPA*ry),
+        (x - rx, y_top),
+    ]
+
+    top_codes = [
+        Path.MOVETO,
+        Path.CURVE4,
+        Path.CURVE4,
+        Path.CURVE4,
+        Path.CURVE4,
+        Path.CURVE4,
+        Path.CURVE4,
+    ]
+
+    line_kwargs = kwargs.copy()
+    line_kwargs["facecolor"] = "none"
+    ax.add_patch(
+        patches.PathPatch(
+            Path(top_front, top_codes),
+            **line_kwargs
+        )
+    )
+
+
+
+
+    import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+from matplotlib.path import Path
+
+fig, axs = plt.subplots(2, 2, figsize=(10, 8))
+axs = axs.ravel()
+
+# Magic constant for drawing near-perfect circular arcs using cubic Bézier curves
+KAPPA = 0.552284749831
+
+# =====================================================================
+# 1. ACCURATE AND GATE
+# =====================================================================
+# Straight back, flat top/bottom, and a perfect 180-degree semicircular front
+and_verts = [
+    (0.1, 0.2),  # Start bottom-left
+    (0.1, 0.8),  # Up to top-left
+    (0.5, 0.8),  # Right to start of top arc
+    # Top half of semicircle arc:
+    (0.5 + KAPPA * 0.4, 0.8),
+    (0.9, 0.5 + KAPPA * 0.3),
+    (0.9, 0.5),
+    # Bottom half of semicircle arc:
+    (0.9, 0.5 - KAPPA * 0.3),
+    (0.5 + KAPPA * 0.4, 0.2),
+    (0.5, 0.2),
+    (0.1, 0.2),  # Close
+]
+and_codes = [
+    Path.MOVETO,
+    Path.LINETO,
+    Path.LINETO,
+    Path.CURVE4,
+    Path.CURVE4,
+    Path.CURVE4,  # First cubic Bézier arc
+    Path.CURVE4,
+    Path.CURVE4,
+    Path.CURVE4,  # Second cubic Bézier arc
+    Path.CLOSEPOLY,
+]
+
+axs[0].add_patch(
+    patches.PathPatch(
+        Path(and_verts, and_codes), facecolor="#e1f5fe", edgecolor="#0288d1", lw=2
+    )
+)
+axs[0].set_title("AND Gate", fontsize=12, pad=10)
+
+# =====================================================================
+# 2. ACCURATE OR GATE
+# =====================================================================
+# Inward-curved back, swept outer edges meeting at a sharp point
+or_verts = [
+    (0.1, 0.2),  # Bottom-left
+    (0.25, 0.5),
+    (0.1, 0.8),  # Inward curved back to top-left
+    (0.4, 0.75),
+    (0.75, 0.6),
+    (0.9, 0.5),  # Swept top edge to sharp apex
+    (0.75, 0.4),
+    (0.4, 0.25),
+    (0.1, 0.2),  # Swept bottom edge back to start
+]
+or_codes = [
+    Path.MOVETO,
+    Path.CURVE3,
+    Path.CURVE3,  # Curved back
+    Path.CURVE4,
+    Path.CURVE4,
+    Path.CURVE4,  # Upper swept wing
+    Path.CURVE4,
+    Path.CURVE4,
+    Path.CURVE4,  # Lower swept wing
+]
+
+axs[1].add_patch(
+    patches.PathPatch(
+        Path(or_verts, or_codes), facecolor="#efebe9", edgecolor="#5d4037", lw=2
+    )
+)
+axs[1].set_title("OR Gate", fontsize=12, pad=10)
+
+# =====================================================================
+# 3. ACCURATE DATABASE (CYLINDER)
+# ====================================================================
+# Cylinder dimensions
+x_center = 0.5
+y_top = 0.7
+y_bottom = 0.3
+rx = 0.3  # Horizontal radius
+ry = 0.1  # Vertical radius (controls the perspective angle)
+
+db_verts = [
+    (x_center - rx, y_bottom),  # 0: Start at bottom-left corner
+    (x_center - rx, y_top),  # 1: Straight up to top-left corner
+    # --- Top Back Half Ellipse ---
+    (x_center - rx, y_top + KAPPA * ry),  # 2
+    (x_center - KAPPA * rx, y_top + ry),  # 3
+    (x_center, y_top + ry),  # 4
+    (x_center + KAPPA * rx, y_top + ry),  # 5
+    (x_center + rx, y_top + KAPPA * ry),  # 6
+    (x_center + rx, y_top),  # 7: Top-right corner
+    (x_center + rx, y_bottom),  # 8: Straight down to bottom-right corner
+    # --- Bottom Front Half Ellipse ---
+    (x_center + rx, y_bottom - KAPPA * ry),  # 9
+    (x_center + KAPPA * rx, y_bottom - ry),  # 10
+    (x_center, y_bottom - ry),  # 11
+    (x_center - KAPPA * rx, y_bottom - ry),  # 12
+    (x_center - rx, y_bottom - KAPPA * ry),  # 13
+    (x_center - rx, y_bottom),  # 14: End of the last curve segment
+    (x_center - rx, y_bottom),  # 15: Vertex for CLOSEPOLY
+]
+
+db_codes = [
+    Path.MOVETO,  # 0
+    Path.LINETO,  # 1
+    Path.CURVE4,
+    Path.CURVE4,
+    Path.CURVE4,  # 2, 3, 4
+    Path.CURVE4,
+    Path.CURVE4,
+    Path.CURVE4,  # 5, 6, 7
+    Path.LINETO,  # 8
+    Path.CURVE4,
+    Path.CURVE4,
+    Path.CURVE4,  # 9, 10, 11
+    Path.CURVE4,
+    Path.CURVE4,
+    Path.CURVE4,  # 12, 13, 14
+    Path.CLOSEPOLY,  # 15
+]
+
+# Add main body
+axs[2].add_patch(
+    patches.PathPatch(
+        Path(db_verts, db_codes), facecolor="#e8f5e9", edgecolor="#388e3c", lw=2
+    )
+)
+
+# =====================================================================
+# 2. MATCHING TOP LID OVERLAY
+# =====================================================================
+# Draws the front half of the top ellipse to complete the cylinder rim.
+lid_verts = [
+    (x_center + rx, y_top),  # Start at top-right
+    # --- Top Front Half Ellipse (Right to Left) ---
+    (x_center + rx, y_top - KAPPA * ry),  # Control 1
+    (x_center + KAPPA * rx, y_top - ry),  # Control 2
+    (x_center, y_top - ry),  # Center front apex
+    (x_center - KAPPA * rx, y_top - ry),  # Control 1
+    (x_center - rx, y_top - KAPPA * ry),  # Control 2
+    (x_center - rx, y_top),  # Ends cleanly at top-left
+]
+
+lid_codes = [
+    Path.MOVETO,
+    Path.CURVE4,
+    Path.CURVE4,
+    Path.CURVE4,
+    Path.CURVE4,
+    Path.CURVE4,
+    Path.CURVE4,
+]
+
+# Add the lip line
+axs[2].add_patch(
+    patches.PathPatch(
+        Path(lid_verts, lid_codes), fill=False, edgecolor="#388e3c", lw=2
+    )
+)
+axs[2].set_title("Database / Data Storage", fontsize=12, pad=10)
+
+# =====================================================================
+# 4. ACCURATE DOCUMENT SYMBOL
+# =====================================================================
+# Rectangle with a precise sinusoidal/wave-like torn bottom edge
+doc_verts = [
+    (0.2, 0.25),  # Start bottom-left
+    (0.2, 0.8),  # Up to top-left
+    (0.8, 0.8),  # Straight across to top-right
+    (0.8, 0.25),  # Down to bottom-right
+    # Sinusoidal wave curve back to the start:
+    (0.65, 0.15),
+    (0.5, 0.25),  # First dip/rise
+    (0.35, 0.35),
+    (0.2, 0.25),  # Second dip/rise back to origin
+]
+doc_codes = [
+    Path.MOVETO,
+    Path.LINETO,
+    Path.LINETO,
+    Path.LINETO,
+    Path.CURVE3,
+    Path.CURVE3,
+    Path.CURVE3,
+    Path.CURVE3,
+]
+
+axs[3].add_patch(
+    patches.PathPatch(
+        Path(doc_verts, doc_codes), facecolor="#fffde7", edgecolor="#fbc02d", lw=2
+    )
+)
+axs[3].set_title("Document", fontsize=12, pad=10)
+
+# Formatting grid uniformly
+for ax in axs:
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+plt.tight_layout()
+plt.show()
