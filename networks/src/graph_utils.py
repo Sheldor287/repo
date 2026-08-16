@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-def create_layered_graph(layer_sizes, fully_connect=True):
+def create_layered_graph(layer_sizes=[1,2,2,1], fully_connect=True):
     """ Generate a graph from a list of layer sizes """
     G = nx.DiGraph()
     layers = []

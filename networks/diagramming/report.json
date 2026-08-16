@@ -1,0 +1,635 @@
+{
+  "schema_version": "1.0",
+  "report": {
+    "id": "network_reliability_analysis_001",
+    "title": "Network Reliability Analysis",
+    "subtitle": "Monte Carlo Simulation, Sensitivity Analysis, and Critical-Component Identification",
+    "author": "Andrew Sheldon",
+    "organization": "Operations Research",
+    "date": "2026-08-13",
+    "version": "1.0",
+    "status": "draft",
+    "confidentiality": "Internal Research"
+  },
+  "presentation": {
+    "aspect_ratio": "16:9",
+    "theme": "technical",
+    "fonts": {
+      "title": "Aptos Display",
+      "body": "Aptos",
+      "monospace": "Aptos Mono"
+    },
+    "show_slide_numbers": true,
+    "show_footer": true,
+    "footer_text": "Network Reliability Analysis"
+  },
+  "executive_summary": {
+    "overview": "This study evaluates the reliability of a directed network subject to probabilistic component failures. Monte Carlo simulation is used to estimate the probability that at least one viable path remains between a source and destination.",
+    "key_metrics": [
+      {
+        "id": "connectivity_probability",
+        "label": "Estimated Connectivity",
+        "value": 0.873,
+        "display_value": "87.3%",
+        "units": "probability",
+        "interpretation": "Probability that at least one s\u2192t path remains available."
+      },
+      {
+        "id": "simulation_count",
+        "label": "Simulation Runs",
+        "value": 200000,
+        "display_value": "200,000",
+        "units": "runs",
+        "interpretation": "Independent Monte Carlo network realizations."
+      },
+      {
+        "id": "critical_components",
+        "label": "Critical Components",
+        "value": 3,
+        "display_value": "3",
+        "units": "components",
+        "interpretation": "Components responsible for the largest estimated reliability reduction."
+      },
+      {
+        "id": "confidence_interval",
+        "label": "95% CI Width",
+        "value": 0.0032,
+        "display_value": "\u00b10.16%",
+        "units": "probability",
+        "interpretation": "Approximate half-width of the Monte Carlo confidence interval."
+      }
+    ],
+    "headline_findings": [
+      "Overall network connectivity is estimated at 87.3%.",
+      "A small subset of components has disproportionate influence on network reliability.",
+      "Component influence is driven by both failure probability and network position.",
+      "Sensitivity analysis identifies structurally important components that warrant further investigation."
+    ]
+  },
+  "sections": [
+    {
+      "id": "problem_definition",
+      "type": "section",
+      "title": "1. Problem Definition",
+      "purpose": "Define the reliability problem, network structure, and failure model.",
+      "slides": [
+        {
+          "id": "problem_overview",
+          "type": "two_column",
+          "title": "Problem Overview",
+          "left": {
+            "heading": "Research Question",
+            "paragraphs": [
+              "How does stochastic component failure affect the probability that demand can be served from a designated source to destination?"
+            ],
+            "bullets": [
+              "Directed network",
+              "Independent component failures",
+              "Binary component availability",
+              "Connectivity evaluated from source s to destination t"
+            ]
+          },
+          "right": {
+            "heading": "Analytical Objectives",
+            "bullets": [
+              "Estimate network connectivity probability.",
+              "Quantify Monte Carlo estimation uncertainty.",
+              "Identify influential nodes and edges.",
+              "Evaluate sensitivity to component failure probabilities.",
+              "Develop a reusable computational workflow."
+            ]
+          }
+        },
+        {
+          "id": "network_structure",
+          "type": "figure",
+          "title": "Network Structure",
+          "figure": {
+            "path": "C://Users//Drew//Documents//MyFiles//work//pptx-xlsx-docx//ex_images//afmc.jpg",
+            "caption": "Directed network used for the reliability experiment.",
+            "alt_text": "Directed network showing source, destination, intermediate nodes, and connecting edges.",
+            "width": "full"
+          }
+        }
+      ]
+    },
+    {
+      "id": "methodology",
+      "type": "section",
+      "title": "2. Methodology",
+      "purpose": "Describe the stochastic network model and simulation procedure.",
+      "slides": [
+        {
+          "id": "network_model",
+          "type": "model",
+          "title": "Network Reliability Model",
+          "model": {
+            "notation": [
+              {
+                "symbol": "G",
+                "meaning": "Directed network"
+              },
+              {
+                "symbol": "V",
+                "meaning": "Set of nodes"
+              },
+              {
+                "symbol": "E",
+                "meaning": "Set of edges"
+              },
+              {
+                "symbol": "p_i",
+                "meaning": "Failure probability of component i"
+              },
+              {
+                "symbol": "X_i",
+                "meaning": "Binary availability state of component i"
+              },
+              {
+                "symbol": "C",
+                "meaning": "Event that an s\u2192t path exists"
+              }
+            ],
+            "equations": [
+              {
+                "label": "Component state",
+                "latex": "X_i \\sim Bernoulli(1-p_i)"
+              },
+              {
+                "label": "Network reliability",
+                "latex": "R = P(C)"
+              }
+            ]
+          },
+          "notes": "The network is evaluated as a binary connectivity system."
+        },
+        {
+          "id": "simulation_process",
+          "type": "process",
+          "title": "Monte Carlo Simulation Procedure",
+          "steps": [
+            {
+              "id": "step_1",
+              "number": 1,
+              "label": "Sample",
+              "description": "Sample a binary availability state for every component."
+            },
+            {
+              "id": "step_2",
+              "number": 2,
+              "label": "Construct",
+              "description": "Construct the surviving subnetwork."
+            },
+            {
+              "id": "step_3",
+              "number": 3,
+              "label": "Evaluate",
+              "description": "Determine whether an s\u2192t path exists."
+            },
+            {
+              "id": "step_4",
+              "number": 4,
+              "label": "Record",
+              "description": "Record the connectivity indicator."
+            },
+            {
+              "id": "step_5",
+              "number": 5,
+              "label": "Aggregate",
+              "description": "Estimate reliability and uncertainty from all realizations."
+            }
+          ],
+          "figure": {
+            "path": "c:\\Users\\Drew\\Documents\\MyFiles\\work\\pptx-xlsx-docx\\ex_images\\images (1).jpg",
+            "caption": "Simulation workflow."
+          }
+        },
+        {
+          "id": "simulation_configuration",
+          "type": "table",
+          "title": "Simulation Configuration",
+          "table": {
+            "columns": [
+              {
+                "key": "parameter",
+                "label": "Parameter"
+              },
+              {
+                "key": "value",
+                "label": "Value"
+              },
+              {
+                "key": "description",
+                "label": "Description"
+              }
+            ],
+            "rows": [
+              {
+                "parameter": "Simulation runs",
+                "value": "200,000",
+                "description": "Independent Monte Carlo realizations"
+              },
+              {
+                "parameter": "Source",
+                "value": "s",
+                "description": "Origin node"
+              },
+              {
+                "parameter": "Destination",
+                "value": "t",
+                "description": "Terminal node"
+              },
+              {
+                "parameter": "Component model",
+                "value": "Bernoulli",
+                "description": "Binary available/unavailable state"
+              },
+              {
+                "parameter": "Random seed",
+                "value": "123",
+                "description": "Reproducibility seed"
+              },
+              {
+                "parameter": "Confidence level",
+                "value": "95%",
+                "description": "Interval reported for estimated reliability"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "results",
+      "type": "section",
+      "title": "3. Results",
+      "purpose": "Present primary reliability estimates and simulation diagnostics.",
+      "slides": [
+        {
+          "id": "primary_results",
+          "type": "metrics",
+          "title": "Primary Results",
+          "metrics": [
+            {
+              "label": "Network Reliability",
+              "value": "87.3%",
+              "detail": "Estimated probability of s\u2192t connectivity",
+              "emphasis": "primary"
+            },
+            {
+              "label": "Successful Runs",
+              "value": "174,600",
+              "detail": "Approximate connected realizations",
+              "emphasis": "secondary"
+            },
+            {
+              "label": "Failed Runs",
+              "value": "25,400",
+              "detail": "Approximate disconnected realizations",
+              "emphasis": "secondary"
+            },
+            {
+              "label": "95% CI",
+              "value": "[87.14%, 87.46%]",
+              "detail": "Monte Carlo confidence interval",
+              "emphasis": "secondary"
+            }
+          ]
+        },
+        {
+          "id": "reliability_distribution",
+          "type": "figure",
+          "title": "Estimated Reliability Across Simulation Batches",
+          "figure": {
+            "path": "C:\\Users\\Drew\\Documents\\MyFiles\\work\\pptx-xlsx-docx\\ex_images\\images.jpg",
+            "caption": "Running estimate of network reliability across simulation batches.",
+            "alt_text": "Line chart showing convergence of the estimated reliability toward approximately 0.873."
+          }
+        },
+        {
+          "id": "convergence",
+          "type": "figure",
+          "title": "Monte Carlo Convergence",
+          "figure": {
+            "path": "C:\\Users\\Drew\\Documents\\MyFiles\\work\\pptx-xlsx-docx\\ex_images\\images (2).jpg",
+            "caption": "Convergence of the reliability estimator as the number of simulations increases."
+          },
+          "annotations": [
+            {
+              "type": "callout",
+              "text": "Estimate stabilizes after approximately 100,000 realizations."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sensitivity",
+      "type": "section",
+      "title": "4. Sensitivity Analysis",
+      "purpose": "Quantify how component failure probabilities affect network reliability.",
+      "slides": [
+        {
+          "id": "component_influence",
+          "type": "table",
+          "title": "Component Influence Ranking",
+          "table": {
+            "columns": [
+              {
+                "key": "rank",
+                "label": "Rank"
+              },
+              {
+                "key": "component",
+                "label": "Component"
+              },
+              {
+                "key": "baseline_failure",
+                "label": "Baseline Failure"
+              },
+              {
+                "key": "influence",
+                "label": "Estimated Influence"
+              },
+              {
+                "key": "reliability_drop",
+                "label": "\u0394 Reliability"
+              }
+            ],
+            "rows": [
+              {
+                "rank": 1,
+                "component": "Node N7",
+                "baseline_failure": "0.10",
+                "influence": "0.31",
+                "reliability_drop": "8.4 pp"
+              },
+              {
+                "rank": 2,
+                "component": "Edge E12",
+                "baseline_failure": "0.15",
+                "influence": "0.24",
+                "reliability_drop": "6.7 pp"
+              },
+              {
+                "rank": 3,
+                "component": "Node N4",
+                "baseline_failure": "0.08",
+                "influence": "0.17",
+                "reliability_drop": "4.9 pp"
+              },
+              {
+                "rank": 4,
+                "component": "Edge E08",
+                "baseline_failure": "0.12",
+                "influence": "0.11",
+                "reliability_drop": "3.1 pp"
+              },
+              {
+                "rank": 5,
+                "component": "Node N9",
+                "baseline_failure": "0.05",
+                "influence": "0.08",
+                "reliability_drop": "2.2 pp"
+              }
+            ]
+          }
+        },
+        {
+          "id": "sensitivity_surface",
+          "type": "figure",
+          "title": "Reliability Sensitivity Surface",
+          "figure": {
+            "path": "c:\\Users\\Drew\\Documents\\MyFiles\\work\\pptx-xlsx-docx\\ex_images\\images (2).jpg",
+            "caption": "Estimated network reliability under perturbations to selected component failure probabilities."
+          }
+        },
+        {
+          "id": "influence_interpretation",
+          "type": "findings",
+          "title": "Sensitivity Findings",
+          "findings": [
+            {
+              "severity": "high",
+              "title": "N7 is highly influential",
+              "text": "N7 combines a relatively modest failure probability with a structurally important network position."
+            },
+            {
+              "severity": "high",
+              "title": "Influence is not equivalent to failure probability",
+              "text": "Components with higher failure probabilities do not necessarily produce the largest reliability reductions."
+            },
+            {
+              "severity": "medium",
+              "title": "Network redundancy moderates risk",
+              "text": "Components participating in multiple independent paths tend to have lower marginal influence."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "discussion",
+      "type": "section",
+      "title": "5. Discussion",
+      "purpose": "Interpret the results and identify modeling implications.",
+      "slides": [
+        {
+          "id": "interpretation",
+          "type": "two_column",
+          "title": "Interpretation of Results",
+          "left": {
+            "heading": "What the Results Suggest",
+            "bullets": [
+              "Network reliability is relatively high under baseline assumptions.",
+              "Reliability is concentrated around a small number of critical components.",
+              "Redundancy provides meaningful protection against individual failures."
+            ]
+          },
+          "right": {
+            "heading": "Implications",
+            "bullets": [
+              "Prioritize monitoring of high-influence components.",
+              "Evaluate whether redundancy can be increased around critical nodes.",
+              "Use influence measures to guide additional data collection.",
+              "Consider dependence between component failures in future models."
+            ]
+          }
+        },
+        {
+          "id": "limitations",
+          "type": "findings",
+          "title": "Model Limitations",
+          "findings": [
+            {
+              "severity": "medium",
+              "title": "Independent failures",
+              "text": "The baseline model assumes component failures are independent."
+            },
+            {
+              "severity": "medium",
+              "title": "Binary component state",
+              "text": "Components are represented as either fully operational or failed."
+            },
+            {
+              "severity": "low",
+              "title": "Static network",
+              "text": "The current model does not represent repair, restoration, or time-dependent degradation."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "recommendations",
+      "type": "section",
+      "title": "6. Recommendations",
+      "purpose": "Translate analytical findings into next steps.",
+      "slides": [
+        {
+          "id": "recommendations",
+          "type": "recommendations",
+          "title": "Recommended Next Steps",
+          "recommendations": [
+            {
+              "priority": 1,
+              "title": "Investigate N7",
+              "rationale": "N7 has the largest estimated marginal influence on network connectivity.",
+              "action": "Validate the assumed failure probability and assess available redundancy."
+            },
+            {
+              "priority": 2,
+              "title": "Expand sensitivity analysis",
+              "rationale": "Single-component perturbations do not capture interaction effects.",
+              "action": "Evaluate joint perturbations of the top-ranked components."
+            },
+            {
+              "priority": 3,
+              "title": "Introduce correlated failures",
+              "rationale": "Shared environmental or operational causes may violate independence.",
+              "action": "Compare independent and correlated failure models."
+            }
+          ]
+        },
+        {
+          "id": "decision_summary",
+          "type": "summary",
+          "title": "Decision Summary",
+          "summary": "The baseline network is reasonably reliable, but reliability is sensitive to a small set of structurally important components. The recommended next step is targeted analysis of those components rather than uniform treatment of all network elements."
+        }
+      ]
+    }
+  ],
+  "appendix": [
+    {
+      "id": "appendix_a",
+      "type": "table",
+      "title": "Appendix A \u2014 Component Parameters",
+      "table": {
+        "columns": [
+          {
+            "key": "component",
+            "label": "Component"
+          },
+          {
+            "key": "type",
+            "label": "Type"
+          },
+          {
+            "key": "failure_probability",
+            "label": "Failure Probability"
+          },
+          {
+            "key": "influence",
+            "label": "Influence"
+          }
+        ],
+        "rows": [
+          {
+            "component": "N1",
+            "type": "Node",
+            "failure_probability": 0.05,
+            "influence": 0.02
+          },
+          {
+            "component": "N4",
+            "type": "Node",
+            "failure_probability": 0.08,
+            "influence": 0.17
+          },
+          {
+            "component": "N7",
+            "type": "Node",
+            "failure_probability": 0.1,
+            "influence": 0.31
+          },
+          {
+            "component": "N9",
+            "type": "Node",
+            "failure_probability": 0.05,
+            "influence": 0.08
+          },
+          {
+            "component": "E08",
+            "type": "Edge",
+            "failure_probability": 0.12,
+            "influence": 0.11
+          },
+          {
+            "component": "E12",
+            "type": "Edge",
+            "failure_probability": 0.15,
+            "influence": 0.24
+          }
+        ]
+      }
+    },
+    {
+      "id": "appendix_b",
+      "type": "text",
+      "title": "Appendix B \u2014 Reproducibility",
+      "paragraphs": [
+        "All simulation results are generated from a fixed random seed.",
+        "The analysis should be reproducible from the reported configuration and source data.",
+        "Figures referenced in the report are external assets and are resolved relative to the report package."
+      ],
+      "code": {
+        "language": "python",
+        "content": "rng = np.random.default_rng(123)"
+      }
+    }
+  ],
+  "references": [
+    {
+      "id": "ref_01",
+      "type": "article",
+      "authors": [
+        "Example Author"
+      ],
+      "year": 2024,
+      "title": "Network Reliability and Stochastic Connectivity",
+      "source": "Example Journal",
+      "url": null
+    },
+    {
+      "id": "ref_02",
+      "type": "book",
+      "authors": [
+        "Example Author"
+      ],
+      "year": 2023,
+      "title": "Reliability Engineering Methods",
+      "source": "Example Publisher",
+      "url": null
+    }
+  ],
+  "assets": {
+    "base_path": ".",
+    "figures": [
+      "C://Users//Drew//Documents//MyFiles//work//pptx-xlsx-docx//ex_images//afmc.jpg",
+      "c:\\Users\\Drew\\Documents\\MyFiles\\work\\pptx-xlsx-docx\\ex_images\\images (1).jpg",
+      "c:\\Users\\Drew\\Documents\\MyFiles\\work\\pptx-xlsx-docx\\ex_images\\images (2).jpg",
+      "c:\\Users\\Drew\\Documents\\MyFiles\\work\\pptx-xlsx-docx\\ex_images\\images.jpg"
+    ]
+  }
+}
