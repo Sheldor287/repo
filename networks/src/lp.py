@@ -85,7 +85,7 @@ def standard_min_cost_flow(G):
 def standard_max_flow(G):
     """ Maximize total flow over the graph """
     # Create artificial nodes if needed
-    G = preprocess_demand_imbalance(G)
+    #G = preprocess_demand_imbalance(G)
 
     # Sets & params
     model = pyo.ConcreteModel()

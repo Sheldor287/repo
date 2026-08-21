@@ -3,9 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-def create_layered_graph(layer_sizes=[1,2,2,1], fully_connect=True):
+def create_layered_graph(layer_sizes=[1,2,2,1], fully_connect=True, graph_type='DiGraph'):
     """ Generate a graph from a list of layer sizes """
-    G = nx.DiGraph()
+    if graph_type == 'Graph':
+        G = nx.Graph()
+    else:
+        G = nx.DiGraph()
     layers = []
 
     node_id = 0
