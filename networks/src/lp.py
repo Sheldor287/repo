@@ -13,7 +13,7 @@ def mf_obj(m):
     return outflow - inflow
 
 def edge_cap_rule(m, u, v):
-    return m.x[u, v] <= m.capacity[u, v]
+    return m.x[u, v] <= m.capacity[u, v] * m.edge_state[u, v] * m.node_state[u] * m.node_state[v] 
 
 def edge_flow_rule(m, n):
     if n in m.s or n in m.t:
@@ -95,6 +95,8 @@ def standard_max_flow(G):
     model.demand = pyo.Param(model.nodes,initialize={n: G.nodes[n]['demand'] for n in G.nodes()})
     model.s = pyo.Set(initialize=[n for n in model.nodes if model.demand[n] < 0])
     model.t = pyo.Set(initialize=[n for n in model.nodes if model.demand[n] > 0])
+    model.node_state = pyo.Param(model.nodes, within=pyo.Binary, mutable=True, initialize=1)
+    model.edge_state = pyo.Param(model.edges, within=pyo.Binary, mutable=True, initialize=1)
 
     # Vars
     model.x = pyo.Var(model.edges, within=pyo.NonNegativeReals)
@@ -116,5 +118,28 @@ def standard_max_flow(G):
     return result, flow_dict
 
 
+def build_max_flow_model(G):
+    """ Maximize total flow over the graph """
+    # Sets & params
+    model = pyo.ConcreteModel()
+    model.nodes = pyo.Set(initialize=list(G.nodes()))
+    model.edges = pyo.Set(initialize=list(G.edges()), dimen=2)
+    model.capacity = pyo.Param(model.edges,initialize={(u, v): G.edges[u, v]['capacity'] for u, v in G.edges()})
+    model.demand = pyo.Param(model.nodes,initialize={n: G.nodes[n]['demand'] for n in G.nodes()})
+    model.s = pyo.Set(initialize=[n for n in model.nodes if model.demand[n] < 0])
+    model.t = pyo.Set(initialize=[n for n in model.nodes if model.demand[n] > 0])
+    model.node_state = pyo.Param(model.nodes, within=pyo.Binary, mutable=True, initialize=1)
+    model.edge_state = pyo.Param(model.edges, within=pyo.Binary, mutable=True, initialize=1)
 
+    # Vars
+    model.x = pyo.Var(model.edges, within=pyo.NonNegativeReals)
+    model.F = pyo.Var(within=pyo.NonNegativeReals)
+
+    # Objective & constraints
+    model.obj = pyo.Objective(expr=model.F, sense=pyo.maximize)
+    model.cap = pyo.Constraint(model.edges, rule=edge_cap_rule)
+    model.flow = pyo.Constraint(model.nodes, rule=edge_flow_rule)
+    model.source = pyo.Constraint(rule=source_flow_rule)
+    model.sink = pyo.Constraint(rule=sink_flow_rule)
+    return model
 
