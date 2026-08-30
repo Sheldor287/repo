@@ -1,0 +1,322 @@
+import networkx as nx
+from IPython.display import display, HTML
+from html import escape
+import json
+
+
+G = nx.path_graph(["A", "B", "C", "D"])
+
+pos = {
+    "A": (100, 100),
+    "B": (250, 150),
+    "C": (400, 100),
+    "D": (550, 200),
+}
+
+width = 650
+height = 300
+
+
+# =========================================================
+# BUILD EDGES
+# =========================================================
+
+edges = ""
+
+for u, v in G.edges:
+
+    x1, y1 = pos[u]
+    x2, y2 = pos[v]
+
+    edges += f"""
+    <line
+        class="edge"
+        data-u="{escape(str(u))}"
+        data-v="{escape(str(v))}"
+        x1="{x1}"
+        y1="{y1}"
+        x2="{x2}"
+        y2="{y2}"
+        stroke="black"
+        stroke-width="2"
+    />
+    """
+
+
+# =========================================================
+# BUILD NODES
+# =========================================================
+
+nodes = ""
+
+for node, (x, y) in pos.items():
+
+    nodes += f"""
+    <circle
+        class="node"
+        data-node="{escape(str(node))}"
+        cx="{x}"
+        cy="{y}"
+        r="25"
+        fill="lightblue"
+        stroke="black"
+        stroke-width="2"
+    />
+
+    <text
+        class="label"
+        data-node="{escape(str(node))}"
+        x="{x}"
+        y="{y + 5}"
+        text-anchor="middle"
+        font-size="14"
+        pointer-events="none"
+    >{escape(str(node))}</text>
+    """
+
+
+# =========================================================
+# INITIAL POSITION DICTIONARY
+# =========================================================
+
+initial = json.dumps(
+    {
+        str(n): [float(x), float(y)]
+        for n, (x, y) in pos.items()
+    },
+    indent=4
+)
+
+
+# =========================================================
+# JAVASCRIPT
+#
+# This is deliberately NOT an f-string.
+# Therefore normal JavaScript {} are safe.
+# =========================================================
+
+javascript = """
+(function() {
+
+    const svg = document.getElementById("graph");
+    const output = document.getElementById("positions");
+
+    const nodes = svg.querySelectorAll(".node");
+
+    let dragging = false;
+    let selected = null;
+
+
+    // -----------------------------------------------------
+    // Update displayed position dictionary
+    // -----------------------------------------------------
+
+    function updatePositions() {
+
+        const positions = [];
+
+        nodes.forEach(function(node) {
+
+            const x = parseFloat(
+                node.getAttribute("cx")
+            );
+
+            const y = parseFloat(
+                node.getAttribute("cy")
+            );
+
+            positions.push(
+                '"' +
+                node.dataset.node +
+                '": (' +
+                Number(x.toFixed(3)) +
+                ', ' +
+                Number(y.toFixed(3)) +
+                ')'
+            );
+
+        });
+
+        output.value =
+            "{\\n    " +
+            positions.join(",\\n    ") +
+            "\\n}";
+    }
+
+
+    // -----------------------------------------------------
+    // Start dragging
+    // -----------------------------------------------------
+
+    nodes.forEach(function(node) {
+
+        node.addEventListener(
+            "mousedown",
+            function(event) {
+
+                dragging = true;
+                selected = node;
+
+                event.preventDefault();
+
+            }
+        );
+
+    });
+
+
+    // -----------------------------------------------------
+    // Drag
+    // -----------------------------------------------------
+
+    svg.addEventListener(
+        "mousemove",
+        function(event) {
+
+            if (!dragging || selected === null)
+                return;
+
+            const x = event.offsetX;
+            const y = event.offsetY;
+
+
+            // Move node
+
+            selected.setAttribute("cx", x);
+            selected.setAttribute("cy", y);
+
+
+            // Move label
+
+            const name = selected.dataset.node;
+
+            const label = svg.querySelector(
+                '.label[data-node="' + name + '"]'
+            );
+
+            label.setAttribute("x", x);
+            label.setAttribute("y", y + 5);
+
+
+            // Update edges
+
+            svg.querySelectorAll(".edge").forEach(
+                function(edge) {
+
+                    const u = edge.dataset.u;
+                    const v = edge.dataset.v;
+
+                    const nodeU = svg.querySelector(
+                        '.node[data-node="' + u + '"]'
+                    );
+
+                    const nodeV = svg.querySelector(
+                        '.node[data-node="' + v + '"]'
+                    );
+
+                    edge.setAttribute(
+                        "x1",
+                        nodeU.getAttribute("cx")
+                    );
+
+                    edge.setAttribute(
+                        "y1",
+                        nodeU.getAttribute("cy")
+                    );
+
+                    edge.setAttribute(
+                        "x2",
+                        nodeV.getAttribute("cx")
+                    );
+
+                    edge.setAttribute(
+                        "y2",
+                        nodeV.getAttribute("cy")
+                    );
+
+                }
+            );
+
+
+            // Update dictionary
+
+            updatePositions();
+
+        }
+    );
+
+
+    // -----------------------------------------------------
+    // End dragging
+    // -----------------------------------------------------
+
+    svg.addEventListener(
+        "mouseup",
+        function() {
+
+            dragging = false;
+            selected = null;
+
+        }
+    );
+
+
+    svg.addEventListener(
+        "mouseleave",
+        function() {
+
+            dragging = false;
+            selected = null;
+
+        }
+    );
+
+
+    // Initial dictionary
+
+    updatePositions();
+
+})();
+"""
+
+
+# =========================================================
+# SINGLE HTML F-STRING
+# =========================================================
+
+html = f"""
+<div id="graph-editor">
+
+    <svg
+        id="graph"
+        width="{width}"
+        height="{height}"
+        style="
+            border: 1px solid gray;
+            user-select: none;
+        "
+    >
+
+        {edges}
+        {nodes}
+
+    </svg>
+
+    <br><br>
+
+    <textarea
+        id="positions"
+        rows="10"
+        cols="50"
+        style="font-family: monospace;"
+    >{escape(initial)}</textarea>
+
+</div>
+
+<script>
+{javascript}
+</script>
+"""
+
+
+display(HTML(html))

@@ -1,0 +1,296 @@
+{
+  "name": "ArbitraryPythonArchitecture",
+  "summary": {
+    "elements": 29,
+    "classes": 4,
+    "types": 5,
+    "properties": 7,
+    "operations": 2,
+    "parameters": 2,
+    "relationships": 3,
+    "constraints": 4
+  },
+  "classes": [
+    {
+      "id": "class_d4ff5c2cdfae",
+      "name": "Vehicle",
+      "python_type": "__main__.Vehicle",
+      "stereotype": "block",
+      "abstract": false,
+      "generalizations": [],
+      "properties": [
+        "property_12bacca9676e",
+        "property_07f966b68fda"
+      ],
+      "operations": []
+    },
+    {
+      "id": "class_d7129d8e42d8",
+      "name": "Battery",
+      "python_type": "__main__.Battery",
+      "stereotype": "block",
+      "abstract": false,
+      "generalizations": [],
+      "properties": [
+        "property_ee20ceb06ee9",
+        "property_32bcb508a943"
+      ],
+      "operations": []
+    },
+    {
+      "id": "class_534f4a624e0e",
+      "name": "ElectricVehicle",
+      "python_type": "__main__.ElectricVehicle",
+      "stereotype": "block",
+      "abstract": false,
+      "generalizations": [
+        "class_d4ff5c2cdfae"
+      ],
+      "properties": [
+        "property_f541346c2192",
+        "property_22aa48680de3"
+      ],
+      "operations": [
+        "operation_4b4fc413ab35"
+      ]
+    },
+    {
+      "id": "class_8cece135bb5e",
+      "name": "Fleet",
+      "python_type": "__main__.Fleet",
+      "stereotype": "block",
+      "abstract": false,
+      "generalizations": [],
+      "properties": [
+        "property_4f72ca655a4b"
+      ],
+      "operations": [
+        "operation_7b9e806cd24a"
+      ]
+    }
+  ],
+  "types": [
+    {
+      "id": "type_395adff98166",
+      "name": "Real",
+      "kind": "uml:PrimitiveType"
+    },
+    {
+      "id": "type_2152fb75e96b",
+      "name": "String",
+      "kind": "uml:PrimitiveType"
+    },
+    {
+      "id": "type_5e25871d7a7e",
+      "name": "float",
+      "kind": "uml:DataType"
+    },
+    {
+      "id": "type_437dc92033cb",
+      "name": "ElectricVehicle",
+      "kind": "uml:DataType"
+    },
+    {
+      "id": "type_a7929cd7c0b5",
+      "name": "None",
+      "kind": "uml:DataType"
+    }
+  ],
+  "properties": [
+    {
+      "id": "property_12bacca9676e",
+      "name": "mass",
+      "owner": "class_d4ff5c2cdfae",
+      "type": "type_395adff98166",
+      "annotation": "float",
+      "multiplicity": [
+        1,
+        "1"
+      ],
+      "aggregation": null,
+      "stereotype": "valueProperty"
+    },
+    {
+      "id": "property_07f966b68fda",
+      "name": "name",
+      "owner": "class_d4ff5c2cdfae",
+      "type": "type_2152fb75e96b",
+      "annotation": "str",
+      "multiplicity": [
+        1,
+        "1"
+      ],
+      "aggregation": null,
+      "stereotype": "valueProperty"
+    },
+    {
+      "id": "property_ee20ceb06ee9",
+      "name": "capacity",
+      "owner": "class_d7129d8e42d8",
+      "type": "type_395adff98166",
+      "annotation": "float",
+      "multiplicity": [
+        1,
+        "1"
+      ],
+      "aggregation": null,
+      "stereotype": "valueProperty"
+    },
+    {
+      "id": "property_32bcb508a943",
+      "name": "voltage",
+      "owner": "class_d7129d8e42d8",
+      "type": "type_395adff98166",
+      "annotation": "float",
+      "multiplicity": [
+        1,
+        "1"
+      ],
+      "aggregation": null,
+      "stereotype": "valueProperty"
+    },
+    {
+      "id": "property_f541346c2192",
+      "name": "battery",
+      "owner": "class_534f4a624e0e",
+      "type": "class_d7129d8e42d8",
+      "annotation": "Battery",
+      "multiplicity": [
+        1,
+        "1"
+      ],
+      "aggregation": null,
+      "stereotype": "referenceProperty"
+    },
+    {
+      "id": "property_22aa48680de3",
+      "name": "range_km",
+      "owner": "class_534f4a624e0e",
+      "type": "type_395adff98166",
+      "annotation": "float",
+      "multiplicity": [
+        1,
+        "1"
+      ],
+      "aggregation": null,
+      "stereotype": "valueProperty"
+    },
+    {
+      "id": "property_4f72ca655a4b",
+      "name": "vehicles",
+      "owner": "class_8cece135bb5e",
+      "type": "class_534f4a624e0e",
+      "annotation": "list[ElectricVehicle]",
+      "multiplicity": [
+        0,
+        "*"
+      ],
+      "aggregation": "composite",
+      "stereotype": "part"
+    }
+  ],
+  "operations": [
+    {
+      "id": "operation_4b4fc413ab35",
+      "name": "estimate_range",
+      "owner": "class_534f4a624e0e",
+      "parameters": [
+        "parameter_1fe5290b67ba"
+      ],
+      "return_type": "type_5e25871d7a7e"
+    },
+    {
+      "id": "operation_7b9e806cd24a",
+      "name": "add_vehicle",
+      "owner": "class_8cece135bb5e",
+      "parameters": [
+        "parameter_2702fd6ba0bb"
+      ],
+      "return_type": "type_a7929cd7c0b5"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "parameter_1fe5290b67ba",
+      "name": "efficiency",
+      "owner": "operation_4b4fc413ab35",
+      "type": "type_5e25871d7a7e",
+      "direction": "in",
+      "default": null
+    },
+    {
+      "id": "parameter_2702fd6ba0bb",
+      "name": "vehicle",
+      "owner": "operation_7b9e806cd24a",
+      "type": "type_437dc92033cb",
+      "direction": "in",
+      "default": null
+    }
+  ],
+  "relationships": [
+    {
+      "id": "rel_cb2a311d6f85",
+      "name": "ElectricVehicle specializes Vehicle",
+      "relationship": "generalization",
+      "source": "class_534f4a624e0e",
+      "target": "class_d4ff5c2cdfae",
+      "source_role": null,
+      "target_role": null,
+      "inferred": false
+    },
+    {
+      "id": "rel_a3b31ac5a6d1",
+      "name": "ElectricVehicle.battery",
+      "relationship": "association",
+      "source": "class_534f4a624e0e",
+      "target": "class_d7129d8e42d8",
+      "source_role": null,
+      "target_role": "battery",
+      "inferred": true
+    },
+    {
+      "id": "rel_91232034e5df",
+      "name": "Fleet.vehicles",
+      "relationship": "composition",
+      "source": "class_8cece135bb5e",
+      "target": "class_534f4a624e0e",
+      "source_role": null,
+      "target_role": "vehicles",
+      "inferred": true
+    }
+  ],
+  "constraints": [
+    {
+      "id": "constraint_f5b4ebc6249a",
+      "name": "VehicleAttributeCount",
+      "specification": "declaredAttributeCount(Vehicle) = 2",
+      "constrained": [
+        "class_d4ff5c2cdfae"
+      ]
+    },
+    {
+      "id": "constraint_28daea950136",
+      "name": "BatteryAttributeCount",
+      "specification": "declaredAttributeCount(Battery) = 2",
+      "constrained": [
+        "class_d7129d8e42d8"
+      ]
+    },
+    {
+      "id": "constraint_bb44b7279031",
+      "name": "ElectricVehicleAttributeCount",
+      "specification": "declaredAttributeCount(ElectricVehicle) = 2",
+      "constrained": [
+        "class_534f4a624e0e"
+      ]
+    },
+    {
+      "id": "constraint_6f6abe02e555",
+      "name": "FleetAttributeCount",
+      "specification": "declaredAttributeCount(Fleet) = 1",
+      "constrained": [
+        "class_8cece135bb5e"
+      ]
+    }
+  ]
+}

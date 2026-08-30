@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='utf-8'?>
+<xmi:XMI xmlns:uml="http://www.omg.org/spec/UML/20131001" xmlns:xmi="http://www.omg.org/XMI" xmi:version="2.5">
+  <uml:Model xmi:id="umlmodel_e36434b036df" name="ArbitraryPythonArchitecture">
+    <uml:packagedElement xmi:type="uml:Profile" xmi:id="profile_3d6ef3f190cd" name="PythonSysMLFacade">
+      <uml:packagedElement xmi:type="uml:Stereotype" xmi:id="stereo_1e9d9af73eaa" name="Block" />
+      <uml:packagedElement xmi:type="uml:Stereotype" xmi:id="stereo_5120dfa84d9c" name="PartProperty" />
+      <uml:packagedElement xmi:type="uml:Stereotype" xmi:id="stereo_5322706565f7" name="ValueProperty" />
+      <uml:packagedElement xmi:type="uml:Stereotype" xmi:id="stereo_a1c957a76926" name="ReferenceProperty" />
+      <uml:packagedElement xmi:type="uml:Stereotype" xmi:id="stereo_60e6bddb4a08" name="Interface" />
+    </uml:packagedElement>
+    <uml:packagedElement xmi:type="uml:Package" xmi:id="package_3ea3a24e5a4a" name="ArbitraryPythonArchitecture">
+      <uml:packagedElement xmi:type="uml:PrimitiveType" xmi:id="type_ac9b44f811cd" name="Real" />
+      <uml:packagedElement xmi:type="uml:PrimitiveType" xmi:id="type_aa63d293f713" name="String" />
+      <uml:packagedElement xmi:type="uml:DataType" xmi:id="type_575678ef13db" name="None" />
+      <uml:packagedElement xmi:type="uml:Class" xmi:id="class_6e60314adb12" name="Vehicle">
+        <uml:ownedComment xmi:type="uml:Comment" xmi:id="comment_4b2b8a461075" body="Base vehicle." />
+        <uml:ownedAttribute xmi:type="uml:Property" xmi:id="property_289f91dbf6bf" name="mass" lower="1" upper="1" type="type_ac9b44f811cd">
+          <uml:ownedComment xmi:type="uml:Comment" xmi:id="comment_3e56068c2488" body="Python annotation: float" />
+        </uml:ownedAttribute>
+        <uml:ownedAttribute xmi:type="uml:Property" xmi:id="property_aeb6eb3bcaad" name="name" lower="1" upper="1" type="type_aa63d293f713">
+          <uml:ownedComment xmi:type="uml:Comment" xmi:id="comment_1841c65cb5f0" body="Python annotation: str" />
+        </uml:ownedAttribute>
+      </uml:packagedElement>
+      <uml:packagedElement xmi:type="uml:Class" xmi:id="class_79e2fab4ec43" name="Battery">
+        <uml:ownedComment xmi:type="uml:Comment" xmi:id="comment_3248b68c9fd7" body="Battery(capacity: float, voltage: float)" />
+        <uml:ownedAttribute xmi:type="uml:Property" xmi:id="property_a0a625926d58" name="capacity" lower="1" upper="1" type="type_ac9b44f811cd">
+          <uml:ownedComment xmi:type="uml:Comment" xmi:id="comment_4b3614ce673b" body="Python annotation: float" />
+        </uml:ownedAttribute>
+        <uml:ownedAttribute xmi:type="uml:Property" xmi:id="property_82a1a44e8869" name="voltage" lower="1" upper="1" type="type_ac9b44f811cd">
+          <uml:ownedComment xmi:type="uml:Comment" xmi:id="comment_da49b82ed4f4" body="Python annotation: float" />
+        </uml:ownedAttribute>
+      </uml:packagedElement>
+      <uml:packagedElement xmi:type="uml:Class" xmi:id="class_bf4e123017b8" name="ElectricVehicle">
+        <uml:ownedComment xmi:type="uml:Comment" xmi:id="comment_605c0a0b4886" body="ElectricVehicle(mass: float, name: str, battery: __main__.Battery, range_km: float = 0.0)" />
+        <uml:ownedAttribute xmi:type="uml:Property" xmi:id="property_7cc603938920" name="battery" lower="1" upper="1" type="class_79e2fab4ec43">
+          <uml:ownedComment xmi:type="uml:Comment" xmi:id="comment_fcfe3668ce64" body="Python annotation: Battery" />
+        </uml:ownedAttribute>
+        <uml:ownedAttribute xmi:type="uml:Property" xmi:id="property_6ccba54ef8ea" name="range_km" lower="1" upper="1" type="type_ac9b44f811cd">
+          <uml:ownedComment xmi:type="uml:Comment" xmi:id="comment_8cb66acd9021" body="Python annotation: float" />
+        </uml:ownedAttribute>
+        <uml:ownedOperation xmi:type="uml:Operation" xmi:id="operation_86d560f709ef" name="estimate_range">
+          <uml:ownedParameter xmi:type="uml:Parameter" xmi:id="parameter_2cecab60f0f1" name="efficiency" direction="in" type="type_ac9b44f811cd" />
+          <uml:ownedParameter xmi:type="uml:Parameter" xmi:id="return_51c9122147f3" name="return" direction="return" type="type_ac9b44f811cd" />
+        </uml:ownedOperation>
+      </uml:packagedElement>
+      <uml:packagedElement xmi:type="uml:Class" xmi:id="class_dbd11fce3228" name="Fleet">
+        <uml:ownedAttribute xmi:type="uml:Property" xmi:id="property_ec151b04c8f5" name="vehicles" lower="0" upper="*" type="class_bf4e123017b8" aggregation="composite">
+          <uml:ownedComment xmi:type="uml:Comment" xmi:id="comment_f019f79b7410" body="Python annotation: list[ElectricVehicle]" />
+        </uml:ownedAttribute>
+        <uml:ownedOperation xmi:type="uml:Operation" xmi:id="operation_adeb157253e0" name="add_vehicle">
+          <uml:ownedParameter xmi:type="uml:Parameter" xmi:id="parameter_7f57d2631b93" name="vehicle" direction="in" type="class_bf4e123017b8" />
+          <uml:ownedParameter xmi:type="uml:Parameter" xmi:id="return_62a2888649ed" name="return" direction="return" type="type_575678ef13db" />
+        </uml:ownedOperation>
+      </uml:packagedElement>
+      <uml:packagedElement xmi:type="uml:Generalization" xmi:id="rel_d0cc8719cce3" specific="class_bf4e123017b8" general="class_6e60314adb12" />
+      <uml:packagedElement xmi:type="uml:Association" xmi:id="rel_e4814f150516" name="ElectricVehicle.battery">
+        <uml:ownedEnd xmi:type="uml:Property" xmi:id="end_8ffc0f72260d" name="source" type="class_bf4e123017b8" association="rel_e4814f150516" />
+        <uml:ownedEnd xmi:type="uml:Property" xmi:id="end_8201b9551eb2" name="battery" type="class_79e2fab4ec43" association="rel_e4814f150516" />
+      </uml:packagedElement>
+      <uml:packagedElement xmi:type="uml:Association" xmi:id="rel_731c012ca700" name="Fleet.vehicles">
+        <uml:ownedEnd xmi:type="uml:Property" xmi:id="end_cf1e99839354" name="source" type="class_dbd11fce3228" association="rel_731c012ca700" />
+        <uml:ownedEnd xmi:type="uml:Property" xmi:id="end_f70a857ee311" name="vehicles" type="class_bf4e123017b8" association="rel_731c012ca700" aggregation="composite" />
+      </uml:packagedElement>
+      <uml:packagedElement xmi:type="uml:Constraint" xmi:id="constraint_c08504d585f5" name="VehicleAttributeCount">
+        <uml:specification xmi:type="uml:LiteralString" xmi:id="literal_ed62c69d4520" value="declaredAttributeCount(Vehicle) = 2" />
+      </uml:packagedElement>
+      <uml:packagedElement xmi:type="uml:Constraint" xmi:id="constraint_1438789beaa0" name="BatteryAttributeCount">
+        <uml:specification xmi:type="uml:LiteralString" xmi:id="literal_4db7501eb4de" value="declaredAttributeCount(Battery) = 2" />
+      </uml:packagedElement>
+      <uml:packagedElement xmi:type="uml:Constraint" xmi:id="constraint_8c5da4225dfe" name="ElectricVehicleAttributeCount">
+        <uml:specification xmi:type="uml:LiteralString" xmi:id="literal_c3c65b2f2978" value="declaredAttributeCount(ElectricVehicle) = 2" />
+      </uml:packagedElement>
+      <uml:packagedElement xmi:type="uml:Constraint" xmi:id="constraint_b65cbf023adb" name="FleetAttributeCount">
+        <uml:specification xmi:type="uml:LiteralString" xmi:id="literal_a6c371e027cb" value="declaredAttributeCount(Fleet) = 1" />
+      </uml:packagedElement>
+    </uml:packagedElement>
+  </uml:Model>
+</xmi:XMI>
