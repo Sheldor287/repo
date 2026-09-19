@@ -1,0 +1,201 @@
+from __future__ import annotations
+from pathlib import Path
+from typing import Iterable, Mapping
+import numpy as np
+import pandas as pd
+import base64
+from cryptography.hazmat.primitives.ciphers.aead import AESSIV
+
+class DataPipeline:
+    """
+    Data ingestion and normalization pipeline. Order:
+        read source --> infer metadata (pgm, etc.) --> rename columns to fit the template --> add missing schema columns
+        --> add path/source columns --> reorder columns --> encrpyt select columns --> combine sources
+    """
+    def __init__(self,schema: list[str],rename_map: Mapping[str, str] | None = None, encrypt_columns: Iterable[str] | None = None, test=False):
+        self.schema = list(schema)
+        self.rename_map = dict(rename_map or {})
+        self.encrypt_columns = set(encrypt_columns or [])
+        self._validate_configuration()
+        self._test_state = test
+
+    """Schema Validation"""
+    # Validate schema
+    def _validate_configuration(self):
+        if len(self.schema) != len(set(self.schema)):
+            raise ValueError("Schema contains duplicate columns.")
+        unknown = self.encrypt_columns - set(self.schema)
+        if unknown:
+            raise ValueError(f"Encryption columns not in schema: {sorted(unknown)}")
+
+    # Transform to schema
+    def rename_columns(self, df: pd.DataFrame) -> pd.DataFrame:
+        return df.rename(columns=self.rename_map)
+
+    def add_missing_columns(self, df: pd.DataFrame) -> pd.DataFrame:
+        df = df.copy()
+        for column in self.schema:
+            if column not in df.columns:
+                df[column] = np.nan
+        return df
+
+    def reorder_columns(self, df: pd.DataFrame) -> pd.DataFrame:
+        return df.loc[:, self.schema]
+
+    def normalize(self, df: pd.DataFrame) -> pd.DataFrame:
+        df = self.rename_columns(df)
+        df = self.add_missing_columns(df)
+        df = self.reorder_columns(df)
+        return df
+
+    """Infer data from path information"""
+    @staticmethod
+    def identify_path_value(path: str | Path, path_names: Mapping[str, str]) -> str | None:
+        path = Path(path)
+        # Check every component of the path
+        for part in path.parts:
+            if part in path_names:
+                return path_names[part]
+        # Also allow a direct path-string match
+        path_string = str(path)
+        for key, value in path_names.items():
+            if key in path_string:
+                return value
+        return None
+    @staticmethod
+    def parse_path(path:str|Path, path_schema: Mapping[str, int],) -> dict[str, str]:
+        """path schema maps parts of the filepath to catagorical data in the table"""
+        #path_schema = {'div': 2, 'pmo': 3} I think?
+        path = Path(path)
+        parts=path.parts
+        result = {}
+        for col, pos in path_schema.items():
+            if pos >= len(parts):
+                raise ValueError(f"{path} does not have {pos} subdirectories")
+            value = parts[pos]
+            if pos == len(parts)-1:
+                value = Path(value).stem
+            result[col] = value
+        return result
+  
+    def add_path_metadata(self,df:pd.DataFrame,path:str|Path,path_schema:Mapping[str,int]) -> pd.DataFrame:
+        """ Add/assign the canonical path_name column"""
+        df = df.copy()
+        path_data = self.parse_path(path, path_schema)
+        for col, val in path_data.items():
+            if col not in self.schema:
+                raise ValueError("1. Make sure path-schema is set correctly\n2. Make sure every division has a folder")
+            if col not in df.columns:
+                df[col]=val
+            else: 
+                df[col] = df[col].fillna(val)
+        return df
+
+    """Encrpytion"""
+    @staticmethod
+    def generate_key() -> str:
+        # AES-SIV requires a 64-byte key (512 bits)
+        key = AESSIV.generate_key(bit_length=512)
+        return base64.b64encode(key).decode("utf-8")
+
+    @staticmethod
+    def _siv(key_str: str) -> AESSIV:
+        key = base64.b64decode(key_str.encode("utf-8"))
+        return AESSIV(key)
+
+    @staticmethod
+    def encrypt_value(value, siv: AESSIV):
+        if pd.isna(value):
+            return np.nan
+        encrypted = siv.encrypt(str(value).encode("utf-8"), associated_data=None)
+        return base64.b64encode(encrypted).decode("utf-8")
+
+    @staticmethod
+    def decrypt_value(value, siv: AESSIV):
+        if pd.isna(value):
+            return np.nan
+        decoded = base64.b64decode(str(value).encode("utf-8"))
+        return siv.decrypt(decoded, associated_data=None).decode("utf-8")
+
+    def encrypt(self, df: pd.DataFrame, key: str) -> pd.DataFrame:
+        df = df.copy()
+        siv = self._siv(key)
+        for column in self.encrypt_columns:
+            df[column] = df[column].map(lambda val: self.encrypt_value(val, siv))
+        return df
+
+    def decrypt(self, df: pd.DataFrame, key: str) -> pd.DataFrame:
+        df = df.copy()
+        siv = self._siv(key)
+        for column in self.encrypt_columns:
+            df[column] = df[column].map(lambda val: self.decrypt_value(val, siv))
+        return df
+
+    """Table Joining"""
+    def transform(self, df:pd.DataFrame, key:str|None=None, path:str|Path|None=None, path_schema:Mapping[str, int]|None=None) -> pd.DataFrame:
+        df = self.rename_columns(df)
+        if path is not None and path_schema is not None:
+            df = self.add_path_metadata(df, path, path_schema)
+        df = self.add_missing_columns(df)
+        df = self.reorder_columns(df)
+        if self.encrypt_columns:
+            if key is None:
+                raise ValueError("Encryption key required.")
+            df = self.encrypt(df, key)
+        return df
+            
+    def concat_paths(self, paths:Iterable[str|Path], path_schema: Mapping[str, int], key: str|None=None, read_kwargs:Mapping|None=None) -> pd.DataFrame:
+        """df: the table; key: Encryption key; path: source of the file; path_names: used to get data from the path name"""
+        read_kwargs = dict(read_kwargs or {})
+        transformed = []
+        for path in paths:
+            path = Path(path)
+            df = self.read_csv(path, **read_kwargs)
+            df = self.transform(df, key=key,path=path,path_schema=path_schema,)
+            transformed.append(df)
+        return pd.concat(transformed, ignore_index=True)
+
+    """Multiple Tables"""
+    def concat(self,dataframes: Iterable[pd.DataFrame],key: str | None = None) -> pd.DataFrame:
+        """Normalize and concatenate multiple DataFrames."""
+        transformed = [self.transform(df, key=key) for df in dataframes]
+        return pd.concat(transformed,ignore_index=True)
+
+    """Multiple Files"""
+    def read_csv(self,path: str | Path,**kwargs) -> pd.DataFrame:
+        """Read a CSV source."""
+        if self._test_state and "dataframes" in globals(): 
+            return dataframes[str(path)].copy()
+        elif self._test_state and "dataframes" not in globals(): 
+            raise ValueError("dataframes not in globals")
+        elif not self._test_state:
+            return pd.read_csv(path, **kwargs)
+        else:
+            raise Warning("additonal case not covered in DataPipeline.read_csv()")
+
+if __name__ == "__main__":
+
+    # Testing
+    schema = ["col1", "col2", "col3", "id","name","category","value","email","path_name",]
+    schema_renaming_map = {"identifier": "id","person_name": "name","type": "category","amount": "value","email_address": "email","value":"col3"}
+    path_map = {"scenario_A": {"path_name": "A",},"scenario_B": {"path_name": "B",},"scenario_C": {"path_name": "C",},}
+    # "source files"
+    dataframes = {
+        r"data\scenario_A\run1.csv": pd.DataFrame({"value": [10, 20],"email_address": ["alice@example.com","bob@example.com",],}),
+        r"data\scenario_A\run2.csv": pd.DataFrame({"value": [30],"email_address": ["charlie@example.com",],}),
+        r"data\scenario_B\run1.csv": pd.DataFrame({"value": [40, 50],"email_address": ["david@example.com","eve@example.com",],}),
+        r"data\scenario_B\run2.csv": pd.DataFrame({"email_address": ["frank@example.com",],}),
+    }
+    pipeline = DataPipeline(schema=schema, rename_map=schema_renaming_map, encrypt_columns={'email'}, test=True)
+    key = pipeline.generate_key()
+    result = pipeline.concat_paths(paths=dataframes.keys(),path_schema={"col1":1,"col2":2},key=key,)
+    for path, df in dataframes.items():
+        print(path)
+        print(df)
+        print(f"{'=' * 190}")
+    print(f"Encrpytion Key:{key}\nThis key is create when DataPipeline is run and will change with every reoccuring call.")
+    print("Once the Pipeline is validated and the encrypted table is stored, DOTs the key.")
+    print(f"{'=' * 190}\n{result.to_string()}")
+    print(f"{'=' * 190}\nTo decrypt: pipeline.decrypt(result, key)\n{pipeline.decrypt(result, key).to_string()}")
+
+    
