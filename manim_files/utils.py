@@ -47,3 +47,93 @@ def remove_edges_balanced(G, remove_fraction=0.6):
             removed_count += 1
     return H
 
+class FordFulkerson:
+    def __init__(self, G: nx.DiGraph, sources: list, sinks: list):
+        self.G = G.copy()
+        self.sources = sources
+        self.sinks = sinks
+        
+        for _, _, d in self.G.edges(data=True):
+            if "capacity" not in d:
+                d["capacity"] = 1
+                
+        self._initialize_supersources()
+
+    def _initialize_supersources(self):
+        self.source = 's'
+        self.sink = 't'
+        
+        self.H = self.G.copy()
+        self.capacity = {(u, v): d.get('capacity', 1) for u, v, d in self.G.edges(data=True)}
+        self.flow = {(u, v): 0 for (u, v) in self.G.edges()}
+        
+        M = sum(self.capacity.values()) if self.capacity else 1
+        
+        for s in self.sources:
+            self.H.add_edge(self.source, s)
+            self.capacity[(self.source, s)] = M
+            self.flow[(self.source, s)] = 0
+            
+        for t in self.sinks:
+            self.H.add_edge(t, self.sink)
+            self.capacity[(t, self.sink)] = M
+            self.flow[(t, self.sink)] = 0
+            
+        self.steps = []
+
+    def residual_graph(self):
+        R = nx.DiGraph()
+        R.add_nodes_from(self.H.nodes())
+        for u, v in self.H.edges():
+            forward = self.capacity[(u, v)] - self.flow[(u, v)]
+            if forward > 0:
+                R.add_edge(u, v, capacity=forward)
+            backward = self.flow[(u, v)]
+            if backward > 0:
+                R.add_edge(v, u, capacity=backward)
+        return R
+
+    def find_augmenting_path(self, strategy="dfs"):
+        R = self.residual_graph()
+        if not nx.has_path(R, self.source, self.sink):
+            return None
+            
+        if strategy == "bfs":
+            return nx.shortest_path(R, self.source, self.sink)
+        else:
+            # DFS search on active residual graph R (supports backward edges)
+            try:
+                return next(nx.all_simple_paths(R, self.source, self.sink))
+            except StopIteration:
+                return None
+
+    def augment(self, path):
+        R_before = self.residual_graph()
+        delta = min(R_before[u][v]["capacity"] for u, v in zip(path[:-1], path[1:]))
+        
+        for u, v in zip(path[:-1], path[1:]):
+            if (u, v) in self.capacity:
+                self.flow[(u, v)] += delta
+            else:
+                self.flow[(v, u)] -= delta
+
+        R_after = self.residual_graph()
+        self.steps.append({
+            "path": path,
+            "flow": self.flow.copy(),
+            "delta": delta,
+            "residual_before": R_before,
+            "residual_after": R_after
+        })
+        return delta
+
+    def run(self, strategy="dfs"):
+        while True:
+            path = self.find_augmenting_path(strategy=strategy)
+            if path is None:
+                break
+            self.augment(path)
+        return self.steps
+
+    def max_flow_val(self):
+        return sum(self.flow[self.source, s] for s in self.sources)
