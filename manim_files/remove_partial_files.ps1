@@ -1,0 +1,1 @@
+Get-ChildItem -Path . -Directory -Recurse -Filter "partial_movie_files" | Remove-Item -Recurse -Force
