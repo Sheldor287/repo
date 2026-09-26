@@ -1,0 +1,1 @@
+codebase-to-text --input "C:/Users/Drew/Documents/MyFiles/work/optimize" --output "output.txt" --output_type "txt" --exclude "*.pyc" --exclude "build/" --exclude "venv/"        
