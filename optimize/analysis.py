@@ -140,8 +140,7 @@ class Analysis:
     # Component identification
     @staticmethod
     def _get_component_columns(df):
-        """Identify node and edge state columns in a simulation dataframe."""
-        node_cols = [c for c in df.columns if re.match(r"^node_.+$", c)]
+        node_cols = [c for c in df.columns if re.match(r"^node_-?\d+$", c)]
         edge_cols = [c for c in df.columns if re.match(r"^edge_\(.+\)$", c)]
         return node_cols, edge_cols
 
