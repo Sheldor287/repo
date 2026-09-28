@@ -100,7 +100,7 @@ class LP:
         model.alpha = pyo.Var(model.nodes,within=pyo.UnitInterval)
         # P2 interdiction variables
         model.omega = pyo.Var(model.nodes,within=pyo.Binary)
-        model.z = pyo.Var(model.edges,within=pyo.Binary)
+        model.w = pyo.Var(model.edges,within=pyo.Binary)
         # Aux params
         model.M = pyo.Param(initialize=M,within=pyo.PositiveReals)
         model.interdiction_cost = pyo.Param(model.nodes,initialize={n: self.g.nodes[n].get('cost', 0) for n in model.nodes})
@@ -110,11 +110,11 @@ class LP:
         model.stflow = pyo.Constraint(rule=self.r.st_boundary_rule)
         model.budget_limit = pyo.Constraint(rule=self.r.interdiction_budget_rule)
         model.artificial_protection = pyo.Constraint(model.nodes,rule=self.r.artificial_node_interdiction_rule)
-        # Z linearization
-        model.z1 = pyo.Constraint(model.edges, rule=self.r.cut_capacity_upper_rule)
-        model.z2 = pyo.Constraint(model.edges, rule=self.r.cut_capacity_lower_rule)
-        model.z3 = pyo.Constraint(model.edges, rule=self.r.cut_capacity_node_u_rule)
-        model.z4 = pyo.Constraint(model.edges, rule=self.r.cut_capacity_node_v_rule)
+        # W linearization
+        model.w1 = pyo.Constraint(model.edges, rule=self.r.cut_capacity_upper_rule)
+        model.w2 = pyo.Constraint(model.edges, rule=self.r.cut_capacity_lower_rule)
+        model.w3 = pyo.Constraint(model.edges, rule=self.r.cut_capacity_node_u_rule)
+        model.w4 = pyo.Constraint(model.edges, rule=self.r.cut_capacity_node_v_rule)
         Objectives.apply('interdicted_min_cut_flow',model)
         return model
 
@@ -336,7 +336,7 @@ class Solver:
         edge_results = {}
         for u, v in self.model.edges:
             theta = pyo.value(self.model.theta[u, v])
-            z = pyo.value(self.model.z[u, v])
+            z = pyo.value(self.model.w[u, v])
             capacity = pyo.value(self.model.capacity[u, v])
             omega_u = pyo.value(self.model.omega[u])
             omega_v = pyo.value(self.model.omega[v])

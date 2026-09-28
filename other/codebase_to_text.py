@@ -526,7 +526,7 @@ Examples:
             print("✅ Conversion completed successfully!")
 
     except (OSError, ValueError, git.GitCommandError) as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
         return 1
 
     finally:

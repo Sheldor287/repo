@@ -19,7 +19,7 @@ class Objectives:
 
     @staticmethod
     def interdicted_min_cut_flow(m:pyo.ConcreteModel) -> pyo.Objective:
-        return pyo.Objective(expr=sum(m.capacity[u,v]*m.z[u,v] for u, v in m.edges), sense=pyo.minimize)
+        return pyo.Objective(expr=sum(m.capacity[u,v]*m.w[u,v] for u, v in m.edges), sense=pyo.minimize)
 
     @staticmethod
     def min_cost_flow(m:pyo.ConcreteModel) -> pyo.Objective:
@@ -102,24 +102,24 @@ class Rules:
         """linearization of node interdict multiplication constraints: part1"""
         if m.artificial_edge[u, v]:
             return pyo.Constraint.Skip
-        return m.z[u, v] <= m.theta[u, v]
+        return m.w[u, v] <= m.theta[u, v]
 
     @staticmethod
     def cut_capacity_node_u_rule(m, u, v):
         """linearization of node interdict multiplication constraints: part2"""
         if m.artificial_edge[u, v]:
             return pyo.Constraint.Skip
-        return m.z[u, v] <= 1 - m.omega[u]
+        return m.w[u, v] <= 1 - m.omega[u]
 
     @staticmethod
     def cut_capacity_node_v_rule(m, u, v):
         """linearization of node interdict multiplication constraints: part3"""
         if m.artificial_edge[u, v]:
             return pyo.Constraint.Skip
-        return m.z[u, v] <= 1 - m.omega[v]
+        return m.w[u, v] <= 1 - m.omega[v]
 
     @staticmethod
     def cut_capacity_lower_rule(m, u, v):
         """linearization of node interdict multiplication constraints: part4"""
-        return m.z[u, v] >= m.theta[u, v]- m.omega[u] - m.omega[v]
+        return m.w[u, v] >= m.theta[u, v]- m.omega[u] - m.omega[v]
 
