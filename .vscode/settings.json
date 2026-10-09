@@ -67,7 +67,7 @@
     "python-envs.defaultPackageManager": "ms-python.python:conda",
     "prettier.bracketSpacing": false,
     "python.testing.pytestArgs": [
-        "optimize"
+        "optimize", "sysml/interop/tests"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true

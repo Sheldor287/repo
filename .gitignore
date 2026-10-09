@@ -1,0 +1,11 @@
+# local environment variables
+.env
+.env.local
+
+# logs and cache
+*.pyc
+__pycache__/
+*.log
+
+
+
