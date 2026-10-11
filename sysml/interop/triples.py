@@ -105,3 +105,42 @@ predicate_definitions = {
     "ownedBy": "Brand or subsidiary organization is owned by a parent corporation",
     "usesPlatform": "Vehicle model is constructed on a specific automotive architecture or platform",
 }
+
+
+predicate_definitions_mapping = {
+    "assembledAt": {
+        "definition": "Vehicle model is assembled at a manufacturing plant facility",
+        "uml_equivalent": "uml:Association (Directed Dependency or General Association)",
+        "sysml_equivalent": "sysml:Allocate (or Directed Allocation Relationship)"
+    },
+    "hasEngine": {
+        "definition": "Vehicle model is equipped with a specific engine or powertrain",
+        "uml_equivalent": "uml:Property (Composition / Composite Aggregation)",
+        "sysml_equivalent": "sysml:PartProperty (Block Definition Diagram composition)"
+    },
+    "hasFuelType": {
+        "definition": "Vehicle model utilizes a primary fuel or propulsion type",
+        "uml_equivalent": "uml:Property (Value Attribute / Enumeration Reference)",
+        "sysml_equivalent": "sysml:ValueProperty (Typed by a ValueType)"
+    },
+    "headquarteredIn": {
+        "definition": "Organization or corporation is headquartered in a specific geographic location",
+        "uml_equivalent": "uml:Association (Directed Association / Dependency)",
+        "sysml_equivalent": "sysml:DirectedRelationship (or Item Flow / Dependency)"
+    },
+    "manufactures": {
+        "definition": "Automotive manufacturer produces a specific vehicle model",
+        "uml_equivalent": "uml:Association (Navigable Directed Association)",
+        "sysml_equivalent": "sysml:DirectedRelationship (or Action / Item Flow)"
+    },
+    "ownedBy": {
+        "definition": "Brand or subsidiary organization is owned by a parent corporation",
+        "uml_equivalent": "uml:Aggregation (Shared Aggregation) / Package Ownership",
+        "sysml_equivalent": "sysml:SharedProperty (or Ownership Dependency)"
+    },
+    "usesPlatform": {
+        "definition": "Vehicle model is constructed on a specific automotive architecture or platform",
+        "uml_equivalent": "uml:Generalization (or Directed Dependency)",
+        "sysml_equivalent": "sysml:Specialization (or <<ref>> Reference Property / Realization)"
+    }
+}
