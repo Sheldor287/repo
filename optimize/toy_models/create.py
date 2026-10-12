@@ -1,7 +1,8 @@
 import networkx as nx
 import numpy as np
 
-class ToyGraph:
+class ToyMultipartite:
+    """ Multipartite Graph Constructor"""
     def __init__(self, layer_list=None, is_fully_connected=True, graph_type='DiGraph', seed=123, p=0.75):
         self.G = nx.Graph() if graph_type != 'DiGraph' else nx.DiGraph() 
         self.layer_list = [1,2,2,1] if layer_list is None else layer_list 
@@ -88,9 +89,99 @@ class ToyGraph:
                 else:
                     self.G.edges[u,v]['capacity'] = np.random.randint(1, 6)
 
+class ToyShell:
+    def __init__(self, seed=123):
+        self.rng = np.random.default_rng(seed=seed)
+        # Wrapper
+        self.G = self._random_config()
+        self._create_params()
+        self._assign_params_to_g()
 
+    def _random_config(self, shell_constructor:list=[(20,60, 0.7), (10, 40, 0.25)], choices:int=10, n:int=6, c_num:int=3):
+        self.G = nx.random_shell_graph(shell_constructor, seed=123).to_directed()
+        val = self.rng.random()
+        self.G.remove_edges_from([(u, v) for u, v in self.G.edges() if u>v and self.rng.random() < val])
+        nodes_without_zero = [n for n in self.G.nodes() if n != 0]
+        node_subsets = []
+        for _ in range(c_num):
+            num_dec = 0
+            while num_dec < n:
+                nodes = np.append(np.array(self.rng.choice(nodes_without_zero, size=choices, replace=False)), 0)
+                subgraph = self.G.subgraph(nodes)
+                num_dec = len(nx.descendants(subgraph, 0))
+            node_subsets.append(nodes)
+        self.subgraphs = [self.G.subgraph(nodes) for nodes in node_subsets]
+        return self.G
 
+    def _create_params(self):
+        self.node_params1 = {n: (self.rng.integers(20, 30), self.rng.integers(1, 10)) for n in self.G.nodes()}
+        self.node_params2 = {n: (self.rng.uniform(10, 20), self.rng.uniform(1, 3)) for n in self.G.nodes()}
 
+        self.edge_params1 = {(u, v): (self.rng.integers(20,30), self.rng.integers(1, 10)) for u, v in self.G.edges()}
+        self.edge_params2 = {(u, v): (self.rng.uniform(10, 20), self.rng.uniform(0, 2), self.rng.uniform(0.5, 3)) for u, v in self.G.edges()}
+        self.edge_params3 = {
+            (u, v): (
+                (self.rng.integers(1, 10), self.rng.integers(1, 10)), 
+                (self.rng.integers(1, 10), self.rng.integers(1, 10))
+                ) for u, v in self.G.edges()
+                }
+        self.edge_params4 = {(u, v): (self.rng.uniform(0, 1), self.rng.uniform(0, 1)) for u, v in self.G.edges()}
 
+    def _assign_params_to_g(self):
+        for par, str in zip([self.node_params1, self.node_params2,], ['node_params1', 'node_params2',]):
+            nx.set_node_attributes(self.G, par, str)
 
+        for par, str in zip(
+            [self.edge_params1, self.edge_params2, self.edge_params3, self.edge_params4],
+            ['edge_params1', 'edge_params2', 'edge_params3', 'edge_params4']
+        ):
+            nx.set_edge_attributes(self.G, par, str)
+
+class ToyBarabasi:
+    def __init__(self, seed=123, cutoff: float=0.5):
+        self.rng = np.random.default_rng(seed=seed)
+        # Wrapper
+        self.G = self._random_config(cutoff=cutoff)
+        self._create_params()
+        self._assign_params_to_g()
+
+    def _random_config(self, constructor:list=[30, 2, 0.6, 0.3], choices:int=10, n:int=6, c_num:int=3, cutoff: float=0.5):
+        self.G = nx.extended_barabasi_albert_graph(*constructor, seed=123).to_directed()
+        val = self.rng.random()
+        self.G.remove_edges_from([(u, v) for u, v in self.G.edges() if self.rng.random() < cutoff])
+        nodes_without_zero = [n for n in self.G.nodes() if n != 0]
+        node_subsets = []
+        for _ in range(c_num):
+            num_dec = 0
+            while num_dec < n:
+                nodes = np.append(np.array(self.rng.choice(nodes_without_zero, size=choices, replace=False)), 0)
+                subgraph = self.G.subgraph(nodes)
+                num_dec = len(nx.descendants(subgraph, 0))
+            node_subsets.append(nodes)
+        self.subgraphs = [self.G.subgraph(nodes) for nodes in node_subsets]
+        return self.G
+
+    def _create_params(self):
+        self.node_params1 = {n: (self.rng.integers(20, 30), self.rng.integers(1, 10)) for n in self.G.nodes()}
+        self.node_params2 = {n: (self.rng.uniform(10, 20), self.rng.uniform(1, 3)) for n in self.G.nodes()}
+
+        self.edge_params1 = {(u, v): (self.rng.integers(20,30), self.rng.integers(1, 10)) for u, v in self.G.edges()}
+        self.edge_params2 = {(u, v): (self.rng.uniform(10, 20), self.rng.uniform(0, 2), self.rng.uniform(0.5, 3)) for u, v in self.G.edges()}
+        self.edge_params3 = {
+            (u, v): (
+                (self.rng.integers(1, 10), self.rng.integers(1, 10)), 
+                (self.rng.integers(1, 10), self.rng.integers(1, 10))
+                ) for u, v in self.G.edges()
+                }
+        self.edge_params4 = {(u, v): (self.rng.uniform(0, 1), self.rng.uniform(0, 1)) for u, v in self.G.edges()}
+
+    def _assign_params_to_g(self):
+        for par, str in zip([self.node_params1, self.node_params2,], ['node_params1', 'node_params2',]):
+            nx.set_node_attributes(self.G, par, str)
+
+        for par, str in zip(
+            [self.edge_params1, self.edge_params2, self.edge_params3, self.edge_params4],
+            ['edge_params1', 'edge_params2', 'edge_params3', 'edge_params4']
+        ):
+            nx.set_edge_attributes(self.G, par, str)
 

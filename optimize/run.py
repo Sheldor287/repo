@@ -1,7 +1,7 @@
-from toy_models.create import ToyGraph
+from toy_models.create import ToyMultipartite
 from models import LP
 if __name__ == "__main__":
-    toy = ToyGraph()
+    toy = ToyMultipartite()
     solution = LP(toy,model_type='zerosum_mf_static_nodes').solve()
     drawer = solution.draw()
     analysis = solution.analyze()
@@ -12,7 +12,6 @@ Workflow options include:
 
 model_type in ['max_flow','min_cost_flow','min_cut','interdicted_min_cut_flow']
 df --> analysis.stochastic_analysis(n_sim=50,seed=123,)
-
 
 # Inspection based on problem type
 analysis.summary()
