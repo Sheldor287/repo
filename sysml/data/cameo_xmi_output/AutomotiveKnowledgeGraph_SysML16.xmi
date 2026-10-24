@@ -1,0 +1,672 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xmi:XMI xmlns:sysml="http://www.omg.org/spec/SysML/20181001/SysML" xmlns:uml="http://www.omg.org/spec/UML/20161101" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmi:version="2.5.1">
+  <uml:Model xmi:id="model_AutomotiveKnowledgeGraph_SysML16" name="AutomotiveKnowledgeGraph_SysML16">
+    <packagedElement xmi:type="uml:Package" xmi:id="pkg_DomainObjects" name="DomainObjects">
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Camry" name="Camry">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Camry">
+          <body>Mid-size sedan produced by Toyota</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Chevrolet" name="Chevrolet">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Chevrolet">
+          <body>Automotive brand under General Motors</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Civic" name="Civic">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Civic">
+          <body>Compact car produced by Honda</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Corolla" name="Corolla">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Corolla">
+          <body>Compact car produced by Toyota</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Coyote_V8" name="Coyote V8">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Coyote_V8">
+          <body>5.0L naturally aspirated V8 engine by Ford</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Dearborn" name="Dearborn">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Dearborn">
+          <body>City in Michigan, home to Ford Motor Company headquarters</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Dearborn_Truck_Plant" name="Dearborn Truck Plant">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Dearborn_Truck_Plant">
+          <body>Ford assembly plant located in Dearborn, Michigan</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Dynamic_Force_I4" name="Dynamic Force I4">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Dynamic_Force_I4">
+          <body>Family of inline-four gasoline and hybrid engines by Toyota</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_EcoBoost_V6" name="EcoBoost V6">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_EcoBoost_V6">
+          <body>Twin-turbocharged direct-injection V6 engine family by Ford</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_EcoTec3_V8" name="EcoTec3 V8">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_EcoTec3_V8">
+          <body>Small block V8 engine family by General Motors</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_F_150" name="F-150">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_F_150">
+          <body>Full-size pickup truck produced by Ford</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Flat_Rock_Plant" name="Flat Rock Plant">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Flat_Rock_Plant">
+          <body>Ford assembly plant located in Flat Rock, Michigan</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Ford" name="Ford">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Ford">
+          <body>American multinational automotive manufacturer</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Ford_CD6" name="Ford CD6">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Ford_CD6">
+          <body>Rear-wheel drive/all-wheel drive platform by Ford</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Ford_T3" name="Ford T3">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Ford_T3">
+          <body>Full-size body-on-frame truck platform by Ford</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Fort_Wayne_Plant" name="Fort Wayne Plant">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Fort_Wayne_Plant">
+          <body>General Motors assembly plant located in Roanoke, Indiana</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_GM_T1XX" name="GM T1XX">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_GM_T1XX">
+          <body>Full-size body-on-frame truck platform by General Motors</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Gasoline" name="Gasoline">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Gasoline">
+          <body>Internal combustion fuel type using refined petroleum</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_General_Motors" name="General Motors">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_General_Motors">
+          <body>American multinational automotive manufacturing corporation</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Georgetown_Plant" name="Georgetown Plant">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Georgetown_Plant">
+          <body>Toyota Motor Manufacturing Kentucky plant in Georgetown, Kentucky</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Honda" name="Honda">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Honda">
+          <body>Japanese multinational automotive manufacturer</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Honda_Compact_Platform" name="Honda Compact Platform">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Honda_Compact_Platform">
+          <body>Global architecture for compact vehicles by Honda</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Honda_I4" name="Honda I4">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Honda_I4">
+          <body>Inline-four cylinder engine produced by Honda</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Hybrid" name="Hybrid">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Hybrid">
+          <body>Powertrain combining an internal combustion engine with one or more electric motors</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Indiana_Auto_Plant" name="Indiana Auto Plant">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Indiana_Auto_Plant">
+          <body>Honda manufacturing facility located in Greensburg, Indiana</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Mississippi_Plant" name="Mississippi Plant">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Mississippi_Plant">
+          <body>Toyota Motor Manufacturing Mississippi plant in Blue Springs, Mississippi</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Mustang" name="Mustang">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Mustang">
+          <body>Pony/sports car produced by Ford</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Silverado" name="Silverado">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Silverado">
+          <body>Full-size pickup truck produced by Chevrolet</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Tokyo" name="Tokyo">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Tokyo">
+          <body>Capital of Japan and headquarters location for Honda</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Toyota" name="Toyota">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Toyota">
+          <body>Japanese multinational automotive manufacturer</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Toyota_City" name="Toyota City">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Toyota_City">
+          <body>City in Aichi Prefecture, Japan, home to Toyota Motor Corporation headquarters</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Toyota_TNGA_C" name="Toyota TNGA-C">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Toyota_TNGA_C">
+          <body>Modular compact vehicle platform by Toyota</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="class_Toyota_TNGA_K" name="Toyota TNGA-K">
+        <ownedComment xmi:type="uml:Comment" xmi:id="comment_obj_Toyota_TNGA_K">
+          <body>Modular mid-size to full-size vehicle platform by Toyota</body>
+        </ownedComment>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="pkg_Relationships" name="Relationships">
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0001_manufactures" name="manufactures" memberEnd="assoc_0001_manufactures_source assoc_0001_manufactures_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0001_manufactures_source" name="source" type="class_Ford" association="assoc_0001_manufactures" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0001_manufactures_target" name="target" type="class_Mustang" association="assoc_0001_manufactures" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0001_manufactures_comment">
+          <body>Predicate: manufactures
+Definition: Automotive manufacturer produces a specific vehicle model
+Source: Ford
+Target: Mustang
+Proposed SysML mapping: sysml:DirectedRelationship (or Action / Item Flow)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0002_manufactures" name="manufactures" memberEnd="assoc_0002_manufactures_source assoc_0002_manufactures_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0002_manufactures_source" name="source" type="class_Ford" association="assoc_0002_manufactures" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0002_manufactures_target" name="target" type="class_F_150" association="assoc_0002_manufactures" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0002_manufactures_comment">
+          <body>Predicate: manufactures
+Definition: Automotive manufacturer produces a specific vehicle model
+Source: Ford
+Target: F-150
+Proposed SysML mapping: sysml:DirectedRelationship (or Action / Item Flow)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0003_manufactures" name="manufactures" memberEnd="assoc_0003_manufactures_source assoc_0003_manufactures_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0003_manufactures_source" name="source" type="class_Toyota" association="assoc_0003_manufactures" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0003_manufactures_target" name="target" type="class_Camry" association="assoc_0003_manufactures" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0003_manufactures_comment">
+          <body>Predicate: manufactures
+Definition: Automotive manufacturer produces a specific vehicle model
+Source: Toyota
+Target: Camry
+Proposed SysML mapping: sysml:DirectedRelationship (or Action / Item Flow)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0004_manufactures" name="manufactures" memberEnd="assoc_0004_manufactures_source assoc_0004_manufactures_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0004_manufactures_source" name="source" type="class_Toyota" association="assoc_0004_manufactures" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0004_manufactures_target" name="target" type="class_Corolla" association="assoc_0004_manufactures" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0004_manufactures_comment">
+          <body>Predicate: manufactures
+Definition: Automotive manufacturer produces a specific vehicle model
+Source: Toyota
+Target: Corolla
+Proposed SysML mapping: sysml:DirectedRelationship (or Action / Item Flow)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0005_manufactures" name="manufactures" memberEnd="assoc_0005_manufactures_source assoc_0005_manufactures_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0005_manufactures_source" name="source" type="class_Chevrolet" association="assoc_0005_manufactures" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0005_manufactures_target" name="target" type="class_Silverado" association="assoc_0005_manufactures" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0005_manufactures_comment">
+          <body>Predicate: manufactures
+Definition: Automotive manufacturer produces a specific vehicle model
+Source: Chevrolet
+Target: Silverado
+Proposed SysML mapping: sysml:DirectedRelationship (or Action / Item Flow)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0006_manufactures" name="manufactures" memberEnd="assoc_0006_manufactures_source assoc_0006_manufactures_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0006_manufactures_source" name="source" type="class_Honda" association="assoc_0006_manufactures" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0006_manufactures_target" name="target" type="class_Civic" association="assoc_0006_manufactures" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0006_manufactures_comment">
+          <body>Predicate: manufactures
+Definition: Automotive manufacturer produces a specific vehicle model
+Source: Honda
+Target: Civic
+Proposed SysML mapping: sysml:DirectedRelationship (or Action / Item Flow)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0007_hasEngine" name="hasEngine" memberEnd="assoc_0007_hasEngine_source assoc_0007_hasEngine_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0007_hasEngine_source" name="source" type="class_Mustang" association="assoc_0007_hasEngine" aggregation="composite" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0007_hasEngine_target" name="target" type="class_Coyote_V8" association="assoc_0007_hasEngine" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0007_hasEngine_comment">
+          <body>Predicate: hasEngine
+Definition: Vehicle model is equipped with a specific engine or powertrain
+Source: Mustang
+Target: Coyote V8
+Proposed SysML mapping: sysml:PartProperty (Block Definition Diagram composition)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0008_hasEngine" name="hasEngine" memberEnd="assoc_0008_hasEngine_source assoc_0008_hasEngine_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0008_hasEngine_source" name="source" type="class_F_150" association="assoc_0008_hasEngine" aggregation="composite" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0008_hasEngine_target" name="target" type="class_EcoBoost_V6" association="assoc_0008_hasEngine" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0008_hasEngine_comment">
+          <body>Predicate: hasEngine
+Definition: Vehicle model is equipped with a specific engine or powertrain
+Source: F-150
+Target: EcoBoost V6
+Proposed SysML mapping: sysml:PartProperty (Block Definition Diagram composition)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0009_hasEngine" name="hasEngine" memberEnd="assoc_0009_hasEngine_source assoc_0009_hasEngine_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0009_hasEngine_source" name="source" type="class_Camry" association="assoc_0009_hasEngine" aggregation="composite" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0009_hasEngine_target" name="target" type="class_Dynamic_Force_I4" association="assoc_0009_hasEngine" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0009_hasEngine_comment">
+          <body>Predicate: hasEngine
+Definition: Vehicle model is equipped with a specific engine or powertrain
+Source: Camry
+Target: Dynamic Force I4
+Proposed SysML mapping: sysml:PartProperty (Block Definition Diagram composition)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0010_hasEngine" name="hasEngine" memberEnd="assoc_0010_hasEngine_source assoc_0010_hasEngine_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0010_hasEngine_source" name="source" type="class_Corolla" association="assoc_0010_hasEngine" aggregation="composite" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0010_hasEngine_target" name="target" type="class_Dynamic_Force_I4" association="assoc_0010_hasEngine" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0010_hasEngine_comment">
+          <body>Predicate: hasEngine
+Definition: Vehicle model is equipped with a specific engine or powertrain
+Source: Corolla
+Target: Dynamic Force I4
+Proposed SysML mapping: sysml:PartProperty (Block Definition Diagram composition)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0011_hasEngine" name="hasEngine" memberEnd="assoc_0011_hasEngine_source assoc_0011_hasEngine_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0011_hasEngine_source" name="source" type="class_Silverado" association="assoc_0011_hasEngine" aggregation="composite" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0011_hasEngine_target" name="target" type="class_EcoTec3_V8" association="assoc_0011_hasEngine" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0011_hasEngine_comment">
+          <body>Predicate: hasEngine
+Definition: Vehicle model is equipped with a specific engine or powertrain
+Source: Silverado
+Target: EcoTec3 V8
+Proposed SysML mapping: sysml:PartProperty (Block Definition Diagram composition)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0012_hasEngine" name="hasEngine" memberEnd="assoc_0012_hasEngine_source assoc_0012_hasEngine_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0012_hasEngine_source" name="source" type="class_Civic" association="assoc_0012_hasEngine" aggregation="composite" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0012_hasEngine_target" name="target" type="class_Honda_I4" association="assoc_0012_hasEngine" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0012_hasEngine_comment">
+          <body>Predicate: hasEngine
+Definition: Vehicle model is equipped with a specific engine or powertrain
+Source: Civic
+Target: Honda I4
+Proposed SysML mapping: sysml:PartProperty (Block Definition Diagram composition)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0013_usesPlatform" name="usesPlatform" memberEnd="assoc_0013_usesPlatform_source assoc_0013_usesPlatform_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0013_usesPlatform_source" name="source" type="class_Mustang" association="assoc_0013_usesPlatform" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0013_usesPlatform_target" name="target" type="class_Ford_CD6" association="assoc_0013_usesPlatform" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0013_usesPlatform_comment">
+          <body>Predicate: usesPlatform
+Definition: Vehicle model is constructed on a specific automotive architecture or platform
+Source: Mustang
+Target: Ford CD6
+Proposed SysML mapping: sysml:Specialization (or &lt;&lt;ref&gt;&gt; Reference Property / Realization)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0014_usesPlatform" name="usesPlatform" memberEnd="assoc_0014_usesPlatform_source assoc_0014_usesPlatform_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0014_usesPlatform_source" name="source" type="class_F_150" association="assoc_0014_usesPlatform" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0014_usesPlatform_target" name="target" type="class_Ford_T3" association="assoc_0014_usesPlatform" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0014_usesPlatform_comment">
+          <body>Predicate: usesPlatform
+Definition: Vehicle model is constructed on a specific automotive architecture or platform
+Source: F-150
+Target: Ford T3
+Proposed SysML mapping: sysml:Specialization (or &lt;&lt;ref&gt;&gt; Reference Property / Realization)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0015_usesPlatform" name="usesPlatform" memberEnd="assoc_0015_usesPlatform_source assoc_0015_usesPlatform_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0015_usesPlatform_source" name="source" type="class_Camry" association="assoc_0015_usesPlatform" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0015_usesPlatform_target" name="target" type="class_Toyota_TNGA_K" association="assoc_0015_usesPlatform" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0015_usesPlatform_comment">
+          <body>Predicate: usesPlatform
+Definition: Vehicle model is constructed on a specific automotive architecture or platform
+Source: Camry
+Target: Toyota TNGA-K
+Proposed SysML mapping: sysml:Specialization (or &lt;&lt;ref&gt;&gt; Reference Property / Realization)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0016_usesPlatform" name="usesPlatform" memberEnd="assoc_0016_usesPlatform_source assoc_0016_usesPlatform_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0016_usesPlatform_source" name="source" type="class_Corolla" association="assoc_0016_usesPlatform" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0016_usesPlatform_target" name="target" type="class_Toyota_TNGA_C" association="assoc_0016_usesPlatform" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0016_usesPlatform_comment">
+          <body>Predicate: usesPlatform
+Definition: Vehicle model is constructed on a specific automotive architecture or platform
+Source: Corolla
+Target: Toyota TNGA-C
+Proposed SysML mapping: sysml:Specialization (or &lt;&lt;ref&gt;&gt; Reference Property / Realization)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0017_usesPlatform" name="usesPlatform" memberEnd="assoc_0017_usesPlatform_source assoc_0017_usesPlatform_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0017_usesPlatform_source" name="source" type="class_Silverado" association="assoc_0017_usesPlatform" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0017_usesPlatform_target" name="target" type="class_GM_T1XX" association="assoc_0017_usesPlatform" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0017_usesPlatform_comment">
+          <body>Predicate: usesPlatform
+Definition: Vehicle model is constructed on a specific automotive architecture or platform
+Source: Silverado
+Target: GM T1XX
+Proposed SysML mapping: sysml:Specialization (or &lt;&lt;ref&gt;&gt; Reference Property / Realization)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0018_usesPlatform" name="usesPlatform" memberEnd="assoc_0018_usesPlatform_source assoc_0018_usesPlatform_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0018_usesPlatform_source" name="source" type="class_Civic" association="assoc_0018_usesPlatform" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0018_usesPlatform_target" name="target" type="class_Honda_Compact_Platform" association="assoc_0018_usesPlatform" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0018_usesPlatform_comment">
+          <body>Predicate: usesPlatform
+Definition: Vehicle model is constructed on a specific automotive architecture or platform
+Source: Civic
+Target: Honda Compact Platform
+Proposed SysML mapping: sysml:Specialization (or &lt;&lt;ref&gt;&gt; Reference Property / Realization)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0019_assembledAt" name="assembledAt" memberEnd="assoc_0019_assembledAt_source assoc_0019_assembledAt_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0019_assembledAt_source" name="source" type="class_Mustang" association="assoc_0019_assembledAt" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0019_assembledAt_target" name="target" type="class_Flat_Rock_Plant" association="assoc_0019_assembledAt" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0019_assembledAt_comment">
+          <body>Predicate: assembledAt
+Definition: Vehicle model is assembled at a manufacturing plant facility
+Source: Mustang
+Target: Flat Rock Plant
+Proposed SysML mapping: sysml:Allocate (or Directed Allocation Relationship)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0020_assembledAt" name="assembledAt" memberEnd="assoc_0020_assembledAt_source assoc_0020_assembledAt_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0020_assembledAt_source" name="source" type="class_F_150" association="assoc_0020_assembledAt" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0020_assembledAt_target" name="target" type="class_Dearborn_Truck_Plant" association="assoc_0020_assembledAt" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0020_assembledAt_comment">
+          <body>Predicate: assembledAt
+Definition: Vehicle model is assembled at a manufacturing plant facility
+Source: F-150
+Target: Dearborn Truck Plant
+Proposed SysML mapping: sysml:Allocate (or Directed Allocation Relationship)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0021_assembledAt" name="assembledAt" memberEnd="assoc_0021_assembledAt_source assoc_0021_assembledAt_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0021_assembledAt_source" name="source" type="class_Camry" association="assoc_0021_assembledAt" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0021_assembledAt_target" name="target" type="class_Georgetown_Plant" association="assoc_0021_assembledAt" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0021_assembledAt_comment">
+          <body>Predicate: assembledAt
+Definition: Vehicle model is assembled at a manufacturing plant facility
+Source: Camry
+Target: Georgetown Plant
+Proposed SysML mapping: sysml:Allocate (or Directed Allocation Relationship)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0022_assembledAt" name="assembledAt" memberEnd="assoc_0022_assembledAt_source assoc_0022_assembledAt_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0022_assembledAt_source" name="source" type="class_Corolla" association="assoc_0022_assembledAt" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0022_assembledAt_target" name="target" type="class_Mississippi_Plant" association="assoc_0022_assembledAt" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0022_assembledAt_comment">
+          <body>Predicate: assembledAt
+Definition: Vehicle model is assembled at a manufacturing plant facility
+Source: Corolla
+Target: Mississippi Plant
+Proposed SysML mapping: sysml:Allocate (or Directed Allocation Relationship)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0023_assembledAt" name="assembledAt" memberEnd="assoc_0023_assembledAt_source assoc_0023_assembledAt_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0023_assembledAt_source" name="source" type="class_Silverado" association="assoc_0023_assembledAt" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0023_assembledAt_target" name="target" type="class_Fort_Wayne_Plant" association="assoc_0023_assembledAt" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0023_assembledAt_comment">
+          <body>Predicate: assembledAt
+Definition: Vehicle model is assembled at a manufacturing plant facility
+Source: Silverado
+Target: Fort Wayne Plant
+Proposed SysML mapping: sysml:Allocate (or Directed Allocation Relationship)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0024_assembledAt" name="assembledAt" memberEnd="assoc_0024_assembledAt_source assoc_0024_assembledAt_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0024_assembledAt_source" name="source" type="class_Civic" association="assoc_0024_assembledAt" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0024_assembledAt_target" name="target" type="class_Indiana_Auto_Plant" association="assoc_0024_assembledAt" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0024_assembledAt_comment">
+          <body>Predicate: assembledAt
+Definition: Vehicle model is assembled at a manufacturing plant facility
+Source: Civic
+Target: Indiana Auto Plant
+Proposed SysML mapping: sysml:Allocate (or Directed Allocation Relationship)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0025_hasFuelType" name="hasFuelType" memberEnd="assoc_0025_hasFuelType_source assoc_0025_hasFuelType_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0025_hasFuelType_source" name="source" type="class_Mustang" association="assoc_0025_hasFuelType" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0025_hasFuelType_target" name="target" type="class_Gasoline" association="assoc_0025_hasFuelType" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0025_hasFuelType_comment">
+          <body>Predicate: hasFuelType
+Definition: Vehicle model utilizes a primary fuel or propulsion type
+Source: Mustang
+Target: Gasoline
+Proposed SysML mapping: sysml:ValueProperty (Typed by a ValueType)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0026_hasFuelType" name="hasFuelType" memberEnd="assoc_0026_hasFuelType_source assoc_0026_hasFuelType_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0026_hasFuelType_source" name="source" type="class_F_150" association="assoc_0026_hasFuelType" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0026_hasFuelType_target" name="target" type="class_Gasoline" association="assoc_0026_hasFuelType" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0026_hasFuelType_comment">
+          <body>Predicate: hasFuelType
+Definition: Vehicle model utilizes a primary fuel or propulsion type
+Source: F-150
+Target: Gasoline
+Proposed SysML mapping: sysml:ValueProperty (Typed by a ValueType)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0027_hasFuelType" name="hasFuelType" memberEnd="assoc_0027_hasFuelType_source assoc_0027_hasFuelType_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0027_hasFuelType_source" name="source" type="class_Camry" association="assoc_0027_hasFuelType" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0027_hasFuelType_target" name="target" type="class_Hybrid" association="assoc_0027_hasFuelType" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0027_hasFuelType_comment">
+          <body>Predicate: hasFuelType
+Definition: Vehicle model utilizes a primary fuel or propulsion type
+Source: Camry
+Target: Hybrid
+Proposed SysML mapping: sysml:ValueProperty (Typed by a ValueType)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0028_hasFuelType" name="hasFuelType" memberEnd="assoc_0028_hasFuelType_source assoc_0028_hasFuelType_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0028_hasFuelType_source" name="source" type="class_Corolla" association="assoc_0028_hasFuelType" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0028_hasFuelType_target" name="target" type="class_Gasoline" association="assoc_0028_hasFuelType" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0028_hasFuelType_comment">
+          <body>Predicate: hasFuelType
+Definition: Vehicle model utilizes a primary fuel or propulsion type
+Source: Corolla
+Target: Gasoline
+Proposed SysML mapping: sysml:ValueProperty (Typed by a ValueType)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0029_hasFuelType" name="hasFuelType" memberEnd="assoc_0029_hasFuelType_source assoc_0029_hasFuelType_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0029_hasFuelType_source" name="source" type="class_Silverado" association="assoc_0029_hasFuelType" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0029_hasFuelType_target" name="target" type="class_Gasoline" association="assoc_0029_hasFuelType" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0029_hasFuelType_comment">
+          <body>Predicate: hasFuelType
+Definition: Vehicle model utilizes a primary fuel or propulsion type
+Source: Silverado
+Target: Gasoline
+Proposed SysML mapping: sysml:ValueProperty (Typed by a ValueType)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0030_hasFuelType" name="hasFuelType" memberEnd="assoc_0030_hasFuelType_source assoc_0030_hasFuelType_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0030_hasFuelType_source" name="source" type="class_Civic" association="assoc_0030_hasFuelType" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0030_hasFuelType_target" name="target" type="class_Gasoline" association="assoc_0030_hasFuelType" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0030_hasFuelType_comment">
+          <body>Predicate: hasFuelType
+Definition: Vehicle model utilizes a primary fuel or propulsion type
+Source: Civic
+Target: Gasoline
+Proposed SysML mapping: sysml:ValueProperty (Typed by a ValueType)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0031_headquarteredIn" name="headquarteredIn" memberEnd="assoc_0031_headquarteredIn_source assoc_0031_headquarteredIn_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0031_headquarteredIn_source" name="source" type="class_Ford" association="assoc_0031_headquarteredIn" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0031_headquarteredIn_target" name="target" type="class_Dearborn" association="assoc_0031_headquarteredIn" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0031_headquarteredIn_comment">
+          <body>Predicate: headquarteredIn
+Definition: Organization or corporation is headquartered in a specific geographic location
+Source: Ford
+Target: Dearborn
+Proposed SysML mapping: sysml:DirectedRelationship (or Item Flow / Dependency)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0032_headquarteredIn" name="headquarteredIn" memberEnd="assoc_0032_headquarteredIn_source assoc_0032_headquarteredIn_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0032_headquarteredIn_source" name="source" type="class_Toyota" association="assoc_0032_headquarteredIn" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0032_headquarteredIn_target" name="target" type="class_Toyota_City" association="assoc_0032_headquarteredIn" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0032_headquarteredIn_comment">
+          <body>Predicate: headquarteredIn
+Definition: Organization or corporation is headquartered in a specific geographic location
+Source: Toyota
+Target: Toyota City
+Proposed SysML mapping: sysml:DirectedRelationship (or Item Flow / Dependency)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0033_ownedBy" name="ownedBy" memberEnd="assoc_0033_ownedBy_source assoc_0033_ownedBy_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0033_ownedBy_source" name="source" type="class_Chevrolet" association="assoc_0033_ownedBy" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0033_ownedBy_target" name="target" type="class_General_Motors" association="assoc_0033_ownedBy" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0033_ownedBy_comment">
+          <body>Predicate: ownedBy
+Definition: Brand or subsidiary organization is owned by a parent corporation
+Source: Chevrolet
+Target: General Motors
+Proposed SysML mapping: sysml:SharedProperty (or Ownership Dependency)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="assoc_0034_headquarteredIn" name="headquarteredIn" memberEnd="assoc_0034_headquarteredIn_source assoc_0034_headquarteredIn_target">
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0034_headquarteredIn_source" name="source" type="class_Honda" association="assoc_0034_headquarteredIn" />
+        <ownedEnd xmi:type="uml:Property" xmi:id="assoc_0034_headquarteredIn_target" name="target" type="class_Tokyo" association="assoc_0034_headquarteredIn" />
+        <ownedComment xmi:type="uml:Comment" xmi:id="assoc_0034_headquarteredIn_comment">
+          <body>Predicate: headquarteredIn
+Definition: Organization or corporation is headquartered in a specific geographic location
+Source: Honda
+Target: Tokyo
+Proposed SysML mapping: sysml:DirectedRelationship (or Item Flow / Dependency)
+Mapping note: retained as semantic metadata; validate suitability for the target metamodel.</body>
+        </ownedComment>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="pkg_SemanticMetadata" name="SemanticMetadata">
+      <packagedElement xmi:type="uml:Class" xmi:id="predicate_assembledAt" name="assembledAt">
+        <ownedComment xmi:type="uml:Comment" xmi:id="predicate_comment_assembledAt">
+          <body>Definition: Vehicle model is assembled at a manufacturing plant facility
+UML equivalent: uml:Association (Directed Dependency or General Association)
+SysML equivalent: sysml:Allocate (or Directed Allocation Relationship)</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="predicate_hasEngine" name="hasEngine">
+        <ownedComment xmi:type="uml:Comment" xmi:id="predicate_comment_hasEngine">
+          <body>Definition: Vehicle model is equipped with a specific engine or powertrain
+UML equivalent: uml:Property (Composition / Composite Aggregation)
+SysML equivalent: sysml:PartProperty (Block Definition Diagram composition)</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="predicate_hasFuelType" name="hasFuelType">
+        <ownedComment xmi:type="uml:Comment" xmi:id="predicate_comment_hasFuelType">
+          <body>Definition: Vehicle model utilizes a primary fuel or propulsion type
+UML equivalent: uml:Property (Value Attribute / Enumeration Reference)
+SysML equivalent: sysml:ValueProperty (Typed by a ValueType)</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="predicate_headquarteredIn" name="headquarteredIn">
+        <ownedComment xmi:type="uml:Comment" xmi:id="predicate_comment_headquarteredIn">
+          <body>Definition: Organization or corporation is headquartered in a specific geographic location
+UML equivalent: uml:Association (Directed Association / Dependency)
+SysML equivalent: sysml:DirectedRelationship (or Item Flow / Dependency)</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="predicate_manufactures" name="manufactures">
+        <ownedComment xmi:type="uml:Comment" xmi:id="predicate_comment_manufactures">
+          <body>Definition: Automotive manufacturer produces a specific vehicle model
+UML equivalent: uml:Association (Navigable Directed Association)
+SysML equivalent: sysml:DirectedRelationship (or Action / Item Flow)</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="predicate_ownedBy" name="ownedBy">
+        <ownedComment xmi:type="uml:Comment" xmi:id="predicate_comment_ownedBy">
+          <body>Definition: Brand or subsidiary organization is owned by a parent corporation
+UML equivalent: uml:Aggregation (Shared Aggregation) / Package Ownership
+SysML equivalent: sysml:SharedProperty (or Ownership Dependency)</body>
+        </ownedComment>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="predicate_usesPlatform" name="usesPlatform">
+        <ownedComment xmi:type="uml:Comment" xmi:id="predicate_comment_usesPlatform">
+          <body>Definition: Vehicle model is constructed on a specific automotive architecture or platform
+UML equivalent: uml:Generalization (or Directed Dependency)
+SysML equivalent: sysml:Specialization (or &lt;&lt;ref&gt;&gt; Reference Property / Realization)</body>
+        </ownedComment>
+      </packagedElement>
+    </packagedElement>
+    <profileApplication xmi:id="profileApplication_SysML16">
+      <eAnnotations source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <details key="documentation" value="SysML 1.6 profile application; verify href/profile resolution in target Cameo release." />
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" xmi:href="http://www.omg.org/spec/SysML/20181001/SysML.xmi#_0" />
+    </profileApplication>
+  </uml:Model>
+  <sysml:Block xmi:id="block_stereo_Camry" base_Class="class_Camry" />
+  <sysml:Block xmi:id="block_stereo_Chevrolet" base_Class="class_Chevrolet" />
+  <sysml:Block xmi:id="block_stereo_Civic" base_Class="class_Civic" />
+  <sysml:Block xmi:id="block_stereo_Corolla" base_Class="class_Corolla" />
+  <sysml:Block xmi:id="block_stereo_Coyote_V8" base_Class="class_Coyote_V8" />
+  <sysml:Block xmi:id="block_stereo_Dearborn" base_Class="class_Dearborn" />
+  <sysml:Block xmi:id="block_stereo_Dearborn_Truck_Plant" base_Class="class_Dearborn_Truck_Plant" />
+  <sysml:Block xmi:id="block_stereo_Dynamic_Force_I4" base_Class="class_Dynamic_Force_I4" />
+  <sysml:Block xmi:id="block_stereo_EcoBoost_V6" base_Class="class_EcoBoost_V6" />
+  <sysml:Block xmi:id="block_stereo_EcoTec3_V8" base_Class="class_EcoTec3_V8" />
+  <sysml:Block xmi:id="block_stereo_F_150" base_Class="class_F_150" />
+  <sysml:Block xmi:id="block_stereo_Flat_Rock_Plant" base_Class="class_Flat_Rock_Plant" />
+  <sysml:Block xmi:id="block_stereo_Ford" base_Class="class_Ford" />
+  <sysml:Block xmi:id="block_stereo_Ford_CD6" base_Class="class_Ford_CD6" />
+  <sysml:Block xmi:id="block_stereo_Ford_T3" base_Class="class_Ford_T3" />
+  <sysml:Block xmi:id="block_stereo_Fort_Wayne_Plant" base_Class="class_Fort_Wayne_Plant" />
+  <sysml:Block xmi:id="block_stereo_GM_T1XX" base_Class="class_GM_T1XX" />
+  <sysml:Block xmi:id="block_stereo_Gasoline" base_Class="class_Gasoline" />
+  <sysml:Block xmi:id="block_stereo_General_Motors" base_Class="class_General_Motors" />
+  <sysml:Block xmi:id="block_stereo_Georgetown_Plant" base_Class="class_Georgetown_Plant" />
+  <sysml:Block xmi:id="block_stereo_Honda" base_Class="class_Honda" />
+  <sysml:Block xmi:id="block_stereo_Honda_Compact_Platform" base_Class="class_Honda_Compact_Platform" />
+  <sysml:Block xmi:id="block_stereo_Honda_I4" base_Class="class_Honda_I4" />
+  <sysml:Block xmi:id="block_stereo_Hybrid" base_Class="class_Hybrid" />
+  <sysml:Block xmi:id="block_stereo_Indiana_Auto_Plant" base_Class="class_Indiana_Auto_Plant" />
+  <sysml:Block xmi:id="block_stereo_Mississippi_Plant" base_Class="class_Mississippi_Plant" />
+  <sysml:Block xmi:id="block_stereo_Mustang" base_Class="class_Mustang" />
+  <sysml:Block xmi:id="block_stereo_Silverado" base_Class="class_Silverado" />
+  <sysml:Block xmi:id="block_stereo_Tokyo" base_Class="class_Tokyo" />
+  <sysml:Block xmi:id="block_stereo_Toyota" base_Class="class_Toyota" />
+  <sysml:Block xmi:id="block_stereo_Toyota_City" base_Class="class_Toyota_City" />
+  <sysml:Block xmi:id="block_stereo_Toyota_TNGA_C" base_Class="class_Toyota_TNGA_C" />
+  <sysml:Block xmi:id="block_stereo_Toyota_TNGA_K" base_Class="class_Toyota_TNGA_K" />
+</xmi:XMI>

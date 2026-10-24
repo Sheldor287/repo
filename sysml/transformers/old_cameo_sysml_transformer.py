@@ -2719,7 +2719,7 @@ class ModelPlotter:
         return fig, ax
 
 if __name__ == '__main__':
-    from cameo_sysml_transformer import SysMLTransformer, ModelPlotter
+    from sysml.transformers.old_cameo_sysml_transformer import SysMLTransformer, ModelPlotter
     from dataclasses import dataclass
 
     @dataclass

@@ -1,0 +1,254 @@
+{
+    "manufactures": [
+        {
+            "subject": "Ford",
+            "predicate": "manufactures",
+            "object": "Mustang",
+            "semantic_uuid": "0b6e22c5-69ed-4254-9b34-d7d7576f1ea2",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Ford",
+            "predicate": "manufactures",
+            "object": "F-150",
+            "semantic_uuid": "8a1d03f1-146d-45e1-b887-d3802cfe648c",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Toyota",
+            "predicate": "manufactures",
+            "object": "Camry",
+            "semantic_uuid": "6cd2a849-c13f-415a-aef9-d6c104c7fa10",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Toyota",
+            "predicate": "manufactures",
+            "object": "Corolla",
+            "semantic_uuid": "976a04ad-7851-4c36-be8a-383a9db387cf",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Chevrolet",
+            "predicate": "manufactures",
+            "object": "Silverado",
+            "semantic_uuid": "979227f1-c519-4e0f-aa9a-7204dc5d5d05",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Honda",
+            "predicate": "manufactures",
+            "object": "Civic",
+            "semantic_uuid": "9c88293d-6184-497c-9c55-b1f06818b429",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        }
+    ],
+    "hasEngine": [
+        {
+            "subject": "Mustang",
+            "predicate": "hasEngine",
+            "object": "Coyote V8",
+            "semantic_uuid": "d9ffe3e1-8e3f-42f4-a352-c9b0ed2e29fa",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "F-150",
+            "predicate": "hasEngine",
+            "object": "EcoBoost V6",
+            "semantic_uuid": "7fe63ea0-4635-48bf-83a4-4b1557558df5",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Camry",
+            "predicate": "hasEngine",
+            "object": "Dynamic Force I4",
+            "semantic_uuid": "66f8fe96-ce6c-4caf-9b9c-626329755dce",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Corolla",
+            "predicate": "hasEngine",
+            "object": "Dynamic Force I4",
+            "semantic_uuid": "feb53f03-809a-4197-9f56-66cc7b3bf40e",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Silverado",
+            "predicate": "hasEngine",
+            "object": "EcoTec3 V8",
+            "semantic_uuid": "3be95671-a22f-4480-a4b6-246b5eb43c38",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Civic",
+            "predicate": "hasEngine",
+            "object": "Honda I4",
+            "semantic_uuid": "a181e34d-b536-48d4-9a2a-441f0d8ddef2",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        }
+    ],
+    "usesPlatform": [
+        {
+            "subject": "Mustang",
+            "predicate": "usesPlatform",
+            "object": "Ford CD6",
+            "semantic_uuid": "61e90d13-df82-4080-b172-d59d7d28eb14",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "F-150",
+            "predicate": "usesPlatform",
+            "object": "Ford T3",
+            "semantic_uuid": "71451224-6697-4ad1-844d-fe43f4a06bfc",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Camry",
+            "predicate": "usesPlatform",
+            "object": "Toyota TNGA-K",
+            "semantic_uuid": "f0304dc6-210f-4032-9d88-a64a170cceea",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Corolla",
+            "predicate": "usesPlatform",
+            "object": "Toyota TNGA-C",
+            "semantic_uuid": "0b630b66-068d-4733-b32d-761145c1a975",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Silverado",
+            "predicate": "usesPlatform",
+            "object": "GM T1XX",
+            "semantic_uuid": "f270247d-8dcb-4552-bb12-8e01dd5bb6ec",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Civic",
+            "predicate": "usesPlatform",
+            "object": "Honda Compact Platform",
+            "semantic_uuid": "0bb33893-fcdf-48a8-a698-c9f9002f187a",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        }
+    ],
+    "assembledAt": [
+        {
+            "subject": "Mustang",
+            "predicate": "assembledAt",
+            "object": "Flat Rock Plant",
+            "semantic_uuid": "41b24543-662f-4e6f-81c7-171051a89748",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "F-150",
+            "predicate": "assembledAt",
+            "object": "Dearborn Truck Plant",
+            "semantic_uuid": "d18a8f9a-14b5-4793-9fd4-0021f4037208",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Camry",
+            "predicate": "assembledAt",
+            "object": "Georgetown Plant",
+            "semantic_uuid": "9f90122f-e7f6-4cc2-a9ea-1a8ac531b110",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Corolla",
+            "predicate": "assembledAt",
+            "object": "Mississippi Plant",
+            "semantic_uuid": "03ac88a2-db83-476f-80b1-7138081eb553",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Silverado",
+            "predicate": "assembledAt",
+            "object": "Fort Wayne Plant",
+            "semantic_uuid": "82e81a58-ca6e-4283-af35-92e94cebb012",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Civic",
+            "predicate": "assembledAt",
+            "object": "Indiana Auto Plant",
+            "semantic_uuid": "7f426587-176d-4d7b-9ac6-187e1dd8d623",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        }
+    ],
+    "hasFuelType": [
+        {
+            "subject": "Mustang",
+            "predicate": "hasFuelType",
+            "object": "Gasoline",
+            "semantic_uuid": "120312ce-6752-4356-9e97-1aeac1bb47a5",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "F-150",
+            "predicate": "hasFuelType",
+            "object": "Gasoline",
+            "semantic_uuid": "e2752387-f00e-4eb8-b0a9-0fc28428d1c5",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Camry",
+            "predicate": "hasFuelType",
+            "object": "Hybrid",
+            "semantic_uuid": "c5c8a401-c746-4890-981c-18881c665af1",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Corolla",
+            "predicate": "hasFuelType",
+            "object": "Gasoline",
+            "semantic_uuid": "f41b6c74-844e-4abd-8516-bb44ae39d898",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Silverado",
+            "predicate": "hasFuelType",
+            "object": "Gasoline",
+            "semantic_uuid": "68aa4267-fa0f-45ef-bb5c-21a1ee51eae4",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Civic",
+            "predicate": "hasFuelType",
+            "object": "Gasoline",
+            "semantic_uuid": "17d229a5-887e-441c-b694-a2d9425b2ab3",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        }
+    ],
+    "headquarteredIn": [
+        {
+            "subject": "Ford",
+            "predicate": "headquarteredIn",
+            "object": "Dearborn",
+            "semantic_uuid": "f8a31516-e2c0-4909-abc5-253e53e7505b",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Toyota",
+            "predicate": "headquarteredIn",
+            "object": "Toyota City",
+            "semantic_uuid": "bf9d9e53-8bac-4d79-9b12-d104cc8cbb17",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        },
+        {
+            "subject": "Honda",
+            "predicate": "headquarteredIn",
+            "object": "Tokyo",
+            "semantic_uuid": "fb4753a8-7d21-4e0e-b0e7-e32de8454938",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        }
+    ],
+    "ownedBy": [
+        {
+            "subject": "Chevrolet",
+            "predicate": "ownedBy",
+            "object": "General Motors",
+            "semantic_uuid": "52afe4a5-91ee-4d47-9aaa-c3f79c7a9073",
+            "created_at": "2026-10-16 14:15:40.305237+00:00"
+        }
+    ]
+}
