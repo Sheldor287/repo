@@ -60,13 +60,11 @@ class ContinuousTimeMarkov:
         plt.subplots_adjust(hspace=0.4, top=0.82)
         plt.show()
 
-    @ staticmethod
-    def event_list_to_df(states:list, data=[]) -> pd.DataFrame:
-        # Store each node's exact event sequence as records
-        for i, path in enumerate(states):
-            for t, state in path:
-                data.append({'node': f'node_{i+1}', 'time': t, 'state': state,})
-        return pd.DataFrame(data).sort_values(by='time').reset_index(drop=True)
+    @staticmethod
+    def event_list_to_df(states: list) -> pd.DataFrame:
+        """Convert simulated state trajectories into an event DataFrame."""
+        data = [{"node": f"node_{i+1}", "time": t, "state": state,} for i, path in enumerate(states) for t, state in path]
+        return (pd.DataFrame(data, columns=["node", "time", "state"]) .sort_values(["time", "node"], kind="stable") .reset_index(drop=True))
 
     def event_list_to_timegrid(self, states: list) -> pd.DataFrame:
         all_times = {0.0, self.max_time}
