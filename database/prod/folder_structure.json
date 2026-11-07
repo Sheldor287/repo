@@ -1,0 +1,152 @@
+{
+    "parent": "prod",
+    "children": [
+        {
+            "parent": "backend",
+            "children": [
+                {
+                    "parent": "app",
+                    "children": [
+                        {
+                            "parent": "api",
+                            "children": [
+                                {
+                                    "parent": "govern.py"
+                                },
+                                {
+                                    "parent": "ingest.py"
+                                },
+                                {
+                                    "parent": "schema.py"
+                                }
+                            ]
+                        },
+                        {
+                            "parent": "database.py"
+                        },
+                        {
+                            "parent": "models",
+                            "children": [
+                                {
+                                    "parent": "govern.py"
+                                },
+                                {
+                                    "parent": "ingest.py"
+                                },
+                                {
+                                    "parent": "mbse",
+                                    "children": [
+                                        {
+                                            "parent": "element.py"
+                                        },
+                                        {
+                                            "parent": "relationship.py"
+                                        },
+                                        {
+                                            "parent": "semantic.py"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "parent": "__init__.py"
+                                }
+                            ]
+                        },
+                        {
+                            "parent": "services",
+                            "children": [
+                                {
+                                    "parent": "govern.py"
+                                },
+                                {
+                                    "parent": "ingest.py"
+                                },
+                                {
+                                    "parent": "validate.py"
+                                }
+                            ]
+                        },
+                        {
+                            "parent": "static",
+                            "children": []
+                        },
+                        {
+                            "parent": "templates",
+                            "children": [
+                                {
+                                    "parent": "base.html"
+                                },
+                                {
+                                    "parent": "dashboard.html"
+                                },
+                                {
+                                    "parent": "element.html"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "parent": "depr",
+                    "children": []
+                },
+                {
+                    "parent": "DockerFile"
+                },
+                {
+                    "parent": "migrations",
+                    "children": []
+                },
+                {
+                    "parent": "tests",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "parent": "data",
+            "children": [
+                {
+                    "parent": "archive",
+                    "children": []
+                },
+                {
+                    "parent": "landing",
+                    "children": []
+                },
+                {
+                    "parent": "quarantine",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "parent": "development_folder",
+            "children": [
+                {
+                    "parent": "folder_structure.json"
+                },
+                {
+                    "parent": "notebooks",
+                    "children": [
+                        {
+                            "parent": "folder_structure.json"
+                        },
+                        {
+                            "parent": "main_workpoint.ipynb"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "parent": "docker-compose.yml"
+        },
+        {
+            "parent": "folder_structure.json"
+        },
+        {
+            "parent": "README.md"
+        }
+    ]
+}
