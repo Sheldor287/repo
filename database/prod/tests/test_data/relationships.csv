@@ -1,0 +1,6 @@
+relationship_uuid,name,definition
+3b124d60-ac9e-514c-ab66-e50749d75e53,OwningMembership,A membership in which an owning element owns another element.
+fbeba143-32b0-59b4-ac5c-7465fdf9702f,FeatureMembership,A membership that relates an element to a feature.
+68578877-40a7-5e1b-855d-3ca434e42b51,FeatureTyping,A relationship that specifies the type of a feature.
+7b4c6263-0496-5272-aa20-8faacbe06440,Subsetting,A relationship in which one feature is a subset of another.
+e85ec3fd-d8d4-5ab2-8d0a-a3ceec2353f7,Redefinition,A relationship in which one feature redefines another feature.

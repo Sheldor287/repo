@@ -1,13 +1,17 @@
+
+from __future__ import annotations
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, String, UniqueConstraint
-from app.models.mbse.relationship import Relationship
-from app.models.mbse.element import Element
 from app.database import Base
 from uuid import uuid4
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from app.models.mbse.element import Element
+    from app.models.mbse.relationship import Relationship
+
 class Semantic(Base):
     __tablename__ = "semantic_relationships"
-
     __table_args__ = (
         UniqueConstraint(
             "source_element_uuid",
@@ -15,49 +19,43 @@ class Semantic(Base):
             "target_element_uuid",
             name="uq_semantic_triple",
         ),
+        {"schema": "test"},
     )
-
     # Identifier for this specific semantic triple.
     semantic_uuid: Mapped[str] = mapped_column(
         String(36),
         primary_key=True,
         default=lambda: str(uuid4()),
     )
-
     # Subject / source element.
     source_element_uuid: Mapped[str] = mapped_column(
         String(36),
-        ForeignKey("elements.element_uuid"),
+        ForeignKey("test.elements.element_uuid"),
         nullable=False,
         index=True,
     )
-
     # Predicate / relationship type.
     relationship_uuid: Mapped[str] = mapped_column(
         String(36),
-        ForeignKey("relationships.relationship_uuid"),
+        ForeignKey("test.relationships.relationship_uuid"),
         nullable=False,
         index=True,
     )
-
     # Object / target element.
     target_element_uuid: Mapped[str] = mapped_column(
         String(36),
-        ForeignKey("elements.element_uuid"),
+        ForeignKey("test.elements.element_uuid"),
         nullable=False,
         index=True,
     )
-
     # ORM navigation.
     source_element: Mapped["Element"] = relationship(
         back_populates="outgoing_semantics",
         foreign_keys=[source_element_uuid],
     )
-
     relationship_type: Mapped["Relationship"] = relationship(
         back_populates="semantics",
     )
-
     target_element: Mapped["Element"] = relationship(
         back_populates="incoming_semantics",
         foreign_keys=[target_element_uuid],

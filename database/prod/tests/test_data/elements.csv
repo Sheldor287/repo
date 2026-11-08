@@ -1,0 +1,109 @@
+element_uuid,name,definition
+28e95019-a5b6-55d7-90b0-00945ec78a00,VehicleDefinition,Defines a vehicle-level system.
+3177df8d-00f2-5355-a862-6c975a939d9b,PowertrainDefinition,Defines a system responsible for propulsion.
+34437631-36c9-5e1a-850c-25344e85dcc7,EngineDefinition,Defines a component that produces mechanical power.
+298702a7-43db-5b1c-a159-9a0c73d83f51,TransmissionDefinition,Defines a component that transfers mechanical power.
+304e2b6a-af2d-57ed-99b3-3af3a40d90ed,EnergyStorageDefinition,Defines a component that stores usable energy.
+0e6d8ff6-8af1-537b-a426-f716547aed00,ControlSystemDefinition,Defines a component responsible for system control.
+5db050fa-ddc1-5445-b45f-609e956163ee,ChassisDefinition,Defines the structural support system.
+7c3f2131-f0b3-5ee3-b47e-da32bb9a4ea5,WheelDefinition,Defines a component used for vehicle movement.
+cead799a-b8b3-5a8b-b71f-e451ad3df159,Vehicle,Vehicle provides the overall vehicle platform. Environment shoulder entire stuff themselves here.
+66028ef5-d9db-5141-9585-9bf91a30fdc9,PropulsionSystem,PropulsionSystem provides mechanical power for vehicle movement. Forward system civil front free early ability job because our attorney firm large.
+ec22d31d-364a-5c6a-a77d-913723d60f4b,PropulsionSystem_2,PropulsionSystem_2 provides mechanical power for vehicle movement. Behavior central so again treat of.
+14ab1ccb-c080-5830-ae12-6bca515875c2,Transmission,Transmission transfers power to the drivetrain. Light already figure miss lot start police north whether.
+afc146fe-ef5d-5a16-ba3e-b26e0904c6cf,Wheel,Wheel supports vehicle movement and road contact. Huge shoulder mention range point project.
+6d72f889-010c-534d-aaf5-14b2731ceba8,EnergyStorageUnit,EnergyStorageUnit stores energy for vehicle operation. Minute information member suggest population rise bar main energy friend never this.
+1e3c818a-9450-503e-a263-fe2cf01dbe08,ControlModule,ControlModule monitors and controls vehicle functions. Hold single administration only story guy to young if may station.
+f9718a7f-45c4-5781-91bd-0fe024950ada,Transmission_7,Transmission_7 transfers power to the drivetrain. Police yeah who picture do low.
+202cbc82-4a53-580d-9e05-4e879b6ad119,Engine,Engine converts stored energy into mechanical power. Child movie her leave act lead again sometimes.
+a165d0d8-bb5b-51b2-9742-74c9980a45b9,DriveUnit,DriveUnit transfers power to the drivetrain. West plant a pay member religious bar today somebody.
+59db2bd3-a884-5495-a4ee-2bd2cc4f9cd8,DriveUnit_10,DriveUnit_10 transfers power to the drivetrain. Available reason identify world energy line seem friend give police.
+e59e3c17-ff6f-5474-ac4d-2762de89b6fe,Engine_11,Engine_11 converts stored energy into mechanical power. This industry response quickly head dog bad these.
+aad15b08-7022-5206-9207-c281987192da,PropulsionSystem_12,PropulsionSystem_12 provides mechanical power for vehicle movement. Serve hit fill trial significant fact.
+aad1cce9-2e48-5c9c-ba6a-0cb46055e81d,Wheel_13,Wheel_13 supports vehicle movement and road contact. Happy movement front build coach operation it scientist lawyer again.
+54787744-4dfa-533e-aa5a-34342406fbe5,ControlModule_14,ControlModule_14 monitors and controls vehicle functions. That science wonder protect field social agreement miss the method case.
+b280b849-86ae-5e77-b04d-de4d2416813f,Powertrain,Powertrain provides mechanical power for vehicle movement. Bit risk different now behavior upon during though enough amount may what.
+b642e07a-50a1-5413-a6d4-5be2f2462cca,DriveUnit_16,DriveUnit_16 transfers power to the drivetrain. Current yet three create north be first game Mrs upon speak move.
+a0e8604a-4762-5677-b45f-8a3864be6814,Battery,Battery stores energy for vehicle operation. Manage huge agreement research stock test future trial style understand particular accept.
+95af0b5b-5e05-5ea8-b290-8119e6821933,Powertrain_18,Powertrain_18 provides mechanical power for vehicle movement. Participant manager receive business appear technology gun protect inside grow show gas send.
+c7536ca7-a7a3-596d-ae3f-a7d4adb17a9f,Chassis,Chassis provides structural support for vehicle components. Him south success heart enter under task heavy.
+02cb1e64-6f31-5397-b20f-5e8d2dca01e2,Engine_20,Engine_20 converts stored energy into mechanical power. Tv business enter star focus want.
+f51a02f6-d860-57be-aad2-d3862ee9f4c6,Gearbox,Gearbox transfers power to the drivetrain. One fear letter she relationship drug.
+870fa3e1-a510-5ef6-9b89-14df7b0c9dff,ControlModule_22,ControlModule_22 monitors and controls vehicle functions. Entire keep number eat real may town every western consider after.
+ad00a965-37ee-5fdf-8fa0-2e7581fc46f5,Gearbox_23,Gearbox_23 transfers power to the drivetrain. Safe local amount your center that through determine tell leg tonight thought.
+eadf5121-7f1f-5c81-a0ae-aadb5be0e62c,Wheel_24,Wheel_24 supports vehicle movement and road contact. Relationship too add role dinner thought the expect yet.
+3fec0007-d6df-5bba-b2ce-19b687f2de54,TireAssembly,TireAssembly supports vehicle movement and road contact. Interesting parent market clearly another modern shake until style few.
+5c7b1b78-a553-5da5-8e09-fffcc9154bc0,DriveUnit_26,DriveUnit_26 transfers power to the drivetrain. Difference month billion party newspaper southern minute two player hotel something.
+9d0808cb-9534-5f8f-b097-e5e356271dda,TireAssembly_27,TireAssembly_27 supports vehicle movement and road contact. Book now seven job ground manage create deep drop also travel.
+3c28748e-0897-5952-b7c9-5c93ac90418e,HybridMotor,HybridMotor converts stored energy into mechanical power. Idea ago include focus air under.
+1fe8a37f-64a1-5009-bb4e-5582dbd98205,SuspensionAssembly,SuspensionAssembly provides structural support for vehicle components. Room these job fact control both provide start deep.
+7a79274d-9d95-5c48-b2c5-c15bb109db4e,ControlModule_30,ControlModule_30 monitors and controls vehicle functions. Security skill letter increase member turn.
+08ca9339-2028-5c89-988e-5c1a1b2553a1,PropulsionSystem_31,PropulsionSystem_31 provides mechanical power for vehicle movement. Night hope worker market amount cause rule tree call least television.
+f83054cf-32bc-56a4-b6fd-539ff11f5d40,WheelAssembly,WheelAssembly supports vehicle movement and road contact. Pass knowledge good guy hospital another meet those believe professor save sister day.
+6ea52b83-c4f4-5ed9-b177-4103951bb2bb,ControlModule_33,ControlModule_33 monitors and controls vehicle functions. Conference call little surface accept small beat allow chair leader.
+8df4fa48-da56-5d0f-98e9-0184b0351fd0,SuspensionAssembly_34,SuspensionAssembly_34 provides structural support for vehicle components. Product arrive charge leave bed property grow what.
+e04bf737-39a9-54d0-81c6-78fadfee8646,SuspensionAssembly_35,SuspensionAssembly_35 provides structural support for vehicle components. Stage dog issue public become act force husband.
+a42da997-8699-5398-a8a8-e37b70c1b9c2,ControlModule_36,ControlModule_36 monitors and controls vehicle functions. Spring around ask under explain by society size.
+c6060949-bd58-5c32-ad7b-09a051713ae3,ElectronicControlUnit,ElectronicControlUnit monitors and controls vehicle functions. Thus political there myself trouble with new have candidate indicate almost eye finish.
+fb22874e-a738-5efb-8fdb-2400bacfad68,FuelTank,FuelTank stores energy for vehicle operation. Song media able family her contain.
+9a52792c-c4a6-5171-b732-dfa07d893632,Controller,Controller monitors and controls vehicle functions. Know bit others seat cup play audience day group sing.
+1a5c29e8-5e19-5c1f-9461-0f9c7992379b,WheelAssembly_40,WheelAssembly_40 supports vehicle movement and road contact. President need name hold employee all trial personal claim.
+b827d98e-b4f8-514c-9bbc-58f01ed58235,HybridMotor_41,HybridMotor_41 converts stored energy into mechanical power. Half beyond yourself painting establish throughout available arm.
+ec742846-a2f7-5c30-bf9c-177c7bc92e15,Wheel_42,Wheel_42 supports vehicle movement and road contact. Guess edge behavior employee society ten program building trouble.
+341ce007-9436-599a-93aa-15bab28a7bf3,EnergyStorageUnit_43,EnergyStorageUnit_43 stores energy for vehicle operation. Son point seven price keep dog behavior both beyond.
+dcd0c3c5-d7b2-5afb-be47-412a9d7112cb,Transmission_44,Transmission_44 transfers power to the drivetrain. Study stage those grow purpose star car a decide trouble space.
+7e6e016a-5096-533e-b685-fcb6f2fe2643,Gearbox_45,Gearbox_45 transfers power to the drivetrain. Sort base movie instead since hope figure.
+0849f3e0-985c-5273-b3bb-bf3fbee9ef45,ControlModule_46,ControlModule_46 monitors and controls vehicle functions. Business notice entire approach push research.
+7816fcfb-f7d7-5888-bc8c-5fb7814bc86b,DriveSystem,DriveSystem provides mechanical power for vehicle movement. Find natural product year program final they customer deep.
+1a259f8f-c4b8-5132-a366-63b12592fe2d,FuelTank_48,FuelTank_48 stores energy for vehicle operation. Institution tend song child program near.
+e02f99a7-296b-5cfb-b6f7-3e167e6f511d,ControlModule_49,ControlModule_49 monitors and controls vehicle functions. Large whole husband responsibility technology represent.
+f5896af2-91fe-5ef1-813a-55c7b191bc04,Powertrain_50,Powertrain_50 provides mechanical power for vehicle movement. Avoid store democratic keep voice understand red decade along talk.
+edf6489b-398a-5e06-967a-dd0a8ee85d73,Controller_51,Controller_51 monitors and controls vehicle functions. Better research study something third past free consumer price window price billion.
+5e5c8114-226f-52f7-9005-62fe7a661b9d,WheelAssembly_52,WheelAssembly_52 supports vehicle movement and road contact. Democratic prevent popular site product few.
+1dd3d6b1-8b63-5334-9bd3-d213d774503f,Transmission_53,Transmission_53 transfers power to the drivetrain. Inside enjoy in contain more produce near yard understand three page century.
+6c6533c5-9d1d-5851-a972-dd2bf9ddadd9,Transmission_54,Transmission_54 transfers power to the drivetrain. Want over law pretty phone still look he space let possible exist Mrs.
+93a76bd8-78d6-5561-affb-c757fdb6d7fb,EnergyStorageUnit_55,EnergyStorageUnit_55 stores energy for vehicle operation. Young present wife cup always appear best soon senior professional toward with peace.
+49c9fbd6-9a30-5b61-9238-bb6d430acb3f,ElectronicControlUnit_56,ElectronicControlUnit_56 monitors and controls vehicle functions. Off wish media require shake maintain moment discussion.
+b795a272-e171-5cbd-9409-8f3fbe3e2033,Wheel_57,Wheel_57 supports vehicle movement and road contact. Somebody marriage firm painting such size together possible environment put computer bill require apply.
+ee23b4ae-153c-569e-9034-ceebaf4ff2ba,Frame,Frame provides structural support for vehicle components. Represent century value cell southern cold rather season condition newspaper eat well.
+14fede56-ca0b-55f2-be1a-245861b38ab4,EnergyStorageUnit_59,EnergyStorageUnit_59 stores energy for vehicle operation. Sign magazine protect like everybody would measure keep.
+2e34081d-cbd4-5e57-aa16-3b038a125177,Chassis_60,Chassis_60 provides structural support for vehicle components. Interview support line five point ten.
+f209ce6b-4e5f-5d45-b0e2-224206c91152,ControlModule_61,ControlModule_61 monitors and controls vehicle functions. Woman kitchen address also will half sing.
+3937d647-c3b8-5c6c-a784-d7ff45110773,Engine_62,Engine_62 converts stored energy into mechanical power. Reason TV live shoulder open game do continue president dark quality light police.
+eb261ed9-ca8b-56b6-a484-6851a1365b88,ControlModule_63,ControlModule_63 monitors and controls vehicle functions. Give power by west ground financial.
+5cafe197-0fe8-5e41-9198-0b79ee363bc9,FuelTank_64,FuelTank_64 stores energy for vehicle operation. Generation some brother campaign military outside.
+e4f5798c-5765-5fa8-828c-4d95520f70a9,Powertrain_65,Powertrain_65 provides mechanical power for vehicle movement. Inside region ask could give forget increase major how grow voice bill.
+08285a3f-851f-58c4-b62f-fcabb70ce843,ElectricMotor,ElectricMotor converts stored energy into mechanical power. Bed building company bar assume stand pressure large room.
+deda2b4a-abf4-5647-acae-af610e7218bf,Engine_67,Engine_67 converts stored energy into mechanical power. Research increase behind federal medical heavy such forward glass four control.
+45e325d5-8877-5adf-adb3-35da38555045,Gearbox_68,Gearbox_68 transfers power to the drivetrain. Know matter almost daughter expert reflect.
+c588f77b-ed7e-5304-b2dc-fcff549aed53,Frame_69,Frame_69 provides structural support for vehicle components. Floor line difficult senior alone likely choose.
+da528c99-e9c1-5ca1-818b-30f631a41662,EnergyStorageUnit_70,EnergyStorageUnit_70 stores energy for vehicle operation. Drive live develop fine since culture lot former phone leg.
+242da340-3c2c-5ee2-9756-d765ff974e39,Battery_71,Battery_71 stores energy for vehicle operation. Job trial bag hour letter better the such him.
+dbb60de8-4722-58e2-96e4-23e89667efd9,DriveSystem_72,DriveSystem_72 provides mechanical power for vehicle movement. Partner can similar claim indicate meeting quality evening dog fact training down recently.
+56a76371-82d3-5b8e-ab14-dddde2a52f62,DriveSystem_73,DriveSystem_73 provides mechanical power for vehicle movement. On natural happy reason visit write general.
+f6ed7982-415b-564b-94d1-9a9f2e119b11,DriveUnit_74,DriveUnit_74 transfers power to the drivetrain. Campaign who sometimes indeed civil environmental discussion staff father open any test upon.
+41f88f30-b37d-58a8-9374-5c8d7d8d0f8a,Powertrain_75,Powertrain_75 provides mechanical power for vehicle movement. Particularly ago citizen four program claim always during.
+26a9223b-96c8-5dd4-a884-e4f62d2bd2e6,Battery_76,Battery_76 stores energy for vehicle operation. Democratic company left common wonder model paper down bill through.
+d5dd1931-df24-55ee-bce8-34ab802d0c0d,WheelAssembly_77,WheelAssembly_77 supports vehicle movement and road contact. Public color share old scene whatever past financial it.
+d9509c24-1086-5ae8-8bad-07e00d5e9aa3,Battery_78,Battery_78 stores energy for vehicle operation. Civil notice court federal public kid chair quickly reduce social city collection material.
+b72e6fdb-3031-5ca3-9304-42259bfa803f,ElectronicControlUnit_79,ElectronicControlUnit_79 monitors and controls vehicle functions. Behind physical red material she unit if.
+1966c4f0-9cfa-53c1-9c3a-b47fdd59508f,Frame_80,Frame_80 provides structural support for vehicle components. Point discussion per try yet back environmental no entire whole pay word across.
+530880f0-81ae-5a5a-89e8-1ad212292e5b,PropulsionSystem_81,PropulsionSystem_81 provides mechanical power for vehicle movement. Improve few major control follow author name.
+f88e2af4-2470-5401-95ff-429004a31617,Gearbox_82,Gearbox_82 transfers power to the drivetrain. Set PM center free kid security life.
+96e4d30e-7bf9-53a9-a904-cd781c6b67a0,DriveSystem_83,DriveSystem_83 provides mechanical power for vehicle movement. Break manager yard head buy window whether reduce environment.
+f49011f4-982e-5171-8a19-d9d63e54babf,Gearbox_84,Gearbox_84 transfers power to the drivetrain. Begin across require hear late hold condition conference push deal laugh century.
+9adf2a58-535c-5ce9-8f7d-f7654dca233e,Transmission_85,Transmission_85 transfers power to the drivetrain. During south head claim year hand they should movement item present religious discuss.
+9ec77a7f-bac8-56ce-81ee-2b78b658f45b,SuspensionAssembly_86,SuspensionAssembly_86 provides structural support for vehicle components. Different our choice out know require fly represent present front word approach.
+86e69cdf-2641-54cd-948a-e2f4b088022e,ElectricMotor_87,ElectricMotor_87 converts stored energy into mechanical power. Else sound consumer consumer show tree.
+dcdbe4d1-5237-5fa9-8407-0bc61a7badc3,DriveSystem_88,DriveSystem_88 provides mechanical power for vehicle movement. Most community everybody husband listen high information wind really.
+2866e47a-cf32-5a8b-aa66-ebe620a21b6f,WheelAssembly_89,WheelAssembly_89 supports vehicle movement and road contact. Soldier avoid scientist just power throw training collection individual wait.
+cce86778-2d05-52b7-94ca-04c6c44aec39,ElectricMotor_90,ElectricMotor_90 converts stored energy into mechanical power. Myself loss American dream less into bill management travel perform perform.
+027bbe2c-6480-5f27-94ac-28a7e1c1eb43,Chassis_91,Chassis_91 provides structural support for vehicle components. With capital cover after where authority Mrs lose phone fact.
+6df3e38c-0c4d-5d61-93fa-c4fd37a3d869,Chassis_92,Chassis_92 provides structural support for vehicle components. Food hot physical current performance step alone quality.
+ce09e50f-9389-5ff5-a241-a35a0905a129,WheelAssembly_93,WheelAssembly_93 supports vehicle movement and road contact. Phone federal team expert much hospital call check.
+8cd406df-5f22-54d5-a39a-fd63151859de,DriveSystem_94,DriveSystem_94 provides mechanical power for vehicle movement. Plant whatever blood just argue seem have serious north possible.
+0af8d8a3-adb6-53c9-87a6-9e195617f3ae,EnergyStorageUnit_95,EnergyStorageUnit_95 stores energy for vehicle operation. Western similar fund blood play statement whose stand politics early open.
+19fabffa-c32f-5dee-b342-ef848f41ae71,Transmission_96,Transmission_96 transfers power to the drivetrain. Dark form two on she effort personal hard once.
+a4f469f3-959d-5085-b8c6-786b72efbade,Frame_97,Frame_97 provides structural support for vehicle components. Leader modern position certain itself anyone guess quite.
+2f453065-508f-5527-b623-2df8daebe6c6,TireAssembly_98,TireAssembly_98 supports vehicle movement and road contact. Decide agent practice commercial pass energy itself truth.
+2c8d6d8f-de5c-5eb7-85ed-1be88bee2bb3,Transmission_99,Transmission_99 transfers power to the drivetrain. Him security TV as wife or relationship together what property east television.
