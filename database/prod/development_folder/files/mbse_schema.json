@@ -1,0 +1,1647 @@
+{ 
+
+  "database": { 
+
+    "schema": "engineering_mbse", 
+
+    "description": "Relational repository for versioned engineering models, XMI-derived objects, relationships, taxonomies, stereotypes, and properties.", 
+
+    "dialect": "postgresql", 
+
+    "conventions": { 
+
+      "primary_key_type": "UUID", 
+
+      "classification_note": "Classification is organization-governed metadata. This schema does not independently assign or validate handling or security markings.", 
+
+      "source_identifier_note": "Source identifiers, such as XMI xmi:id values, are stored separately from repository UUIDs." 
+
+    }, 
+
+    "tables": [ 
+
+      { 
+
+        "name": "engineering_model", 
+
+        "description": "Top-level record for an engineering model or model repository.", 
+
+        "columns": [ 
+
+          { 
+
+            "name": "uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "primaryKey": true, 
+
+            "default": "gen_random_uuid()" 
+
+          }, 
+
+          { 
+
+            "name": "name", 
+
+            "type": "TEXT", 
+
+            "nullable": false 
+
+          }, 
+
+          { 
+
+            "name": "description", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          }, 
+
+          { 
+
+            "name": "source_tool", 
+
+            "type": "TEXT", 
+
+            "nullable": true, 
+
+            "description": "Tool that generated or owns the source model." 
+
+          }, 
+
+          { 
+
+            "name": "source_format", 
+
+            "type": "TEXT", 
+
+            "nullable": true, 
+
+            "description": "Example: SysML 1.x XMI." 
+
+          }, 
+
+          { 
+
+            "name": "classification", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          }, 
+
+          { 
+
+            "name": "created_at", 
+
+            "type": "TIMESTAMPTZ", 
+
+            "nullable": false, 
+
+            "default": "CURRENT_TIMESTAMP" 
+
+          } 
+
+        ], 
+
+        "constraints": [ 
+
+          { 
+
+            "type": "unique", 
+
+            "columns": ["name"] 
+
+          } 
+
+        ] 
+
+      }, 
+
+      { 
+
+        "name": "model_version", 
+
+        "description": "A version, baseline, branch, or imported snapshot of an engineering model.", 
+
+        "columns": [ 
+
+          { 
+
+            "name": "uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "primaryKey": true, 
+
+            "default": "gen_random_uuid()" 
+
+          }, 
+
+          { 
+
+            "name": "model_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "references": { 
+
+              "table": "engineering_model", 
+
+              "column": "uuid", 
+
+              "onDelete": "RESTRICT" 
+
+            } 
+
+          }, 
+
+          { 
+
+            "name": "version_label", 
+
+            "type": "TEXT", 
+
+            "nullable": false, 
+
+            "description": "Model baseline, tag, revision, or import version." 
+
+          }, 
+
+          { 
+
+            "name": "parent_version_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": true, 
+
+            "references": { 
+
+              "table": "model_version", 
+
+              "column": "uuid", 
+
+              "onDelete": "SET NULL" 
+
+            } 
+
+          }, 
+
+          { 
+
+            "name": "source_filename", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          }, 
+
+          { 
+
+            "name": "source_hash", 
+
+            "type": "TEXT", 
+
+            "nullable": true, 
+
+            "description": "Hash of the imported source artifact." 
+
+          }, 
+
+          { 
+
+            "name": "imported_at", 
+
+            "type": "TIMESTAMPTZ", 
+
+            "nullable": false, 
+
+            "default": "CURRENT_TIMESTAMP" 
+
+          }, 
+
+          { 
+
+            "name": "classification", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          } 
+
+        ], 
+
+        "constraints": [ 
+
+          { 
+
+            "type": "unique", 
+
+            "columns": ["model_uuid", "version_label"] 
+
+          } 
+
+        ], 
+
+        "indexes": [ 
+
+          { 
+
+            "name": "idx_model_version_model_uuid", 
+
+            "columns": ["model_uuid"] 
+
+          } 
+
+        ] 
+
+      }, 
+
+      { 
+
+        "name": "object_definition", 
+
+        "description": "Reusable definition of an engineering object concept, metaclass, or semantic type.", 
+
+        "columns": [ 
+
+          { 
+
+            "name": "uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "primaryKey": true, 
+
+            "default": "gen_random_uuid()" 
+
+          }, 
+
+          { 
+
+            "name": "object", 
+
+            "type": "TEXT", 
+
+            "nullable": false, 
+
+            "description": "Canonical object-definition name, such as Block, Requirement, Property, Port, or Activity." 
+
+          }, 
+
+          { 
+
+            "name": "definition", 
+
+            "type": "TEXT", 
+
+            "nullable": false 
+
+          }, 
+
+          { 
+
+            "name": "metaclass", 
+
+            "type": "TEXT", 
+
+            "nullable": true, 
+
+            "description": "Source metaclass, such as uml:Class, uml:Property, or uml:Dependency." 
+
+          }, 
+
+          { 
+
+            "name": "classification", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          } 
+
+        ], 
+
+        "constraints": [ 
+
+          { 
+
+            "type": "unique", 
+
+            "columns": ["object"] 
+
+          } 
+
+        ] 
+
+      }, 
+
+      { 
+
+        "name": "relationship_definition", 
+
+        "description": "Reusable definition of an engineering relationship semantic.", 
+
+        "columns": [ 
+
+          { 
+
+            "name": "uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "primaryKey": true, 
+
+            "default": "gen_random_uuid()" 
+
+          }, 
+
+          { 
+
+            "name": "relationship", 
+
+            "type": "TEXT", 
+
+            "nullable": false, 
+
+            "description": "Canonical relationship name, such as owns, typed_by, satisfies, verifies, or refines." 
+
+          }, 
+
+          { 
+
+            "name": "definition", 
+
+            "type": "TEXT", 
+
+            "nullable": false 
+
+          }, 
+
+          { 
+
+            "name": "is_directional", 
+
+            "type": "BOOLEAN", 
+
+            "nullable": false, 
+
+            "default": true 
+
+          }, 
+
+          { 
+
+            "name": "classification", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          } 
+
+        ], 
+
+        "constraints": [ 
+
+          { 
+
+            "type": "unique", 
+
+            "columns": ["relationship"] 
+
+          } 
+
+        ] 
+
+      }, 
+
+      { 
+
+        "name": "instance_definition", 
+
+        "description": "A specific semantic element within a model version.", 
+
+        "columns": [ 
+
+          { 
+
+            "name": "uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "primaryKey": true, 
+
+            "default": "gen_random_uuid()" 
+
+          }, 
+
+          { 
+
+            "name": "model_version_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "references": { 
+
+              "table": "model_version", 
+
+              "column": "uuid", 
+
+              "onDelete": "CASCADE" 
+
+            } 
+
+          }, 
+
+          { 
+
+            "name": "object_definition_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "references": { 
+
+              "table": "object_definition", 
+
+              "column": "uuid", 
+
+              "onDelete": "RESTRICT" 
+
+            } 
+
+          }, 
+
+          { 
+
+            "name": "object", 
+
+            "type": "TEXT", 
+
+            "nullable": true, 
+
+            "description": "Display name of the modeled object, such as Vehicle, Engine, or REQ-001." 
+
+          }, 
+
+          { 
+
+            "name": "definition", 
+
+            "type": "TEXT", 
+
+            "nullable": true, 
+
+            "description": "Instance-specific documentation or description." 
+
+          }, 
+
+          { 
+
+            "name": "source_identifier", 
+
+            "type": "TEXT", 
+
+            "nullable": true, 
+
+            "description": "Source-system identifier, such as an XMI xmi:id." 
+
+          }, 
+
+          { 
+
+            "name": "owner_instance_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": true, 
+
+            "references": { 
+
+              "table": "instance_definition", 
+
+              "column": "uuid", 
+
+              "onDelete": "SET NULL" 
+
+            }, 
+
+            "description": "Optional owning or containing model element." 
+
+          }, 
+
+          { 
+
+            "name": "source_path", 
+
+            "type": "TEXT", 
+
+            "nullable": true, 
+
+            "description": "Optional XML/XMI path or source location." 
+
+          }, 
+
+          { 
+
+            "name": "source_payload", 
+
+            "type": "JSONB", 
+
+            "nullable": true, 
+
+            "description": "Optional retained source attributes or source fragment." 
+
+          }, 
+
+          { 
+
+            "name": "classification", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          }, 
+
+          { 
+
+            "name": "is_deleted", 
+
+            "type": "BOOLEAN", 
+
+            "nullable": false, 
+
+            "default": false 
+
+          } 
+
+        ], 
+
+        "constraints": [ 
+
+          { 
+
+            "type": "unique", 
+
+            "columns": ["model_version_uuid", "source_identifier"], 
+
+            "condition": "source_identifier IS NOT NULL" 
+
+          } 
+
+        ], 
+
+        "indexes": [ 
+
+          { 
+
+            "name": "idx_instance_definition_model_version", 
+
+            "columns": ["model_version_uuid"] 
+
+          }, 
+
+          { 
+
+            "name": "idx_instance_definition_object_definition", 
+
+            "columns": ["object_definition_uuid"] 
+
+          }, 
+
+          { 
+
+            "name": "idx_instance_definition_owner", 
+
+            "columns": ["owner_instance_uuid"] 
+
+          } 
+
+        ] 
+
+      }, 
+
+      { 
+
+        "name": "class_taxonomy", 
+
+        "description": "Parent-child or specialization relationships between object definitions.", 
+
+        "columns": [ 
+
+          { 
+
+            "name": "uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "primaryKey": true, 
+
+            "default": "gen_random_uuid()" 
+
+          }, 
+
+          { 
+
+            "name": "class_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "references": { 
+
+              "table": "object_definition", 
+
+              "column": "uuid", 
+
+              "onDelete": "CASCADE" 
+
+            }, 
+
+            "description": "Parent or generalized object definition." 
+
+          }, 
+
+          { 
+
+            "name": "subclass_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "references": { 
+
+              "table": "object_definition", 
+
+              "column": "uuid", 
+
+              "onDelete": "CASCADE" 
+
+            }, 
+
+            "description": "Child or specialized object definition." 
+
+          }, 
+
+          { 
+
+            "name": "classification", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          } 
+
+        ], 
+
+        "constraints": [ 
+
+          { 
+
+            "type": "unique", 
+
+            "columns": ["class_uuid", "subclass_uuid"] 
+
+          }, 
+
+          { 
+
+            "type": "check", 
+
+            "expression": "class_uuid <> subclass_uuid" 
+
+          } 
+
+        ] 
+
+      }, 
+
+      { 
+
+        "name": "stereotypes", 
+
+        "description": "Definitions of profiles and stereotypes that can be applied to objects or relationships.", 
+
+        "columns": [ 
+
+          { 
+
+            "name": "uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "primaryKey": true, 
+
+            "default": "gen_random_uuid()" 
+
+          }, 
+
+          { 
+
+            "name": "stereotype", 
+
+            "type": "TEXT", 
+
+            "nullable": false, 
+
+            "description": "Stereotype name, such as Block, Requirement, Satisfy, Verify, or Refine." 
+
+          }, 
+
+          { 
+
+            "name": "definition", 
+
+            "type": "TEXT", 
+
+            "nullable": false 
+
+          }, 
+
+          { 
+
+            "name": "profile_name", 
+
+            "type": "TEXT", 
+
+            "nullable": true, 
+
+            "description": "Profile or source namespace, such as SysML." 
+
+          }, 
+
+          { 
+
+            "name": "base_metaclass", 
+
+            "type": "TEXT", 
+
+            "nullable": true, 
+
+            "description": "Expected UML or source metaclass to which the stereotype applies." 
+
+          } 
+
+        ], 
+
+        "constraints": [ 
+
+          { 
+
+            "type": "unique", 
+
+            "columns": ["profile_name", "stereotype"] 
+
+          } 
+
+        ] 
+
+      }, 
+
+      { 
+
+        "name": "object_relationships", 
+
+        "description": "Relationship instances connecting engineering-model object instances.", 
+
+        "columns": [ 
+
+          { 
+
+            "name": "uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "primaryKey": true, 
+
+            "default": "gen_random_uuid()" 
+
+          }, 
+
+          { 
+
+            "name": "model_version_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "references": { 
+
+              "table": "model_version", 
+
+              "column": "uuid", 
+
+              "onDelete": "CASCADE" 
+
+            } 
+
+          }, 
+
+          { 
+
+            "name": "relationship_definition_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "references": { 
+
+              "table": "relationship_definition", 
+
+              "column": "uuid", 
+
+              "onDelete": "RESTRICT" 
+
+            } 
+
+          }, 
+
+          { 
+
+            "name": "source_instance_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": true, 
+
+            "references": { 
+
+              "table": "instance_definition", 
+
+              "column": "uuid", 
+
+              "onDelete": "CASCADE" 
+
+            }, 
+
+            "description": "Optional convenience source endpoint for binary relationship queries." 
+
+          }, 
+
+          { 
+
+            "name": "target_instance_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": true, 
+
+            "references": { 
+
+              "table": "instance_definition", 
+
+              "column": "uuid", 
+
+              "onDelete": "CASCADE" 
+
+            }, 
+
+            "description": "Optional convenience target endpoint for binary relationship queries." 
+
+          }, 
+
+          { 
+
+            "name": "source_identifier", 
+
+            "type": "TEXT", 
+
+            "nullable": true, 
+
+            "description": "Source-model relationship identifier, such as XMI xmi:id." 
+
+          }, 
+
+          { 
+
+            "name": "relationship_name", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          }, 
+
+          { 
+
+            "name": "definition", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          }, 
+
+          { 
+
+            "name": "source_payload", 
+
+            "type": "JSONB", 
+
+            "nullable": true 
+
+          }, 
+
+          { 
+
+            "name": "classification", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          }, 
+
+          { 
+
+            "name": "is_deleted", 
+
+            "type": "BOOLEAN", 
+
+            "nullable": false, 
+
+            "default": false 
+
+          } 
+
+        ], 
+
+        "constraints": [ 
+
+          { 
+
+            "type": "unique", 
+
+            "columns": ["model_version_uuid", "source_identifier"], 
+
+            "condition": "source_identifier IS NOT NULL" 
+
+          } 
+
+        ], 
+
+        "indexes": [ 
+
+          { 
+
+            "name": "idx_object_relationships_model_version", 
+
+            "columns": ["model_version_uuid"] 
+
+          }, 
+
+          { 
+
+            "name": "idx_object_relationships_source", 
+
+            "columns": ["source_instance_uuid"] 
+
+          }, 
+
+          { 
+
+            "name": "idx_object_relationships_target", 
+
+            "columns": ["target_instance_uuid"] 
+
+          }, 
+
+          { 
+
+            "name": "idx_object_relationships_definition", 
+
+            "columns": ["relationship_definition_uuid"] 
+
+          } 
+
+        ] 
+
+      }, 
+
+      { 
+
+        "name": "relationship_endpoints", 
+
+        "description": "Endpoint records for relationship instances. Supports binary, n-ary, association-end, and connector-end relationships.", 
+
+        "columns": [ 
+
+          { 
+
+            "name": "uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "primaryKey": true, 
+
+            "default": "gen_random_uuid()" 
+
+          }, 
+
+          { 
+
+            "name": "relationship_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "references": { 
+
+              "table": "object_relationships", 
+
+              "column": "uuid", 
+
+              "onDelete": "CASCADE" 
+
+            } 
+
+          }, 
+
+          { 
+
+            "name": "instance_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "references": { 
+
+              "table": "instance_definition", 
+
+              "column": "uuid", 
+
+              "onDelete": "CASCADE" 
+
+            } 
+
+          }, 
+
+          { 
+
+            "name": "endpoint_role", 
+
+            "type": "TEXT", 
+
+            "nullable": false, 
+
+            "description": "Examples: source, target, client, supplier, member_end, connector_end, owner, owned." 
+
+          }, 
+
+          { 
+
+            "name": "ordinal", 
+
+            "type": "INTEGER", 
+
+            "nullable": false, 
+
+            "default": 1 
+
+          }, 
+
+          { 
+
+            "name": "multiplicity_lower", 
+
+            "type": "INTEGER", 
+
+            "nullable": true 
+
+          }, 
+
+          { 
+
+            "name": "multiplicity_upper", 
+
+            "type": "TEXT", 
+
+            "nullable": true, 
+
+            "description": "Text permits values such as *, 1, or 0..1." 
+
+          }, 
+
+          { 
+
+            "name": "role_name", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          } 
+
+        ], 
+
+        "constraints": [ 
+
+          { 
+
+            "type": "unique", 
+
+            "columns": ["relationship_uuid", "instance_uuid", "endpoint_role", "ordinal"] 
+
+          } 
+
+        ], 
+
+        "indexes": [ 
+
+          { 
+
+            "name": "idx_relationship_endpoints_relationship", 
+
+            "columns": ["relationship_uuid"] 
+
+          }, 
+
+          { 
+
+            "name": "idx_relationship_endpoints_instance", 
+
+            "columns": ["instance_uuid"] 
+
+          } 
+
+        ] 
+
+      }, 
+
+      { 
+
+        "name": "applied_stereotypes", 
+
+        "description": "Applications of stereotypes to either object instances or relationship instances.", 
+
+        "columns": [ 
+
+          { 
+
+            "name": "uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "primaryKey": true, 
+
+            "default": "gen_random_uuid()" 
+
+          }, 
+
+          { 
+
+            "name": "stereotype_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "references": { 
+
+              "table": "stereotypes", 
+
+              "column": "uuid", 
+
+              "onDelete": "RESTRICT" 
+
+            } 
+
+          }, 
+
+          { 
+
+            "name": "target_type", 
+
+            "type": "TEXT", 
+
+            "nullable": false, 
+
+            "description": "Allowed values: instance or relationship." 
+
+          }, 
+
+          { 
+
+            "name": "instance_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": true, 
+
+            "references": { 
+
+              "table": "instance_definition", 
+
+              "column": "uuid", 
+
+              "onDelete": "CASCADE" 
+
+            } 
+
+          }, 
+
+          { 
+
+            "name": "relationship_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": true, 
+
+            "references": { 
+
+              "table": "object_relationships", 
+
+              "column": "uuid", 
+
+              "onDelete": "CASCADE" 
+
+            } 
+
+          }, 
+
+          { 
+
+            "name": "source_identifier", 
+
+            "type": "TEXT", 
+
+            "nullable": true, 
+
+            "description": "Source identifier for the profile-application element." 
+
+          }, 
+
+          { 
+
+            "name": "tagged_values", 
+
+            "type": "JSONB", 
+
+            "nullable": true, 
+
+            "description": "Stereotype-specific tagged values from the source model." 
+
+          } 
+
+        ], 
+
+        "constraints": [ 
+
+          { 
+
+            "type": "check", 
+
+            "expression": "(target_type = 'instance' AND instance_uuid IS NOT NULL AND relationship_uuid IS NULL) OR (target_type = 'relationship' AND relationship_uuid IS NOT NULL AND instance_uuid IS NULL)" 
+
+          }, 
+
+          { 
+
+            "type": "check", 
+
+            "expression": "target_type IN ('instance', 'relationship')" 
+
+          } 
+
+        ], 
+
+        "indexes": [ 
+
+          { 
+
+            "name": "idx_applied_stereotypes_instance", 
+
+            "columns": ["instance_uuid"] 
+
+          }, 
+
+          { 
+
+            "name": "idx_applied_stereotypes_relationship", 
+
+            "columns": ["relationship_uuid"] 
+
+          }, 
+
+          { 
+
+            "name": "idx_applied_stereotypes_stereotype", 
+
+            "columns": ["stereotype_uuid"] 
+
+          } 
+
+        ] 
+
+      }, 
+
+      { 
+
+        "name": "object_instance_properties", 
+
+        "description": "Properties, tagged values, and source attributes associated with object instances.", 
+
+        "columns": [ 
+
+          { 
+
+            "name": "uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "primaryKey": true, 
+
+            "default": "gen_random_uuid()" 
+
+          }, 
+
+          { 
+
+            "name": "instance_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "references": { 
+
+              "table": "instance_definition", 
+
+              "column": "uuid", 
+
+              "onDelete": "CASCADE" 
+
+            } 
+
+          }, 
+
+          { 
+
+            "name": "property_name", 
+
+            "type": "TEXT", 
+
+            "nullable": false, 
+
+            "description": "Examples: text, id, type, aggregation, lower, upper, isConjugated." 
+
+          }, 
+
+          { 
+
+            "name": "property_value", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          }, 
+
+          { 
+
+            "name": "value_type", 
+
+            "type": "TEXT", 
+
+            "nullable": true, 
+
+            "description": "Examples: string, integer, boolean, UUID reference, JSON." 
+
+          }, 
+
+          { 
+
+            "name": "value_json", 
+
+            "type": "JSONB", 
+
+            "nullable": true, 
+
+            "description": "Optional structured representation of the property value." 
+
+          }, 
+
+          { 
+
+            "name": "classification", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          } 
+
+        ], 
+
+        "constraints": [ 
+
+          { 
+
+            "type": "unique", 
+
+            "columns": ["instance_uuid", "property_name"] 
+
+          } 
+
+        ], 
+
+        "indexes": [ 
+
+          { 
+
+            "name": "idx_object_instance_properties_instance", 
+
+            "columns": ["instance_uuid"] 
+
+          }, 
+
+          { 
+
+            "name": "idx_object_instance_properties_name", 
+
+            "columns": ["property_name"] 
+
+          } 
+
+        ] 
+
+      }, 
+
+      { 
+
+        "name": "relationship_instance_properties", 
+
+        "description": "Properties, tagged values, and source attributes associated with relationship instances.", 
+
+        "columns": [ 
+
+          { 
+
+            "name": "uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "primaryKey": true, 
+
+            "default": "gen_random_uuid()" 
+
+          }, 
+
+          { 
+
+            "name": "relationship_uuid", 
+
+            "type": "UUID", 
+
+            "nullable": false, 
+
+            "references": { 
+
+              "table": "object_relationships", 
+
+              "column": "uuid", 
+
+              "onDelete": "CASCADE" 
+
+            } 
+
+          }, 
+
+          { 
+
+            "name": "property_name", 
+
+            "type": "TEXT", 
+
+            "nullable": false 
+
+          }, 
+
+          { 
+
+            "name": "property_value", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          }, 
+
+          { 
+
+            "name": "value_type", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          }, 
+
+          { 
+
+            "name": "value_json", 
+
+            "type": "JSONB", 
+
+            "nullable": true 
+
+          }, 
+
+          { 
+
+            "name": "classification", 
+
+            "type": "TEXT", 
+
+            "nullable": true 
+
+          } 
+
+        ], 
+
+        "constraints": [ 
+
+          { 
+
+            "type": "unique", 
+
+            "columns": ["relationship_uuid", "property_name"] 
+
+          } 
+
+        ], 
+
+        "indexes": [ 
+
+          { 
+
+            "name": "idx_relationship_instance_properties_relationship", 
+
+            "columns": ["relationship_uuid"] 
+
+          }, 
+
+          { 
+
+            "name": "idx_relationship_instance_properties_name", 
+
+            "columns": ["property_name"] 
+
+          } 
+
+        ] 
+
+      } 
+
+    ] 
+
+  } 
+
+} 

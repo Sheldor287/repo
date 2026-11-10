@@ -1,12 +1,12 @@
 from __future__ import annotations
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
 from sqlalchemy import String, Text
 from app.database import Base
 from uuid import uuid4
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.models.mbse.semantic import Semantic
+    from database.prod.backend.app.models.mbse.depr.semantic import Semantic
 
 class Element(Base):
     __tablename__ = "elements"
@@ -29,12 +29,12 @@ class Element(Base):
         nullable=False,
     )
     # Semantic relationships in which this element is the source.
-    outgoing_semantics: Mapped[list["Semantic"]] = relationship(
+    outgoing_semantics: Mapped[list["Semantic"]] = orm_relationship(
         back_populates="source_element",
         foreign_keys="Semantic.source_element_uuid",
     )
     # Semantic relationships in which this element is the target.
-    incoming_semantics: Mapped[list["Semantic"]] = relationship(
+    incoming_semantics: Mapped[list["Semantic"]] = orm_relationship(
         back_populates="target_element",
         foreign_keys="Semantic.target_element_uuid",
     )

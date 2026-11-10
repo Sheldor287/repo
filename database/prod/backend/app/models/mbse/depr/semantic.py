@@ -1,14 +1,14 @@
 
 from __future__ import annotations
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
 from sqlalchemy import ForeignKey, String, UniqueConstraint
 from app.database import Base
 from uuid import uuid4
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.models.mbse.element import Element
-    from app.models.mbse.relationship import Relationship
+    from database.prod.backend.app.models.mbse.depr.element import Element
+    from database.prod.backend.app.models.mbse.depr.relationship import Relationship
 
 class Semantic(Base):
     __tablename__ = "semantic_relationships"
@@ -49,14 +49,14 @@ class Semantic(Base):
         index=True,
     )
     # ORM navigation.
-    source_element: Mapped["Element"] = relationship(
+    source_element: Mapped["Element"] = orm_relationship(
         back_populates="outgoing_semantics",
         foreign_keys=[source_element_uuid],
     )
-    relationship_type: Mapped["Relationship"] = relationship(
+    relationship_type: Mapped["Relationship"] = orm_relationship(
         back_populates="semantics",
     )
-    target_element: Mapped["Element"] = relationship(
+    target_element: Mapped["Element"] = orm_relationship(
         back_populates="incoming_semantics",
         foreign_keys=[target_element_uuid],
     )

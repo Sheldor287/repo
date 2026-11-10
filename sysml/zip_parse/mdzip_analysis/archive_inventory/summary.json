@@ -1,0 +1,24 @@
+{
+  "archive": "SAF_SCM_Profile.mdzip",
+  "archive_members": 29,
+  "parsed_xml_resources": 17,
+  "total_xml_nodes": 3904,
+  "unique_global_ids": 1133,
+  "duplicate_global_ids": 154,
+  "reference_count": 1056,
+  "reference_kinds": {
+    "idref": 142,
+    "href": 525,
+    "attribute:type": 237,
+    "attribute:association": 132,
+    "attribute:general": 20
+  },
+  "resolution_statuses": {
+    "resolved_same_resource": 544,
+    "project_resource_not_in_archive": 40,
+    "candidate_local_reference": 389,
+    "unresolved_project_resource": 12,
+    "external_url_not_resolved": 65,
+    "relative_resource_not_in_archive": 6
+  }
+}

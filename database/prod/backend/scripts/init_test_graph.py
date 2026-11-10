@@ -10,9 +10,9 @@ BACKEND_DIR = Path(__file__).resolve().parents[1]
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 from app.database import Base
-from app.models.mbse.element import Element
-from app.models.mbse.relationship import Relationship
-from app.models.mbse.semantic import Semantic
+from database.prod.backend.app.models.mbse.depr.element import Element
+from database.prod.backend.app.models.mbse.depr.relationship import Relationship
+from database.prod.backend.app.models.mbse.depr.semantic import Semantic
 
 # Configuration
 PROJECT_DIR = BACKEND_DIR.parent

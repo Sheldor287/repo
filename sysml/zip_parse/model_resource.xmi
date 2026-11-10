@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xmi:XMI xmlns:uml='http://www.omg.org/spec/UML/20131001' xmlns:xmi='http://www.omg.org/spec/XMI/20131001' xmlns:MagicDraw_Profile='http://www.omg.org/spec/UML/20131001/MagicDrawProfile' xmlns:Validation_Profile='http://www.omg.org/spec/UML/20131001/ValidationProfile' xmlns:sysml='http://www.omg.org/spec/SysML/20181001/SysML' xmlns:DSL_Customization='http://www.magicdraw.com/schemas/DSL_Customization.xmi' xmlns:StandardProfile='http://www.omg.org/spec/UML/20131001/StandardProfile'>
+	<xmi:Documentation>
+		<xmi:exporter>MagicDraw UML</xmi:exporter>
+		<xmi:exporterVersion>2026x v2</xmi:exporterVersion>
+	</xmi:Documentation>
+	<xmi:Extension extender='MagicDraw UML 2026x'>
+		<req_resource resourceID='1440' resourceName='SysML v1' resourceValueName='MD_customization_for_ViewsViewpoints.mdzip'/>
+		<req_resource resourceID='1480' resourceName='Cameo Requirements Modeler' resourceValueName='SysML Profile.mdzip'/>
+	</xmi:Extension>
+	<uml:Model xmi:type='uml:Model' xmi:id='_2021x_2_8710274_1702028444437_461519_20648' name='Model'>
+		<ownedComment xmi:type='uml:Comment' xmi:id='_2024x_1_26f0132_1721902234276_240144_1598' body='Author:SAF WG.&#10;Created:.&#10;Title:SAF SCM Profile.&#10;Comment:.&#10;'>
+			<annotatedElement xmi:idref='_2021x_2_8710274_1702028444437_461519_20648'/>
+		</ownedComment>
+		<packagedElement href='local:/PROJECT-6b7f528b-f1f1-4adc-9f8f-b4e7590f855f?resource=com.nomagic.magicdraw.uml_umodel.shared_umodel#_19_0_2_26f0132_1567751448404_483623_53664'>
+			<xmi:Extension extender='MagicDraw UML 2026x'>
+				<referenceExtension referentPath='SAF_SCM_Profile' referentType='Profile'/>
+			</xmi:Extension>
+		</packagedElement>
+	</uml:Model>
+	<xmi:Extension extender='MagicDraw UML 2026x'>
+		<stereotypesHREFS/>
+	</xmi:Extension>
+</xmi:XMI>

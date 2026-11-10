@@ -1,12 +1,12 @@
 from __future__ import annotations
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
 from sqlalchemy import String, Text
 from app.database import Base
 from uuid import uuid4
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.models.mbse.semantic import Semantic
+    from database.prod.backend.app.models.mbse.depr.semantic import Semantic
 
 class Relationship(Base):
     __tablename__ = "relationships"
@@ -28,7 +28,7 @@ class Relationship(Base):
         nullable=False,
         )
     # Semantic triples that use this relationship type.
-    semantics: Mapped[list["Semantic"]] = relationship(
+    semantics: Mapped[list["Semantic"]] = orm_relationship(
         back_populates="relationship_type",
         )
 

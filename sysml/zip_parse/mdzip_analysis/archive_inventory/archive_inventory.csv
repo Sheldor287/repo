@@ -1,0 +1,30 @@
+﻿member,size_bytes,compressed_size,extension,is_xml_candidate,xml_parse_success,root_tag,xml_node_count,parse_error
+com.nomagic.magicdraw.uml_model.model,1807,743,.model,True,True,XMI,15,
+proxy.local__PROJECT$h877558e9224f114d50dea1f39a1c119_resource_com$dnomagic$dci$dmetamodel$dproject$dsnapshot,4686,1608,.local__project$h877558e9224f114d50dea1f39a1c119_resource_com$dnomagic$dci$dmetamodel$dproject$dsnapshot,True,True,Project,27,
+proxy.local__PROJECT$h6b7f528b$hf1f1$h4adc$h9f8f$hb4e7590f855f_resource_com$dnomagic$dmagicdraw$duml_umodel$dshared_umodel$dsnapshot,464,308,.local__project$h6b7f528b$hf1f1$h4adc$h9f8f$hb4e7590f855f_resource_com$dnomagic$dmagicdraw$duml_umodel$dshared_umodel$dsnapshot,True,True,Profile,2,
+PROJECT-6b7f528b-f1f1-4adc-9f8f-b4e7590f855f,0,2,,False,False,,0,
+proxy.local__PROJECT$h44892a3bf693c0a47eb2f3bf10930f_resource_com$dnomagic$dmagicdraw$duml_umodel$dshared_umodel$dsnapshot,31288,4206,.local__project$h44892a3bf693c0a47eb2f3bf10930f_resource_com$dnomagic$dmagicdraw$duml_umodel$dshared_umodel$dsnapshot,True,True,XMI,179,
+proxy.local__PROJECT$h66f2967d$h7023$h4926$hbd89$hde7e2f1a12ec_resource_com$dnomagic$dmagicdraw$duml_umodel$dshared_umodel$dsnapshot,64862,6697,.local__project$h66f2967d$h7023$h4926$hbd89$hde7e2f1a12ec_resource_com$dnomagic$dmagicdraw$duml_umodel$dshared_umodel$dsnapshot,True,True,XMI,441,
+com.nomagic.magicdraw.uml_model____sharepoints.shared_model,464,308,.shared_model,True,True,Profile,2,
+BINARY-b477fc4d-855b-444b-89d1-3212aec7ba5a,43791,3822,,True,False,,0,"unbound prefix: line 3, column 1"
+Binaries.properties,429,282,.properties,False,False,,0,
+BINARY-50a84f05-924e-43ba-8ee7-495e91240e47,39394,3280,,True,False,,0,"unbound prefix: line 3, column 1"
+personal-Binaries.properties,32,32,.properties,False,False,,0,
+BINARY-186fcf28-f48b-4f19-968f-9f4689ca8d15,19477,2419,,True,False,,0,"unbound prefix: line 3, column 1"
+com.nomagic.magicdraw.core.project.options.commonprojectoptions,65348,48877,.commonprojectoptions,True,True,CommonProjectOptions,1,
+proxy.local__PROJECT$h44892a3bf693c0a47eb2f3bf10930f_resource_com$dnomagic$dci$dmetamodel$dproject$dsnapshot,6151,1939,.local__project$h44892a3bf693c0a47eb2f3bf10930f_resource_com$dnomagic$dci$dmetamodel$dproject$dsnapshot,True,True,Project,37,
+personal-com.nomagic.magicdraw.core.project.options.personalprojectoptions,18043,13589,.personalprojectoptions,True,True,UserProjectOptions,1,
+com.nomagic.magicdraw.uml_model.shared_model,1471191,156932,.shared_model,True,True,XMI,2703,
+com.nomagic.magicdraw.ce.dmn.commondmncodeengineering,1250,449,.commondmncodeengineering,True,True,XMI,8,
+proxy.local__PROJECT$h66f2967d$h7023$h4926$hbd89$hde7e2f1a12ec_resource_com$dnomagic$dci$dmetamodel$dproject$dsnapshot,8028,2328,.local__project$h66f2967d$h7023$h4926$hbd89$hde7e2f1a12ec_resource_com$dnomagic$dci$dmetamodel$dproject$dsnapshot,True,True,Project,44,
+com.nomagic.ci.persistence.local.proxy.privatedependencylist,235,178,.privatedependencylist,True,True,PrivateDependenciesContainer,1,
+com.nomagic.ci.proxy.snapshot.descriptor.descriptors,1435,524,.descriptors,True,True,SnapshotInfoContainer,9,
+BINARY-7eedc75b-5a55-41f2-ae77-eca416758f94,46126,4201,,True,False,,0,"unbound prefix: line 3, column 1"
+BINARY-7b982137-e091-4759-9c17-8f0e83c8d798,16278,2231,,True,False,,0,"unbound prefix: line 3, column 1"
+BINARY-4fbda35e-81e2-453f-9427-399faae932c1,45209,3969,,True,False,,0,"unbound prefix: line 3, column 1"
+com.nomagic.ci.metamodel.project,9798,2560,.project,True,True,Project,56,
+BINARY-ecb12979-496d-4a48-aaee-6fd29ac24b01,29743,2456,,True,False,,0,"unbound prefix: line 3, column 1"
+com.nomagic.magicdraw.ce.commoncodeengineering,103,90,.commoncodeengineering,True,True,XMI,1,
+proxy.local__PROJECT$h877558e9224f114d50dea1f39a1c119_resource_com$dnomagic$dmagicdraw$duml_umodel$dshared_umodel$dsnapshot,95146,11974,.local__project$h877558e9224f114d50dea1f39a1c119_resource_com$dnomagic$dmagicdraw$duml_umodel$dshared_umodel$dsnapshot,True,True,Package,377,
+BINARY-f7426e20-f962-4425-b727-5e2c85a4316b,19499,2160,,True,False,,0,"unbound prefix: line 3, column 1"
+Records.properties,3705,769,.properties,False,False,,0,
