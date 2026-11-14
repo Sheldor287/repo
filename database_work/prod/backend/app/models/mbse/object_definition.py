@@ -1,24 +1,17 @@
 from __future__ import annotations
-from uuid import UUID, uuid4
-from sqlalchemy import Text, UniqueConstraint, text
+from sqlalchemy import Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
-from app.database import Base
+from ..database import MBSE
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.models.mbse.instance_definition import InstanceDefinition
-    from app.models.mbse.class_taxonomy import ClassTaxonomy
+    from .instance_definition import InstanceDefinition
+    from .class_taxonomy import ClassTaxonomy
 
 
-class ObjectDefinition(Base):
+class ObjectDefinition(MBSE):
     __tablename__ = "object_definition"
     __table_args__ = (
         UniqueConstraint("object", name="uq_object_definition_object"),
-    )
-
-    uuid: Mapped[UUID] = mapped_column(
-        primary_key=True,
-        default=uuid4,
-        server_default=text("gen_random_uuid()"),
     )
 
     object: Mapped[str] = mapped_column(
@@ -32,11 +25,6 @@ class ObjectDefinition(Base):
     )
 
     metaclass: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True,
-    )
-
-    classification: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,
     )

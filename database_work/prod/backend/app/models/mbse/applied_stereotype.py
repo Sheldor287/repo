@@ -1,16 +1,16 @@
 from __future__ import annotations
-from uuid import UUID, uuid4
+from uuid import UUID
 from sqlalchemy import CheckConstraint, ForeignKey, Index, JSON, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
-from app.database import Base
+from ..database import MBSE
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.models.mbse.instance_definition import InstanceDefinition
-    from app.models.mbse.object_relationship import ObjectRelationship
-    from app.models.mbse.stereotype import Stereotype
+    from .instance_definition import InstanceDefinition
+    from .object_relationship import ObjectRelationship
+    from .stereotype import Stereotype
 
 
-class AppliedStereotype(Base):
+class AppliedStereotype(MBSE):
     __tablename__ = "applied_stereotypes"
     __table_args__ = (
         CheckConstraint(
@@ -45,12 +45,6 @@ class AppliedStereotype(Base):
             "idx_applied_stereotype_stereotype_uuid",
             "stereotype_uuid",
         ),
-    )
-
-    uuid: Mapped[UUID] = mapped_column(
-        Uuid(as_uuid=True),
-        primary_key=True,
-        default=uuid4,
     )
 
     stereotype_uuid: Mapped[UUID] = mapped_column(

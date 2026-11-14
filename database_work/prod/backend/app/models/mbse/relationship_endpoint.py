@@ -1,15 +1,15 @@
 from __future__ import annotations
-from uuid import UUID, uuid4
+from uuid import UUID
 from sqlalchemy import ForeignKey, Index, Integer, Text, UniqueConstraint, text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
-from app.database import Base
+from ..database import MBSE
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.models.mbse.instance_definition import InstanceDefinition
-    from app.models.mbse.object_relationship import ObjectRelationship
+    from .instance_definition import InstanceDefinition
+    from .object_relationship import ObjectRelationship
 
 
-class RelationshipEndpoint(Base):
+class RelationshipEndpoint(MBSE):
     __tablename__ = "relationship_endpoints"
     __table_args__ = (
         UniqueConstraint(
@@ -27,12 +27,6 @@ class RelationshipEndpoint(Base):
             "idx_relationship_endpoint_instance_uuid",
             "instance_uuid",
         ),
-    )
-
-    uuid: Mapped[UUID] = mapped_column(
-        Uuid(as_uuid=True),
-        primary_key=True,
-        default=uuid4,
     )
 
     relationship_uuid: Mapped[UUID] = mapped_column(

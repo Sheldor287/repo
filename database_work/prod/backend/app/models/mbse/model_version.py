@@ -1,17 +1,18 @@
 from __future__ import annotations
 from datetime import datetime
-from uuid import UUID, uuid4
-from sqlalchemy import ForeignKey, Index, Text, TIMESTAMP, UniqueConstraint, Uuid, text
+from uuid import UUID
+from datetime import datetime, timezone
+from sqlalchemy import ForeignKey, Index, Text, DateTime, UniqueConstraint, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
-from app.database import Base
+from ..database import MBSE
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.models.mbse.engineering_model import EngineeringModel
-    from app.models.mbse.instance_definition import InstanceDefinition
-    from app.models.mbse.object_relationship import ObjectRelationship
+    from .engineering_model import EngineeringModel
+    from .instance_definition import InstanceDefinition
+    from .object_relationship import ObjectRelationship
 
 
-class ModelVersion(Base):
+class ModelVersion(MBSE):
     __tablename__ = "model_version"
     __table_args__ = (
         UniqueConstraint(
@@ -23,12 +24,6 @@ class ModelVersion(Base):
             "idx_model_version_model_uuid",
             "model_uuid",
         ),
-    )
-
-    uuid: Mapped[UUID] = mapped_column(
-        Uuid(as_uuid=True),
-        primary_key=True,
-        default=uuid4,
     )
 
     model_uuid: Mapped[UUID] = mapped_column(
@@ -64,14 +59,9 @@ class ModelVersion(Base):
         nullable=True,
     )
 
-    imported_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True),
-        nullable=False,
-        server_default=text("CURRENT_TIMESTAMP"),
-    )
-
-    classification: Mapped[str | None] = mapped_column(
-        Text,
+    imported_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
         nullable=True,
     )
 

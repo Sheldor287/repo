@@ -1,19 +1,19 @@
 # app/models/mbse/object_relationship.py
 from __future__ import annotations
-from uuid import UUID, uuid4
+from uuid import UUID
 from sqlalchemy import Boolean, ForeignKey, Index, JSON, Text, Uuid, false
 from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
-from app.database import Base
+from ..database import MBSE
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.models.mbse.instance_definition import InstanceDefinition
-    from app.models.mbse.model_version import ModelVersion
-    from app.models.mbse.relationship_definition import RelationshipDefinition
-    from app.models.mbse.relationship_endpoint import RelationshipEndpoint
-    from app.models.mbse.relationship_instance_property import RelationshipInstanceProperty
+    from .instance_definition import InstanceDefinition
+    from .model_version import ModelVersion
+    from .relationship_definition import RelationshipDefinition
+    from .relationship_endpoint import RelationshipEndpoint
+    from .relationship_instance_property import RelationshipInstanceProperty
 
     
-class ObjectRelationship(Base):
+class ObjectRelationship(MBSE):
     __tablename__ = "object_relationships"
     __table_args__ = (
         Index(
@@ -38,12 +38,6 @@ class ObjectRelationship(Base):
             "source_identifier",
             unique=True,
         ),
-    )
-
-    uuid: Mapped[UUID] = mapped_column(
-        Uuid(as_uuid=True),
-        primary_key=True,
-        default=uuid4,
     )
 
     model_version_uuid: Mapped[UUID] = mapped_column(
@@ -99,11 +93,6 @@ class ObjectRelationship(Base):
 
     source_payload: Mapped[dict | None] = mapped_column(
         JSON,
-        nullable=True,
-    )
-
-    classification: Mapped[str | None] = mapped_column(
-        Text,
         nullable=True,
     )
 

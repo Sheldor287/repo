@@ -1,14 +1,14 @@
 from __future__ import annotations
-from uuid import UUID, uuid4
+from uuid import UUID
 from sqlalchemy import ForeignKey, Index, JSON, Text, UniqueConstraint, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
-from app.database import Base
+from ..database import MBSE
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.models.mbse.instance_definition import InstanceDefinition
+    from .instance_definition import InstanceDefinition
 
 
-class ObjectInstanceProperty(Base):
+class ObjectInstanceProperty(MBSE):
     __tablename__ = "object_instance_properties"
     __table_args__ = (
         UniqueConstraint(
@@ -24,12 +24,6 @@ class ObjectInstanceProperty(Base):
             "idx_object_instance_property_property_name",
             "property_name",
         ),
-    )
-
-    uuid: Mapped[UUID] = mapped_column(
-        Uuid(as_uuid=True),
-        primary_key=True,
-        default=uuid4,
     )
 
     instance_uuid: Mapped[UUID] = mapped_column(
@@ -58,11 +52,6 @@ class ObjectInstanceProperty(Base):
 
     value_json: Mapped[dict | list | None] = mapped_column(
         JSON,
-        nullable=True,
-    )
-
-    classification: Mapped[str | None] = mapped_column(
-        Text,
         nullable=True,
     )
 

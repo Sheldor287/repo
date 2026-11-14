@@ -1,20 +1,19 @@
 
 from __future__ import annotations
-from uuid import UUID, uuid4
-from sqlalchemy import Boolean, ForeignKey, Index, JSON, Text, text
+from uuid import UUID
+from sqlalchemy import Boolean, ForeignKey, Index, JSON, Text, text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
-from app.database import Base, MBSE_SCHEMA
+from ..database import MBSE
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.models.mbse.model_version import ModelVersion
-    from app.models.mbse.object_definition import ObjectDefinition
-    from app.models.mbse.instance_definition import InstanceDefinition
-    from app.models.mbse.object_relationship import ObjectRelationship
-    from app.models.mbse.relationship_endpoint import RelationshipEndpoint
-    from app.models.mbse.object_instance_property import ObjectInstanceProperty
+    from .model_version import ModelVersion
+    from .object_definition import ObjectDefinition
+    from .object_relationship import ObjectRelationship
+    from .relationship_endpoint import RelationshipEndpoint
+    from .object_instance_property import ObjectInstanceProperty
 
 
-class InstanceDefinition(Base):
+class InstanceDefinition(MBSE):
     __tablename__ = "instance_definition"
     __table_args__ = (
         Index(
@@ -36,26 +35,21 @@ class InstanceDefinition(Base):
             "idx_instance_definition_owner_instance_uuid",
             "owner_instance_uuid",
         ),
-        {"schema": MBSE_SCHEMA},
-    )
-
-    uuid: Mapped[UUID] = mapped_column(
-        primary_key=True,
-        default=uuid4,
-        server_default=text("gen_random_uuid()"),
     )
 
     model_version_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
         ForeignKey(
-            f"{MBSE_SCHEMA}.model_version.uuid",
+            "model_version.uuid",
             ondelete="CASCADE",
         ),
         nullable=False,
     )
 
     object_definition_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
         ForeignKey(
-            f"{MBSE_SCHEMA}.object_definition.uuid",
+            "object_definition.uuid",
             ondelete="RESTRICT",
         ),
         nullable=False,
@@ -77,8 +71,9 @@ class InstanceDefinition(Base):
     )
 
     owner_instance_uuid: Mapped[UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
         ForeignKey(
-            f"{MBSE_SCHEMA}.instance_definition.uuid",
+            "instance_definition.uuid",
             ondelete="SET NULL",
         ),
         nullable=True,
@@ -91,11 +86,6 @@ class InstanceDefinition(Base):
 
     source_payload: Mapped[dict | None] = mapped_column(
         JSON,
-        nullable=True,
-    )
-
-    classification: Mapped[str | None] = mapped_column(
-        Text,
         nullable=True,
     )
 
