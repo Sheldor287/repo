@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBSE Data Ingestion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .upload-box {
+            border: 2px dashed #aaa;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        button {padding: 10px 20px; cursor: pointer;}
+        #status {margin-top: 20px;}
+        table {width: 100%; border-collapse: collapse; margin-top: 20px;}
+        th,
+        td {border: 1px solid #ddd; padding: 8px; text-align: left;}
+        th {background: #f3f3f3;}
+        .success {color: green;}
+        .error {color: darkred;}
+    </style>
+</head>
+
+<body>
+<h1>Prototype Data Ingestion</h1>
+<h2>Upload CSV</h2>
+<form id="upload-form">
+    <div class="upload-box">
+        <input type="file" id="csv-file" accept=".csv" required>
+        <br><br>
+        <button type="submit">
+            Upload to Staging
+        </button>
+    </div>
+</form>
+
+<div id="status"></div>
+<h2>Staging Area</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Filename</th>
+            <th>Records</th>
+            <th>Status</th>
+            <th>Upload UUID</th>
+        </tr>
+    </thead>
+    <tbody id="staging-body">
+    </tbody>
+</table>
+
+
+<script>
+const form = document.getElementById("upload-form");
+const status = document.getElementById("status");
+const stagingBody = document.getElementById("staging-body");
+
+form.addEventListener("submit", async function(event) {
+    event.preventDefault();
+    const fileInput = document.getElementById("csv-file");
+    if (!fileInput.files.length) {
+        showError("Please select a CSV file.");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+    status.textContent = "Uploading...";
+    status.className = "";
+
+    try {
+        const response = await fetch(
+            "/api/ingest/upload",
+            {method: "POST", body: formData}
+        );
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(
+                result.detail?.message || result.detail || "Upload failed."
+            );
+        }
+        showSuccess(`Successfully staged ${result.record_count} records.`);
+        form.reset();
+        addStagingRow(result);
+    }
+    catch (error) {
+        showError(error.message);
+    }
+});
+
+function showSuccess(message) {
+    status.textContent = message;
+    status.className = "success";
+}
+
+function showError(message) {
+    status.textContent = message;
+    status.className = "error";
+}
+
+function addStagingRow(upload) {
+    const row = document.createElement("tr");
+    for (const value of [
+        upload.filename,
+        upload.record_count,
+        upload.status,
+        upload.upload_uuid,
+    ]) {
+        const cell = document.createElement("td");
+        cell.textContent = String(value);
+        row.appendChild(cell);
+    }
+    stagingBody.prepend(row);
+}
+</script>
+</body>
+</html>

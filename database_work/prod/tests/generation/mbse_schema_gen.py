@@ -6,25 +6,20 @@ from uuid import uuid4
 from sqlalchemy import create_engine, func, select
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import CreateSchema
-
-# Locate repository root
-repo_root = Path(__file__).resolve().parents[4]/"prod/backend"
-sys.path.insert(0, str(repo_root))
-
-from prod.backend.app.models.database import MBSE
-from prod.backend.app.models.enum_objects import GovernanceStatus, RecordType
-from prod.backend.app.models.mbse.engineering_model import EngineeringModel
-from prod.backend.app.models.mbse.model_version import ModelVersion
-from prod.backend.app.models.mbse.object_definition import ObjectDefinition
-from prod.backend.app.models.mbse.relationship_definition import RelationshipDefinition
-from prod.backend.app.models.mbse.instance_definition import InstanceDefinition
-from prod.backend.app.models.mbse.object_relationship import ObjectRelationship
-from prod.backend.app.models.mbse.relationship_endpoint import RelationshipEndpoint
-from prod.backend.app.models.mbse.object_instance_property import ObjectInstanceProperty
-from prod.backend.app.models.mbse.relationship_instance_property import RelationshipInstanceProperty
-from prod.backend.app.models.mbse.stereotype import Stereotype
-from prod.backend.app.models.mbse.applied_stereotype import AppliedStereotype
-from prod.backend.app.models.mbse.class_taxonomy import ClassTaxonomy
+from database_work.prod.app.models.database import MBSE
+from database_work.prod.app.models.enum_objects import GovernanceStatus, RecordType
+from database_work.prod.app.models.mbse.engineering_model import EngineeringModel
+from database_work.prod.app.models.mbse.model_version import ModelVersion
+from database_work.prod.app.models.mbse.object_definition import ObjectDefinition
+from database_work.prod.app.models.mbse.relationship_definition import RelationshipDefinition
+from database_work.prod.app.models.mbse.instance_definition import InstanceDefinition
+from database_work.prod.app.models.mbse.object_relationship import ObjectRelationship
+from database_work.prod.app.models.mbse.relationship_endpoint import RelationshipEndpoint
+from database_work.prod.app.models.mbse.object_instance_property import ObjectInstanceProperty
+from database_work.prod.app.models.mbse.relationship_instance_property import RelationshipInstanceProperty
+from database_work.prod.app.models.mbse.stereotype import Stereotype
+from database_work.prod.app.models.mbse.applied_stereotype import AppliedStereotype
+from database_work.prod.app.models.mbse.class_taxonomy import ClassTaxonomy
 """
 Generate synthetic records for the MBSE SQLAlchemy models in PostgreSQL.
 

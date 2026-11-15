@@ -1,83 +1,97 @@
-# Production Stack:
+# Database Work Prototype
 
-| Component | Software/Tool | 
-| - | - |
-| API | FastAPI|
-|UI | Jinja2/HTMX|
-|Database|PostgreSQL|
-|Schema Validation|Pydantic/JSON|
-|CSV|Pandas|
-|Object Relational Mapping | SQLAlchemy|
-|Database Migration|Alembic|
-|Background Processes|Celery/RQ/Arq|
-|File Storage|Local Volume --> S3|
-|Container|Docker|
-|Reverse Proxy|Nginx/Caddy|
-|Auth|TBD|
+This repository is an early prototype for a multi-domain data system covering
+MBSE, logistics, contracts, finance, and programmatics. MBSE is currently the
+most developed domain. The repository contains model definitions, ingestion
+experiments, schema artifacts, and test data; it is not yet a complete,
+deployable application.
 
-## Schema:
-Defined up front via contract\JSON schema. 
+## Current layout
 
-## Process:
-Schema --> (JSON/CSV) --> Validation 
-- IF Valid: Staging
-- ELSE: Quarantine
+```text
+prod/
+├── app/
+│   ├── api/                 # FastAPI route modules
+│   ├── db/                  # SQLAlchemy engine and request-scoped sessions
+│   ├── main.py              # FastAPI app, page route, and prototype table setup
+│   ├── models/
+│   │   ├── mbse/            # MBSE SQLAlchemy model definitions
+│   │   ├── database.py      # Declarative bases and shared columns
+│   │   ├── enum_objects.py  # Shared enums
+│   │   └── ingest.py        # Staging upload and record models
+│   ├── services/            # Validation and planned service modules
+│   └── user_interfaces/    # HTML interface prototypes
+├── data/                    # Reserved for data landing/archive/quarantine
+├── development_folder/
+│   ├── files/               # Derived MBSE schema artifact
+│   └── notebooks/           # Exploration notebooks
+├── docs/                    # Design and workflow documentation
+├── scripts/                 # Development data/setup scripts
+├── tests/
+│   ├── generation/          # Schema/data generation experiments
+│   ├── queries/             # SQL inspection queries
+│   └── test_data/           # Example inputs and local SQLite database
+├── DockerFile               # Minimal container stub
+├── docker-compose.yml       # Empty placeholder
+└── folder_structure.json    # Machine-readable high-level layout
+```
 
-## Metadata:
-### Logs:
-- batch_id
-- source
-- filename
-- filetype
-- received_at
-- schema_version
-- record_count
-- valid_count
-- invalid_count
-- status
+## Database runtime
 
-### Record:
-- record_id
-- batch_id
-- source_record_id
-- raw_data
-- validation_status
-- validation_errors
+`app/db/session.py` creates a SQLAlchemy engine from `DATABASE_URL`. If unset,
+it uses `sqlite:///./app.db` for local development. PostgreSQL can be selected
+with a URL such as `postgresql+psycopg://user:password@localhost:5432/dbname`;
+the matching database driver must be installed. SQLite connections translate
+the MBSE schema name into SQLite's default namespace.
 
-### Goverance Process:
-PENDING --> APPROVED/DISPUTED
-- IF DISPUTED: --> PENDING/REJECTED
-- ELSE: APPROVED --> SUPERSEDED
+The SQLAlchemy model definitions are intended to be authoritative. JSON, CSV,
+and other schema descriptions are derived artifacts. PostgreSQL and SQLite are
+the initial engine targets. Migration tooling and deployment configuration are
+not yet established.
 
-### Goverance Records:
-- decision_id
-- element_id
-- status
-- decision
-- decision_by
-- decision_datetime
-- reason_code
-- comments
+## Run the local upload prototype
 
-## SysML:
+Ensure FastAPI, Uvicorn, SQLAlchemy, `python-multipart`, and the selected
+database driver are installed. From the repository root, run:
 
-Element: 
-    - Source
-        - File/batch
-        - Timestamp
-    - Schema 
-        - Version
-    - Governance
-        - Decision --> User --> Reason
+```powershell
+uvicorn app.main:app --reload
+```
 
+Open `http://127.0.0.1:8000/` to use the upload page. By default the app creates
+`app.db` in the current working directory and initializes the registered model
+tables at startup. Set `DATABASE_URL` before starting Uvicorn to use PostgreSQL.
+The upload endpoint is `POST /api/ingest/upload`.
+Use `tests/test_data/ingestion_sample.csv` for the supplied one-row example.
 
-## Notes:
-### Potential Frontend:
-React --> FastAPI --> PostgreSQL
+The current CSV test contract requires these columns in this order:
 
-### Initial:
-Browser --> FastAPI --> Jinja2, HTMX, PostgreSQL
+```text
+uuid,name,phone,job,vin,city,governance_status,created_at
+```
 
-### Considerations:
-- Quarantine S3 instead of DB
-- S3 file archive
+## Intended ingestion behavior
+
+Uploads are events and should be atomic: a failed upload must not leave a
+partially applied model. Rows that fail validation are to be quarantined with
+their validation errors. The upload record is intended to capture uploader,
+organization, upload method, target schema/table, UTC time, and outcome. The
+details of the upload contract and the end-to-end workflow are still under
+development; see [the ingestion notes](docs/ingestion_and_validation.md).
+
+MBSE history is intended to be append-only. A row UUID identifies a stored row;
+the logical identity of an object across revisions must be established from
+source metadata or user input. Current state is derived from INSERT, UPDATE,
+and DELETE history.
+
+## Prototype limitations
+
+- A local FastAPI entry point now serves the upload page and mounts the CSV
+  staging route; other API and service modules are empty or experimental.
+- Authentication and authorization are not implemented. The initial role
+  categories are DBA (read/write), DS (read all), and User (scoped read); the
+  scope rules remain to be defined.
+- Alembic migrations, deployment configuration, and a production storage
+  strategy are not configured.
+- `folder_structure.json` is a high-level map; this README is the human-facing
+  description of the current layout.
