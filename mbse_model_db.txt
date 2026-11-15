@@ -1,0 +1,1163 @@
+Folder Structure
+--------------------------------------------------
+models/
+    database.py
+    enum_objects.py
+    govern.py
+    ingest.py
+    __init__.py
+    mbse/
+        applied_stereotype.py
+        class_taxonomy.py
+        engineering_model.py
+        instance_definition.py
+        model_version.py
+        object_definition.py
+        object_instance_property.py
+        object_relationship.py
+        relationship_definition.py
+        relationship_endpoint.py
+        relationship_instance_property.py
+        stereotype.py
+        __init__.py
+
+
+File Contents
+--------------------------------------------------
+
+
+database.py
+File type: .py
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import MetaData, Uuid, Text, Enum, DateTime
+from uuid import UUID, uuid4
+from datetime import datetime, timezone
+
+from .enum_objects import GovernanceStatus, RecordType
+
+
+class Base(DeclarativeBase):
+
+    uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        primary_key=True,
+        default=uuid4,
+    )
+
+    classification: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    record_type: Mapped[RecordType] = mapped_column(
+        Enum(RecordType, native_enum=False),
+        nullable=False,
+        default=RecordType.INSERT,
+    )
+
+
+class GovernanceBase(Base):
+    __abstract__ = True
+
+    governance_status: Mapped[GovernanceStatus] = mapped_column(
+        Enum(GovernanceStatus, native_enum=False),
+        default=GovernanceStatus.DRAFT,
+        nullable=False,
+    )
+
+    last_update_for_governance: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=True,
+    )
+
+    last_governance_review: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=True,
+    )
+
+
+class MBSE(Base):
+    __abstract__ = True
+    metadata = MetaData(schema="mbse")
+
+
+class Logistics(Base):
+    __abstract__ = True
+    pass
+
+
+class Finance(Base):
+    __abstract__ = True
+    pass
+
+
+class Programmatics(Base):
+    __abstract__ = True
+    pass
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+enum_objects.py
+File type: .py
+import enum
+
+class GovernanceStatus(str, enum.Enum):
+
+    DRAFT = "draft"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    PENDING = "pending"
+
+
+class RecordType(str, enum.Enum):
+
+    INSERT = "INSERT"
+    UPDATE = "UPDATE"
+    DELETE = "DELETE"
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+govern.py
+File type: .py
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+ingest.py
+File type: .py
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+__init__.py
+File type: .py
+# app/models/__init__.py
+from .mbse.engineering_model import EngineeringModel
+from .mbse.model_version import ModelVersion
+from .mbse.object_definition import ObjectDefinition
+from .mbse.relationship_definition import RelationshipDefinition
+from .mbse.instance_definition import InstanceDefinition
+from .mbse.class_taxonomy import ClassTaxonomy
+from .mbse.object_relationship import ObjectRelationship
+from .mbse.relationship_endpoint import RelationshipEndpoint
+from .mbse.stereotype import Stereotype
+from .mbse.applied_stereotype import AppliedStereotype
+from .mbse.object_instance_property import ObjectInstanceProperty
+from .mbse.relationship_instance_property import RelationshipInstanceProperty
+
+__all__ = [
+    "EngineeringModel",
+    "ModelVersion",
+    "ObjectDefinition",
+    "RelationshipDefinition",
+    "InstanceDefinition",
+    "ClassTaxonomy",
+    "ObjectRelationship",
+    "RelationshipEndpoint",
+    "Stereotype",
+    "AppliedStereotype",
+    "ObjectInstanceProperty",
+    "RelationshipInstanceProperty",
+]
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+mbse\applied_stereotype.py
+File type: .py
+from __future__ import annotations
+from uuid import UUID
+from sqlalchemy import CheckConstraint, ForeignKey, Index, JSON, Text, Uuid
+from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
+from ..database import MBSE
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .instance_definition import InstanceDefinition
+    from .object_relationship import ObjectRelationship
+    from .stereotype import Stereotype
+
+
+class AppliedStereotype(MBSE):
+    __tablename__ = "applied_stereotypes"
+    __table_args__ = (
+        CheckConstraint(
+            "target_type IN ('instance', 'relationship')",
+            name="ck_applied_stereotype_target_type",
+        ),
+        CheckConstraint(
+            """
+            (
+                target_type = 'instance'
+                AND instance_uuid IS NOT NULL
+                AND relationship_uuid IS NULL
+            )
+            OR
+            (
+                target_type = 'relationship'
+                AND relationship_uuid IS NOT NULL
+                AND instance_uuid IS NULL
+            )
+            """,
+            name="ck_applied_stereotype_target",
+        ),
+        Index(
+            "idx_applied_stereotype_instance_uuid",
+            "instance_uuid",
+        ),
+        Index(
+            "idx_applied_stereotype_relationship_uuid",
+            "relationship_uuid",
+        ),
+        Index(
+            "idx_applied_stereotype_stereotype_uuid",
+            "stereotype_uuid",
+        ),
+    )
+
+    stereotype_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "stereotypes.uuid",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    )
+
+    target_type: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    instance_uuid: Mapped[UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "instance_definition.uuid",
+            ondelete="CASCADE",
+        ),
+        nullable=True,
+    )
+
+    relationship_uuid: Mapped[UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "object_relationships.uuid",
+            ondelete="CASCADE",
+        ),
+        nullable=True,
+    )
+
+    source_identifier: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    tagged_values: Mapped[dict | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+    stereotype: Mapped["Stereotype"] = orm_relationship(
+        back_populates="applications",
+    )
+
+    instance: Mapped["InstanceDefinition | None"] = orm_relationship()
+
+    relationship: Mapped["ObjectRelationship | None"] = orm_relationship()
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+mbse\class_taxonomy.py
+File type: .py
+from __future__ import annotations
+from uuid import UUID
+from sqlalchemy import CheckConstraint, ForeignKey, UniqueConstraint, Uuid
+from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
+from ..database import MBSE
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .object_definition import ObjectDefinition
+
+
+class ClassTaxonomy(MBSE):
+    __tablename__ = "class_taxonomy"
+    __table_args__ = (
+        UniqueConstraint(
+            "class_uuid",
+            "subclass_uuid",
+            name="uq_class_taxonomy",
+        ),
+        CheckConstraint(
+            "class_uuid <> subclass_uuid",
+            name="ck_class_taxonomy_no_self_reference",
+        ),
+    )
+
+    class_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "object_definition.uuid",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+    )
+
+    subclass_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "object_definition.uuid",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+    )
+
+    class_definition: Mapped["ObjectDefinition"] = orm_relationship(
+        foreign_keys=[class_uuid],
+        back_populates="child_taxonomy",
+    )
+
+    subclass: Mapped["ObjectDefinition"] = orm_relationship(
+        foreign_keys=[subclass_uuid],
+        back_populates="parent_taxonomy",
+    )
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+mbse\engineering_model.py
+File type: .py
+from __future__ import annotations
+from datetime import datetime, timezone
+from sqlalchemy import Text, UniqueConstraint, DateTime
+from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
+from ..database import MBSE
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .model_version import ModelVersion
+
+
+class EngineeringModel(MBSE):
+    __tablename__ = "engineering_model"
+    __table_args__ = (
+        UniqueConstraint("name", name="uq_engineering_model_name"),
+    )
+
+    name: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    description: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    source_tool: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    source_format: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
+
+    versions: Mapped[list["ModelVersion"]] = orm_relationship(
+        back_populates="model",
+        cascade="all, delete-orphan",
+    )
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+mbse\instance_definition.py
+File type: .py
+
+from __future__ import annotations
+from uuid import UUID
+from sqlalchemy import Boolean, ForeignKey, Index, JSON, Text, text, Uuid
+from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
+from ..database import MBSE
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .model_version import ModelVersion
+    from .object_definition import ObjectDefinition
+    from .object_relationship import ObjectRelationship
+    from .relationship_endpoint import RelationshipEndpoint
+    from .object_instance_property import ObjectInstanceProperty
+
+
+class InstanceDefinition(MBSE):
+    __tablename__ = "instance_definition"
+    __table_args__ = (
+        Index(
+            "uq_instance_definition_source_identifier",
+            "model_version_uuid",
+            "source_identifier",
+            unique=True,
+            postgresql_where=text("source_identifier IS NOT NULL"),
+        ),
+        Index(
+            "idx_instance_definition_model_version_uuid",
+            "model_version_uuid",
+        ),
+        Index(
+            "idx_instance_definition_object_definition_uuid",
+            "object_definition_uuid",
+        ),
+        Index(
+            "idx_instance_definition_owner_instance_uuid",
+            "owner_instance_uuid",
+        ),
+    )
+
+    model_version_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "model_version.uuid",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+    )
+
+    object_definition_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "object_definition.uuid",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    )
+
+    object: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    definition: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    source_identifier: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    owner_instance_uuid: Mapped[UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "instance_definition.uuid",
+            ondelete="SET NULL",
+        ),
+        nullable=True,
+    )
+
+    source_path: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    source_payload: Mapped[dict | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+    is_deleted: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("false"),
+    )
+
+    model_version: Mapped["ModelVersion"] = orm_relationship(
+        back_populates="instances",
+    )
+
+    object_definition: Mapped["ObjectDefinition"] = orm_relationship(
+        back_populates="instances",
+    )
+
+    owner: Mapped["InstanceDefinition | None"] = orm_relationship(
+        remote_side="InstanceDefinition.uuid",
+        back_populates="owned_instances",
+    )
+
+    owned_instances: Mapped[list["InstanceDefinition"]] = orm_relationship(
+        back_populates="owner",
+    )
+
+    source_relationships: Mapped[list["ObjectRelationship"]] = orm_relationship(
+        foreign_keys="ObjectRelationship.source_instance_uuid",
+        back_populates="source_instance",
+    )
+
+    target_relationships: Mapped[list["ObjectRelationship"]] = orm_relationship(
+        foreign_keys="ObjectRelationship.target_instance_uuid",
+        back_populates="target_instance",
+    )
+
+    endpoints: Mapped[list["RelationshipEndpoint"]] = orm_relationship(
+        back_populates="instance",
+        cascade="all, delete-orphan",
+    )
+    
+    properties: Mapped[list["ObjectInstanceProperty"]] = orm_relationship(
+        back_populates="instance",
+        cascade="all, delete-orphan",
+    )
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+mbse\model_version.py
+File type: .py
+from __future__ import annotations
+from datetime import datetime
+from uuid import UUID
+from datetime import datetime, timezone
+from sqlalchemy import ForeignKey, Index, Text, DateTime, UniqueConstraint, Uuid
+from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
+from ..database import MBSE
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .engineering_model import EngineeringModel
+    from .instance_definition import InstanceDefinition
+    from .object_relationship import ObjectRelationship
+
+
+class ModelVersion(MBSE):
+    __tablename__ = "model_version"
+    __table_args__ = (
+        UniqueConstraint(
+            "model_uuid",
+            "version_label",
+            name="uq_model_version_model_label",
+        ),
+        Index(
+            "idx_model_version_model_uuid",
+            "model_uuid",
+        ),
+    )
+
+    model_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "engineering_model.uuid",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    )
+
+    version_label: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    parent_version_uuid: Mapped[UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "model_version.uuid",
+            ondelete="SET NULL",
+        ),
+        nullable=True,
+    )
+
+    source_filename: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    source_hash: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    imported_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=True,
+    )
+
+    model: Mapped["EngineeringModel"] = orm_relationship(
+        back_populates="versions",
+    )
+
+    parent_version: Mapped["ModelVersion | None"] = orm_relationship(
+        remote_side="ModelVersion.uuid",
+        back_populates="child_versions",
+    )
+
+    child_versions: Mapped[list["ModelVersion"]] = orm_relationship(
+        back_populates="parent_version",
+    )
+
+    instances: Mapped[list["InstanceDefinition"]] = orm_relationship(
+        back_populates="model_version",
+        cascade="all, delete-orphan",
+    )
+
+    relationships: Mapped[list["ObjectRelationship"]] = orm_relationship(
+        back_populates="model_version",
+        cascade="all, delete-orphan",
+    )
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+mbse\object_definition.py
+File type: .py
+from __future__ import annotations
+from sqlalchemy import Text, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
+from ..database import MBSE
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .instance_definition import InstanceDefinition
+    from .class_taxonomy import ClassTaxonomy
+
+
+class ObjectDefinition(MBSE):
+    __tablename__ = "object_definition"
+    __table_args__ = (
+        UniqueConstraint("object", name="uq_object_definition_object"),
+    )
+
+    object: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    definition: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    metaclass: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    instances: Mapped[list["InstanceDefinition"]] = orm_relationship(
+        back_populates="object_definition",
+    )
+
+    parent_taxonomy: Mapped[list["ClassTaxonomy"]] = orm_relationship(
+        foreign_keys="ClassTaxonomy.subclass_uuid",
+        back_populates="subclass",
+    )
+
+    child_taxonomy: Mapped[list["ClassTaxonomy"]] = orm_relationship(
+        foreign_keys="ClassTaxonomy.class_uuid",
+        back_populates="class_definition",
+    )
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+mbse\object_instance_property.py
+File type: .py
+from __future__ import annotations
+from uuid import UUID
+from sqlalchemy import ForeignKey, Index, JSON, Text, UniqueConstraint, Uuid
+from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
+from ..database import MBSE
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .instance_definition import InstanceDefinition
+
+
+class ObjectInstanceProperty(MBSE):
+    __tablename__ = "object_instance_properties"
+    __table_args__ = (
+        UniqueConstraint(
+            "instance_uuid",
+            "property_name",
+            name="uq_object_instance_property",
+        ),
+        Index(
+            "idx_object_instance_property_instance_uuid",
+            "instance_uuid",
+        ),
+        Index(
+            "idx_object_instance_property_property_name",
+            "property_name",
+        ),
+    )
+
+    instance_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "instance_definition.uuid",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+    )
+
+    property_name: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    property_value: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    value_type: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    value_json: Mapped[dict | list | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+    instance: Mapped["InstanceDefinition"] = orm_relationship(
+        back_populates="properties",
+    )
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+mbse\object_relationship.py
+File type: .py
+# app/models/mbse/object_relationship.py
+from __future__ import annotations
+from uuid import UUID
+from sqlalchemy import Boolean, ForeignKey, Index, JSON, Text, Uuid, false
+from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
+from ..database import MBSE
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .instance_definition import InstanceDefinition
+    from .model_version import ModelVersion
+    from .relationship_definition import RelationshipDefinition
+    from .relationship_endpoint import RelationshipEndpoint
+    from .relationship_instance_property import RelationshipInstanceProperty
+
+    
+class ObjectRelationship(MBSE):
+    __tablename__ = "object_relationships"
+    __table_args__ = (
+        Index(
+            "idx_object_relationship_model_version_uuid",
+            "model_version_uuid",
+        ),
+        Index(
+            "idx_object_relationship_source_instance_uuid",
+            "source_instance_uuid",
+        ),
+        Index(
+            "idx_object_relationship_target_instance_uuid",
+            "target_instance_uuid",
+        ),
+        Index(
+            "idx_object_relationship_relationship_definition_uuid",
+            "relationship_definition_uuid",
+        ),
+        Index(
+            "uq_object_relationship_source_identifier",
+            "model_version_uuid",
+            "source_identifier",
+            unique=True,
+        ),
+    )
+
+    model_version_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "model_version.uuid",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+    )
+
+    relationship_definition_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "relationship_definition.uuid",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+    )
+
+    source_instance_uuid: Mapped[UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "instance_definition.uuid",
+            ondelete="CASCADE",
+        ),
+        nullable=True,
+    )
+
+    target_instance_uuid: Mapped[UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "instance_definition.uuid",
+            ondelete="CASCADE",
+        ),
+        nullable=True,
+    )
+
+    source_identifier: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    relationship_name: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    definition: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    source_payload: Mapped[dict | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+    is_deleted: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=false(),
+    )
+
+    model_version: Mapped["ModelVersion"] = orm_relationship(
+        back_populates="relationships",
+    )
+
+    relationship_definition: Mapped["RelationshipDefinition"] = orm_relationship(
+        back_populates="instances",
+    )
+
+    source_instance: Mapped["InstanceDefinition | None"] = orm_relationship(
+        foreign_keys=[source_instance_uuid],
+        back_populates="source_relationships",
+    )
+
+    target_instance: Mapped["InstanceDefinition | None"] = orm_relationship(
+        foreign_keys=[target_instance_uuid],
+        back_populates="target_relationships",
+    )
+
+    endpoints: Mapped[list["RelationshipEndpoint"]] = orm_relationship(
+        back_populates="relationship",
+        cascade="all, delete-orphan",
+    )
+
+    properties: Mapped[list["RelationshipInstanceProperty"]] = orm_relationship(
+        back_populates="relationship",
+        cascade="all, delete-orphan",
+    )
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+mbse\relationship_definition.py
+File type: .py
+from __future__ import annotations
+from sqlalchemy import Boolean, Text, UniqueConstraint, text
+from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
+from ..database import MBSE, GovernanceBase
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .object_relationship import ObjectRelationship
+
+
+class RelationshipDefinition(MBSE, GovernanceBase):
+    __tablename__ = "relationship_definition"
+    __table_args__ = (
+        UniqueConstraint(
+            "relationship",
+            name="uq_relationship_definition_relationship",
+        ),
+    )
+
+    relationship: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    definition: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    is_directional: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=True,
+        server_default=text("true"),
+    )
+
+    instances: Mapped[list["ObjectRelationship"]] = orm_relationship(
+        back_populates="relationship_definition",
+    )
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+mbse\relationship_endpoint.py
+File type: .py
+from __future__ import annotations
+from uuid import UUID
+from sqlalchemy import ForeignKey, Index, Integer, Text, UniqueConstraint, text, Uuid
+from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
+from ..database import MBSE
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .instance_definition import InstanceDefinition
+    from .object_relationship import ObjectRelationship
+
+
+class RelationshipEndpoint(MBSE):
+    __tablename__ = "relationship_endpoints"
+    __table_args__ = (
+        UniqueConstraint(
+            "relationship_uuid",
+            "instance_uuid",
+            "endpoint_role",
+            "ordinal",
+            name="uq_relationship_endpoint",
+        ),
+        Index(
+            "idx_relationship_endpoint_relationship_uuid",
+            "relationship_uuid",
+        ),
+        Index(
+            "idx_relationship_endpoint_instance_uuid",
+            "instance_uuid",
+        ),
+    )
+
+    relationship_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "object_relationships.uuid",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+    )
+
+    instance_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "instance_definition.uuid",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+    )
+
+    endpoint_role: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    ordinal: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1,
+        server_default=text("1"),
+    )
+
+    multiplicity_lower: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    multiplicity_upper: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    role_name: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    relationship: Mapped["ObjectRelationship"] = orm_relationship(
+        back_populates="endpoints",
+    )
+
+    instance: Mapped["InstanceDefinition"] = orm_relationship(
+        back_populates="endpoints",
+    )
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+mbse\relationship_instance_property.py
+File type: .py
+from __future__ import annotations
+from uuid import UUID
+from sqlalchemy import ForeignKey, Index, JSON, Text, UniqueConstraint, Uuid
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from ..database import MBSE
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .object_relationship import ObjectRelationship
+
+    
+class RelationshipInstanceProperty(MBSE):
+    __tablename__ = "relationship_instance_properties"
+    __table_args__ = (
+        UniqueConstraint(
+            "relationship_uuid",
+            "property_name",
+            name="uq_relationship_instance_property",
+        ),
+        Index(
+            "idx_relationship_instance_property_relationship_uuid",
+            "relationship_uuid",
+        ),
+        Index(
+            "idx_relationship_instance_property_property_name",
+            "property_name",
+        ),
+    )
+
+    relationship_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey(
+            "object_relationships.uuid",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+    )
+
+    property_name: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    property_value: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    value_type: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    value_json: Mapped[dict | list | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+    relationship: Mapped["ObjectRelationship"] = relationship(
+        back_populates="properties",
+    )
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+mbse\stereotype.py
+File type: .py
+from __future__ import annotations
+from sqlalchemy import Text, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship as orm_relationship
+from ..database import MBSE
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .applied_stereotype import AppliedStereotype
+
+
+class Stereotype(MBSE):
+    __tablename__ = "stereotypes"
+    __table_args__ = (
+        UniqueConstraint(
+            "profile_name",
+            "stereotype",
+            name="uq_stereotype_profile_name",
+        ),
+    )
+
+    stereotype: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    definition: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    profile_name: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    base_metaclass: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    applications: Mapped[list["AppliedStereotype"]] = orm_relationship(
+        back_populates="stereotype",
+    )
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+mbse\__init__.py
+File type: .py
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
