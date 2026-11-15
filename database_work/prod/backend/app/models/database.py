@@ -2,7 +2,8 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import MetaData, Uuid, Text, Enum, DateTime
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
-import enum
+
+from .enum_objects import GovernanceStatus, RecordType
 
 
 class Base(DeclarativeBase):
@@ -18,13 +19,11 @@ class Base(DeclarativeBase):
         nullable=True,
     )
 
-
-class GovernanceStatus(str, enum.Enum):
-
-    DRAFT = "draft"
-    APPROVED = "approved"
-    REJECTED = "rejected"
-    PENDING = "pending"
+    record_type: Mapped[RecordType] = mapped_column(
+        Enum(RecordType, native_enum=False),
+        nullable=False,
+        default=RecordType.INSERT,
+    )
 
 
 class GovernanceBase(Base):
