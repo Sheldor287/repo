@@ -7,8 +7,10 @@ import sys
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.schema import CreateSchema
 
-backend = Path.cwd().parents[1]/"backend"
-sys.path.insert(0, str(backend))
+# Locate repository root
+repo_root = Path(__file__).resolve().parents[4]/"prod/backend"
+sys.path.insert(0, str(repo_root))
+
 from app.models.database import MBSE
 import app.models  # Ensure all model classes are registered
 

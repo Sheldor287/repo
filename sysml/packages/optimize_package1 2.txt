@@ -1,0 +1,3881 @@
+Folder Structure
+--------------------------------------------------
+optimize/
+    analysis.py
+    display.py
+    equations.py
+    models.py
+    pyproject.toml
+    run.py
+    test_config.ipynb
+    __init__.py
+    .vscode/
+        settings.json
+    tests/
+        conftest.py
+        test_analysis.py
+        test_graphdrawer.py
+        test_graphmetrics.py
+        test_graphml.py
+        test_lp.py
+        test_pipeline.py
+        test_solver.py
+        test_toy_graph.py
+    toy_models/
+        create.py
+
+
+File Contents
+--------------------------------------------------
+
+
+analysis.py
+File type: .py
+from collections import defaultdict
+from pyomo import environ as pyo
+import matplotlib.pyplot as plt
+from tqdm import trange
+import networkx as nx
+import pandas as pd
+import numpy as np
+import inspect
+import re
+
+from sklearn.metrics import r2_score, mean_absolute_error, accuracy_score
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.cluster import KMeans, AgglomerativeClustering
+from sklearn.inspection import permutation_importance
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+class Analysis:
+    """
+    Analysis layer for Solver results and stochastic network simulations.
+
+    Supports:
+        - max_flow
+        - min_cut
+        - node_interdiction
+
+    The class is intentionally separated from LP and Solver:
+        LP          -> constructs optimization model
+        Solver   -> solves model and standardizes results
+        Analysis -> interprets/analyzes those results
+    """
+    FORMULATION_INFO = {
+        "max_flow": { "value_name": "flow", "performance_direction": "higher", "failure_condition": "zero", },
+        "min_cut": { "value_name": "cut_capacity", "performance_direction": "higher", "failure_condition": "zero", },
+        "node_interdiction": { "value_name": "interdicted_cut_capacity", "performance_direction": "lower", "failure_condition": "zero", },
+    }
+
+    def __init__(self, solver):
+        self.solver = solver
+        self.g = solver.g
+        self.model = solver.model
+        self.model_type = solver.model_type
+        self.results = solver.results
+        # Statistics
+        self.node_results = self.results.get("node_results", {})
+        self.edge_results = self.results.get("edge_results", {})
+        self.metrics = self.results.get("metrics", {})
+        self.problem = self.results.get("problem", {})
+        self.solver_results = self.results.get("solver", {})
+        # Simulation attributes
+        self.nodes = None
+        self.edges = None
+        self.node_p = None
+        self.edge_p = None
+
+    # General solver results
+    def analysis_step(category, description=""):
+        def decorator(func):
+            func._analysis_category = category
+            func._analysis_description = description
+            return func
+        return decorator
+
+    def ml(self):
+        return GraphML(self, df=self.stochastic_analysis(n_sim=50,seed=123,))
+
+    @analysis_step("Solution", "General solution information")
+    def summary(self):
+        """Return a formulation-independent summary of the solution"""
+        return {
+            "model_type": self.model_type,
+            "objective_value": self.problem.get("objective_value"),
+            "status": self.solver_results.get("status"),
+            "termination_condition":self.solver_results.get("termination_condition"),
+            "cut_capacity":self.metrics.get("cut_capacity"),
+            "capacity_removed":self.metrics.get("capacity_removed"),
+            "interdiction_cost":self.metrics.get("interdiction_cost"),
+            "budget":self.metrics.get("budget"),
+        }
+    
+    @analysis_step("Solution", "Optimization objective value")
+    def get_objective_value(self):
+        return self.problem.get("objective_value")
+
+    # Node / edge access
+    @analysis_step("Get Data", "Node Results")
+    def get_node_results(self):
+        return self.node_results
+    
+    @analysis_step("Get Data", "Edge Results")
+    def get_edge_results(self):
+        return self.edge_results
+
+    @analysis_step("Get Data", "Solver Metrics")
+    def get_metrics(self):
+        return self.metrics
+
+    # Cut analysis
+    @analysis_step("Cut Analysis", "Edges belonging to the minimum cut")
+    def get_cut_edges(self):
+        """Return edges identified as belonging to the minimum cut. Works for both min_cut and node_interdiction results."""
+        return [edge for edge, data in self.edge_results.items() if data.get("in_cut", False)]
+
+    @analysis_step("Cut Analysis", "Edges belonging to the interdicted cut")
+    def get_interdicted_cut_edges(self):
+        """Return edges actually contributing to the interdicted cut. Returns an empty list for formulations without interdiction."""
+        return [edge for edge, data in self.edge_results.items() if data.get("in_interdicted_cut", False)]
+
+    @analysis_step("Cut Analysis", "Returns the maximum flow left on the network")
+    def get_cut_capacity(self):
+        return self.metrics.get("cut_capacity")
+
+    @analysis_step("Cut Analysis", "Returns the maximum flow destroyed by the interdiction")
+    def get_capacity_removed(self):
+        return self.metrics.get("capacity_removed", 0)
+
+    # Interdiction analysis
+    @analysis_step("Interdiction", "Nodes selected for interdiction")
+    def get_interdicted_nodes(self):
+        """Return nodes selected by the interdiction formulation."""
+        return [node for node, data in self.node_results.items() if data.get("interdicted", False)]
+    
+    @analysis_step("Interdiction", "Price of node interdiction")
+    def get_interdiction_cost(self):
+        return self.metrics.get("interdiction_cost", 0)
+    
+    @analysis_step("Interdiction", "How much capacity is lost per unit cost")
+    def get_interdiction_efficiency(self):
+        """Capacity removed per unit interdiction cost."""
+        cost = self.get_interdiction_cost()
+        removed = self.get_capacity_removed()
+        if cost is None or cost <= 0:
+            return None
+        return removed / cost
+
+    ##################################
+    ####### Simulation Helpers #######
+    ##################################
+
+    # Component identification
+    @staticmethod
+    def _get_component_columns(df):
+        node_cols = [c for c in df.columns if re.match(r"^node_-?\d+$", c)]
+        edge_cols = [c for c in df.columns if re.match(r"^edge_\(.+\)$", c)]
+        return node_cols, edge_cols
+
+    # Stochastic simulation preprocessing
+    def _preprocess_network_simulation(self):
+        self.nodes = [n for n in self.g.nodes() if not self.g.nodes[n].get("artificial", False)]
+        self.edges = [(u, v) for u, v in self.g.edges() if not self.g.edges[u, v].get("artificial", False)]
+        self.node_p = np.array([self.g.nodes[n].get("probability1", 1) for n in self.nodes])
+        self.edge_p = np.array([self.g.edges[u, v].get("probability", 1)for u, v in self.edges])
+
+    def _sample_states(self, rng):
+        """Sample operational states for nodes and edges"""
+        node_state = rng.binomial(1, self.node_p)
+        edge_state = rng.binomial(1, self.edge_p)
+        return node_state, edge_state
+
+    #######################################
+    ####### Monte Carlo Simulations #######
+    #######################################
+
+    @analysis_step("Monte Carlo", "Main Optimization Solver")
+    def stochastic_analysis(self,n_sim=1000,seed=123,solver_str="appsi_highs",):
+        """
+        Perform stochastic analysis using the current LP formulation.
+
+        The graph structure and Pyomo model are retained. Only mutable
+        node_state and edge_state parameters are changed between runs.
+        The interpretation of the resulting objective depends on the formulation:
+
+            max_flow: realized maximum flow
+            min_cut: realized minimum cut
+            node_interdiction: realized interdicted minimum cut
+        """
+        if not hasattr(self.model, "node_state"):
+            raise AttributeError("The current model does not contain mutable node_state.")
+        if not hasattr(self.model, "edge_state"):
+            raise AttributeError("The current model does not contain mutable edge_state.")
+        self._preprocess_network_simulation()
+        rng = np.random.default_rng(seed)
+        pyo_solver = pyo.SolverFactory(solver_str)
+        results = []
+        for i in trange(n_sim):
+            node_state, edge_state = self._sample_states(rng)
+            for n, state in zip(self.nodes, node_state):
+                self.model.node_state[n] = int(state)
+            for (u, v), state in zip(self.edges, edge_state):
+                self.model.edge_state[u, v] = int(state)
+            result = pyo_solver.solve(self.model)
+            results.append(self._process_simulation_result(result,node_state,edge_state,i,))
+        return pd.DataFrame(results)
+
+    def _process_simulation_result(self,result,node_state,edge_state,i,):
+        """Convert one stochastic optimization result into a dataframe row"""
+        objective = pyo.value(self.model.obj)
+        node_operational = int(node_state.sum())
+        node_failed = len(node_state) - node_operational
+        edge_operational = int(edge_state.sum())
+        edge_failed = len(edge_state) - edge_operational
+        row = {
+            "sim_number": i,
+            "objective": objective,
+            "node_operational": node_operational,
+            "node_failed": node_failed,
+            "edge_operational": edge_operational,
+            "edge_failed": edge_failed,
+            "node_opr_ratio":node_operational / len(self.nodes),
+            "edge_opr_ratio":edge_operational / len(self.edges),
+            "termination_condition":str(result.solver.termination_condition),
+        }
+        ## Formulation-specific aliases
+        if self.model_type == "max_flow":
+            row["flow"] = objective
+            row["flow_failure_indicator"] = int(objective == 0)
+        elif self.model_type == "min_cut":
+            row["cut_capacity"] = objective
+            row["cut_failure_indicator"] = int(objective == 0)
+        elif self.model_type == "node_interdiction":
+            row["interdicted_cut_capacity"] = objective
+            row["interdiction_failure_indicator"] = int(objective == 0)
+        ## Component states
+        for n, state in zip(self.nodes, node_state):
+            row[f"node_{n}"] = int(state)
+        for (u, v), state in zip(self.edges, edge_state):
+            row[f"edge_({u},{v})"] = int(state)
+        return row
+
+    # Reliability analysis
+    @staticmethod
+    @analysis_step("Reliability", "P(Y >= threshold)")
+    def reliability(df,threshold,y_column="objective",):
+        return (df[y_column] >= threshold).mean()
+
+    @staticmethod
+    @analysis_step("Reliability", "P(Y < threshold)")
+    def failure_probability(df,threshold,y_column="objective",):
+        return (df[y_column] < threshold).mean()
+
+    @staticmethod
+    @analysis_step("Reliability", "Construct the empirical reliability curve: R(q) = P(Y >= q)")
+    def reliability_curve(df, y_column="objective",):
+        values = np.sort(df[y_column].dropna().unique())
+        return pd.DataFrame({
+            "requirement": values, "reliability": [(df[y_column] >= q).mean()for q in values],
+        })
+
+    @staticmethod
+    @analysis_step("Reliability", "Summarize the empirical distribution of network performance")
+    def performance_distribution(df,y_column="objective",threshold=None):
+        values = df[y_column].dropna()
+        if values.empty:
+            return {}
+        return {
+            "mean": values.mean(),
+            "median": values.median(),
+            "std": values.std(),
+            "variance": values.var(),
+            "min": values.min(),
+            "max": values.max(),
+            "q05": values.quantile(0.05),
+            "q10": values.quantile(0.10),
+            "q25": values.quantile(0.25),
+            "q50": values.quantile(0.50),
+            "q75": values.quantile(0.75),
+            "q90": values.quantile(0.90),
+            "q95": values.quantile(0.95),
+            "zero_probability": (values == 0).mean(),
+            "reliability_threshold": threshold,
+            "reliability": (values >= threshold).mean() if threshold is not None else None,
+            "probability_of_failure": (values < threshold).mean() if threshold is not None else None,
+        }
+
+    @analysis_step("Reliability", "The meta-collection of stochastic network performance")
+    def performance_summary(self,df,y_column="objective",threshold=None,):
+        summary = self.performance_distribution(df,y_column=y_column,)
+        if threshold is not None:
+            summary["reliability"] = (self.reliability(df,threshold,y_column,))
+            summary["failure_probability"] = (self.failure_probability(df,threshold,y_column,))
+            summary["expected_shortfall"] = (self.expected_shortfall(df,threshold,y_column,))
+        return summary
+
+    @staticmethod
+    @analysis_step("Reliability", "Estimate the expected network performance conditional on performance being below a threshold.")    
+    def expected_shortfall(df,threshold,y_column="objective",):
+        values = df[y_column].dropna()
+        tail = values[values < threshold]
+        if tail.empty:
+            return np.nan
+        return tail.mean()
+
+    @staticmethod
+    @analysis_step("Reliability", "Resilience curves capturing expected performance as a function of component failures")   
+    def resilience_curve(df,y_column="objective",failure_column="node_failed",baseline=None,):
+        """
+        Estimate expected performance as a function of component failures.
+        For each number of failed components k: E[Y | failures = k]
+        If baseline is supplied, also calculate: E[Y | failures = k] / baseline.
+
+        USABLE for both nodes and edges.
+        """
+        data = df[[y_column, failure_column]].dropna()
+        if data.empty:
+            return pd.DataFrame()
+        if baseline is None:
+            baseline = data[y_column].max()
+        curve = (data.groupby(failure_column)[y_column].agg(mean="mean",median="median",std="std",count="count",).reset_index())
+        curve["relative_performance"] = (curve["mean"] / baseline if baseline and baseline != 0 else np.nan)
+        return curve
+
+    # Component influence
+    @staticmethod
+    def _get_influence_logic(df,component_columns,y_column="objective",):
+        """Calculate conditional performance associated with component state."""
+        results = []
+        for component in component_columns:
+            operational = df[component] == 1
+            failed = df[component] == 0
+            value_operational = (df.loc[operational, y_column].mean() if operational.any() else np.nan)
+            value_failed = (df.loc[failed, y_column].mean() if failed.any() else np.nan)
+            difference = (value_operational - value_failed if not np.isnan(value_failed) else np.nan)
+            relative_difference = (difference / value_operational if (not np.isnan(difference) and value_operational != 0) else np.nan)
+            results.append({
+                "component": component,
+                "value_if_operational": value_operational,
+                "value_if_failed": value_failed,
+                "value_difference": difference,
+                "relative_impact": relative_difference,
+                "n_operational": operational.sum(),
+                "n_failed": failed.sum(),
+                "observed_performance_rate": operational.mean(),
+            })
+        return (pd.DataFrame(results).sort_values("value_difference",ascending=False,).reset_index(drop=True))
+
+    @analysis_step("Reliability", "Return separate node and edge component influence tables.")   
+    def get_component_influence(self,df,y_column="objective",):
+        node_cols, edge_cols = self._get_component_columns(df)
+        node_results = self._get_influence_logic(df,node_cols,y_column,)
+        edge_results = self._get_influence_logic(df,edge_cols,y_column,)
+        return node_results, edge_results
+
+    # Component reliability importance
+    @analysis_step("Compinent Reliability", "R_i = P(Y >= q | X_i = 1) - P(Y >= q | X_i = 0).")   
+    def get_component_reliability(self,df,threshold,y_column="objective",):
+        """Calculate component-level reliability impact. R_i = P(Y >= q | X_i = 1) - P(Y >= q | X_i = 0)"""
+        node_cols, edge_cols = self._get_component_columns(df)
+        results = []
+        for component in node_cols + edge_cols:
+            operational = df[component] == 1
+            failed = df[component] == 0
+            reliability_operational = ((df.loc[operational, y_column] >= threshold).mean() if operational.any() else np.nan)
+            reliability_failed = ((df.loc[failed, y_column] >= threshold).mean() if failed.any() else np.nan)
+            impact = (reliability_operational - reliability_failed if not np.isnan(reliability_failed) else np.nan)
+            results.append({
+                "component": component,
+                "component_type": "node" if component in node_cols else "edge",
+                "reliability_if_operational": reliability_operational,
+                "reliability_if_failed": reliability_failed,
+                "reliability_impact": impact,
+                "n_operational": operational.sum(),
+                "n_failed": failed.sum(),
+                "observed_failure_rate": failed.mean(),
+            })
+        return (pd.DataFrame(results).sort_values("reliability_impact",ascending=False,).reset_index(drop=True))
+
+    # Plotting
+    @analysis_step("Plotting", "R(q) = P(Y >= q)")   
+    def plot_reliability_curve(self,df,y_column="objective",threshold=None,ax=None,):
+        """Plot: R(q) = P(Y >= q)"""
+        if ax is None:
+            _, ax = plt.subplots(figsize=(8, 5))
+        curve = self.reliability_curve(df,y_column=y_column,)
+        ax.step(curve["requirement"],curve["reliability"],where="post",)
+        if threshold is not None:
+            ax.axvline(threshold,linestyle="--",label=f"Required value of Flow: {threshold}",)
+            ax.legend()
+        ax.set_xlabel("Required Value of Flow")
+        ax.set_ylabel("Reliability")
+        ax.set_title("Network Reliability Curve",weight="bold",)
+        ax.set_ylim(0, 1.02)
+        ax.grid(True, alpha=0.3)
+        return ax
+
+    @analysis_step("Plotting", "Plot expected network performance as components fail.")       
+    def plot_resilience_curve(self,df,y_column="objective",failure_column="node_failed",baseline=None,relative=True,ax=None,):
+        if ax is None:
+            _, ax = plt.subplots(figsize=(8, 5))
+        curve = self.resilience_curve(df,y_column=y_column,failure_column=failure_column,baseline=baseline,)
+        if curve.empty:
+            return ax
+        y_column = ("relative_performance"if relative else "mean")
+        ax.plot(curve[failure_column],curve[y_column],marker="o",)
+        ax.set_xlabel("Number of Failed " + ("Nodes" if "node" in failure_column else "Edges"))
+        ax.set_ylabel("Relative Performance" if relative else "Expected Performance")
+        ax.set_title("Network Resilience Curve", weight="bold",)
+        ax.grid(True, alpha=0.3)
+        if relative:
+            ax.set_ylim(bottom=0)
+        return ax
+
+    @staticmethod
+    @analysis_step("Plotting", "Plot the components having the greatest reliability impact.")   
+    def plot_component_reliability(reliability_df,top_n=15,ax=None,):
+        if ax is None:
+            _, ax = plt.subplots(figsize=(9, 6))
+        data = reliability_df.head(top_n).iloc[::-1]
+        ax.barh(data["component"],data["reliability_impact"],)
+        ax.set_xlabel("Reliability Impact")
+        ax.set_ylabel("Component")
+        ax.set_title("Component Reliability Importance",weight="bold",)
+        ax.grid(True,axis="x",alpha=0.3,)
+        return ax
+
+    @classmethod
+    def show_workflow(cls):
+        categories = defaultdict(list)
+        # Inspect methods defined on Analysis
+        for name, method in inspect.getmembers(cls, predicate=inspect.isfunction):
+            category = getattr(method, "_analysis_category", None)
+            if category is None:
+                continue
+            description = getattr(method,"_analysis_description","")
+            categories[category].append((name, description))
+        print(f"\n{cls.__name__} — Analysis Workflow")
+        print("│")
+        category_items = list(categories.items())
+        for i, (category, methods) in enumerate(category_items):
+            is_last_category = i == len(category_items) - 1
+            category_prefix = "|--> " if is_last_category else "|--> "
+            print(f"{category_prefix}{category}")
+            method_prefix = "    " if is_last_category else "|   "
+            for j, (name, description) in enumerate(methods):
+                is_last_method = j == len(methods) - 1
+                branch = "|--> " if is_last_method else "|--> "
+                print(f"{method_prefix}{branch}{name}() — {description}" if description else "")
+        print()
+
+class GraphMetrics:
+    """
+    Graph-theoretic analysis layer.
+
+    GraphML consumes:
+        - Analysis for solved/stochastic network behavior
+        - NetworkX graph structure for graph-theoretic features
+        - stochastic DataFrame for ML-based performance analysis
+
+    Capabilities:
+        1. Clustering & other network metrics
+        2. Special analysis + (1) --> ML data-table
+        2. Random forest / permutation importance
+        3. Spectral metrics
+        4. Relationship between graph structure and optimization performance
+    """
+    def __init__( self, analysis:Analysis=None,):
+        self.analysis = analysis
+        if analysis is not None:
+            self.solver = analysis.solver
+            self.g = analysis.g
+            self.results = analysis.results
+            self.node_results = analysis.node_results
+            self.edge_results = analysis.edge_results
+            self.metrics = analysis.metrics
+        else:
+            self.solver = None
+            self.g = None
+            self.results = {}
+            self.node_results = {}
+            self.edge_results = {}
+            self.metrics = {}
+            
+    # Validation
+    def _require_graph(self):
+        if self.g is None:
+            raise ValueError("GraphML requires an Analysis object.")
+        
+    # Graph information
+    def graph_info(self):
+        """Return basic structural information about the graph."""
+        self._require_graph()
+        return {
+            "nodes": self.g.number_of_nodes(),
+            "edges": self.g.number_of_edges(),
+            "density": nx.density(self.g),
+            "directed": self.g.is_directed(),
+            "weighted": nx.is_weighted(self.g),
+            "connected": (nx.is_weakly_connected(self.g) if self.g.is_directed() else nx.is_connected(self.g)),
+        }
+    
+    # Combined structural features --> Main ML df
+    def node_features(self):
+        """Return a single node-level structural feature table: Primary ML Object"""
+        degree = self.degree_metrics()
+        centrality = self.centrality_metrics()
+        clustering = self.clustering_metrics()
+        spectral = self.spectral_node_features()
+        community = self.community_detection()
+        df = (
+            degree.merge(centrality, on="node")
+            .merge(clustering, on="node")
+            .merge(spectral, on="node")
+            .merge(community, on='node')
+            .reset_index(drop=True)
+        )
+        return df
+    
+    # Degree metrics
+    def degree_metrics(self):
+        """Calculate node-level degree-based structural metrics"""
+        self._require_graph()
+        rows = []
+        for node in self.g.nodes:
+            if self.g.is_directed():
+                in_degree = self.g.in_degree(node)
+                out_degree = self.g.out_degree(node)
+            else:
+                in_degree = self.g.degree(node)
+                out_degree = self.g.degree(node)
+            rows.append({"node": node, "degree": self.g.degree(node), "in_degree": in_degree, "out_degree": out_degree,})
+        return pd.DataFrame(rows)
+    
+    # Centrality metrics
+    def centrality_metrics(self, max_iter=1000):
+        """Calculate common node-centrality measures"""
+        self._require_graph()
+        degree = nx.degree_centrality(self.g)
+        betweenness = nx.betweenness_centrality(self.g)
+        closeness = nx.closeness_centrality(self.g)
+        try:
+            eigenvector = nx.eigenvector_centrality(self.g, max_iter=max_iter)
+        except nx.PowerIterationFailedConvergence:
+            eigenvector = {node: np.nan for node in self.g.nodes}
+        rows = []
+        for node in self.g.nodes:
+            rows.append({
+                "node": node,
+                "degree_centrality": degree[node],
+                "betweenness_centrality": betweenness[node],
+                "closeness_centrality": closeness[node],
+                "eigenvector_centrality": eigenvector[node],
+            })
+        return pd.DataFrame(rows)
+
+    # Local clustering
+    def clustering_metrics(self):
+        """Calculate local clustering coefficients"""
+        self._require_graph()
+        clustering = nx.clustering(self.g)
+        return pd.DataFrame(
+            [{ "node": node, "clustering_coefficient": value,} for node, value in clustering.items()]
+        )
+    
+    # Spectral metrics
+    def spectral_metrics(self):
+        """
+        Calculate graph-level spectral metrics.
+
+        adjacency_spectral_radius: Largest absolute eigenvalue of the adjacency matrix.
+            Measures maximum propagation potential across a network.
+            Higher values --> Faster spreading 
+
+        adjacency_largest_eigenvalue: Largest real eigenvalue of the adjacency matrix.
+            Is a measurement of overall density and how large the "hubs" are. 
+            It tracks the size of the dominate flow over a set of commonly-used paths. 
+
+        laplacian_algebraic_connectivity (Fiedler Value)): Second-smallest Laplacian eigenvalue.
+            Quantifies how tightly connected the graph is as a single unit.
+            0: G is not connected; The higher, the more difficult it is to disconnect  
+
+        laplacian_spectral_gap: Difference between the two smallest Laplacian eigenvalues.
+            This measures bottleneck potential. A large gap --> the absence of weak points
+
+        laplacian_largest_eigenvalue: Largest Laplacian eigenvalue.
+            The larger the eigenvalue, the more "bipartite" the graph is. 
+            Bipartite = Seperatable into two clean parts that connect over the middle. 
+        """
+
+        self._require_graph()
+
+        # Adjacency matrix
+        A = nx.to_numpy_array(self.g)
+        adjacency_eigenvalues = np.linalg.eigvals(A)
+        adjacency_eigenvalues = np.real_if_close(adjacency_eigenvalues)
+        adjacency_eigenvalues = np.real(adjacency_eigenvalues)
+
+        # Laplacian
+        if self.g.is_directed():
+            # Use the underlying undirected topology for the standard Laplacian.
+            G_lap = self.g.to_undirected()
+        else:
+            G_lap = self.g
+        L = nx.laplacian_matrix(G_lap).toarray()
+        laplacian_eigenvalues = np.linalg.eigvalsh(L)
+        laplacian_eigenvalues = np.sort(np.real(laplacian_eigenvalues))
+
+        # Algebraic connectivity
+        if len(laplacian_eigenvalues) >= 2:
+            algebraic_connectivity = (laplacian_eigenvalues[1])
+            spectral_gap = (laplacian_eigenvalues[1] - laplacian_eigenvalues[0])
+        else:
+            algebraic_connectivity = 0.0
+            spectral_gap = 0.0
+
+        # Fiedler vector
+        if len(laplacian_eigenvalues) >= 2:
+            eigenvalues, eigenvectors = np.linalg.eigh(L)
+            fiedler_vector = eigenvectors[:, 1]
+        else:
+            fiedler_vector = np.array([0.0])
+
+        # Results
+        return {
+            "adjacency_spectral_radius": np.max(np.abs(adjacency_eigenvalues)),
+            "adjacency_largest_eigenvalue": np.max(adjacency_eigenvalues),
+            "laplacian_algebraic_connectivity": algebraic_connectivity,
+            "laplacian_spectral_gap": spectral_gap,
+            "laplacian_largest_eigenvalue": laplacian_eigenvalues[-1],
+            "adjacency_eigenvalues": adjacency_eigenvalues,
+            "laplacian_eigenvalues": laplacian_eigenvalues,
+            "fiedler_vector": fiedler_vector,
+        }
+    # Node features --> node_features
+    def spectral_node_features(self):
+        """ Return node-level spectral features """
+        self._require_graph()
+        if self.g.is_directed():
+            G = self.g.to_undirected()
+        else:
+            G = self.g
+        L = nx.laplacian_matrix(G).toarray()
+        eigenvalues, eigenvectors = np.linalg.eigh(L)
+        rows = []
+        for i, node in enumerate(G.nodes):
+            row = {"node": node, "fiedler_value": eigenvectors[i, 1] if len(eigenvalues) > 1 else 0.0,}
+            # Include a few low-order spectral coordinates.
+            for k in range(min(3, eigenvectors.shape[1])):
+                row[f"spectral_coordinate_{k}"] = (eigenvectors[i, k])
+            rows.append(row)
+        return pd.DataFrame(rows)
+    
+    def community_detection(self):
+        """Detect structural communities.
+        Handles mixed-type node identifiers by temporarily relabeling
+        nodes to integers. Original node identifiers are restored in
+        the returned DataFrame.
+        """
+        self._require_graph()
+        G = ( self.g.to_undirected() if self.g.is_directed() else self.g )
+        # Temporarily relabel nodes with integers
+        node_map = { node: i for i, node in enumerate(G.nodes()) }
+        inverse_map = { i: node for node, i in node_map.items() }
+        H = nx.relabel_nodes(G, node_map)
+        # Community detection happens on H, NOT G
+        communities = nx.community.greedy_modularity_communities(H)
+        # Convert results back to original node identifiers
+        rows = []
+        for community_id, community in enumerate(communities):
+            for numeric_node in community:
+                original_node = inverse_map[numeric_node]
+                rows.append({ "node": original_node, "community": community_id, "community_size": len(community), })
+        return (pd.DataFrame(rows) .sort_values( ["community", "node"], key=lambda col: col.map(str) if col.name == "node" else col ) .reset_index(drop=True))
+
+class GraphML(GraphMetrics, Analysis):
+
+    def __init__(self, analysis: Analysis = None, df: pd.DataFrame = None,):
+        super().__init__(analysis)
+        # Stochastic results df
+        self.df = df
+        # Structural feature matrices
+        self.node_X = self.node_features()
+        self.edge_X = None
+        # Simulation matrices
+        self.simulation_X = None
+        self.simulation_y = None
+        # Component target matrices
+        self.node_y = None
+        self.edge_y = None
+        # ML objects
+        self.cluster_df = None
+        self.rf_model = None
+        self.rf_importance = None
+        self.permutation_importance = None
+        # Graph encoders
+        self.graph_encoder, self.graph_decoder = self._numeric_node_map()
+
+    # Validation
+    def _require_data(self):
+        if self.df is None:
+            raise ValueError( "GraphML requires a stochastic simulation DataFrame." )
+    def _require_features(self):
+        if self.node_X is None:
+            raise ValueError( "Node feature matrix has not been initialized." )
+
+    def _numeric_node_map(self):
+        """Create a numeric representation of node labels."""
+        mapping = {}
+        inverse = {}
+        next_negative = -1
+        for node in self.g.nodes():
+            if isinstance(node, (int, np.integer)):
+                new_node = node
+            else:
+                new_node = next_negative
+                next_negative -= 1
+            mapping[node] = new_node
+            inverse[new_node] = node
+        return mapping, inverse
+
+
+    # Matrix construction
+    def get_simulation_matrix( self, y_column="objective", ):
+        """ 
+        Construct the scenario/component ML matrix.
+        X:
+            rows = stochastic scenarios
+            columns = node/edge operational states
+        y:
+            optimization result for each scenario
+        """
+        self._require_data()
+        node_cols, edge_cols = self._get_component_columns(self.df)
+        self.simulation_X = self.df[node_cols + edge_cols].copy()
+        self.simulation_y = self.df[y_column].copy()
+        return self.simulation_X, self.simulation_y
+
+    def target_matrices(self, y_column="objective",):
+        """Construct node-level optimization influence targets"""
+        self._require_data()
+        node_influence, edge_influence = (self.analysis.get_component_influence( self.df, y_column=y_column,))
+        self.node_y = node_influence.copy()
+        self.edge_y = edge_influence.copy()
+        return self.node_y, self.edge_y
+
+    # Clustering
+    def cluster_nodes(self, n_clusters:int=3, method:str="kmeans", scale:bool=True, random_state:int=123,) -> pd.DataFrame:
+        """
+        Cluster nodes according to structural characteristics.
+            n_clusters: Number of clusters.
+            method: {"kmeans", "hierarchical"} Clustering algorithm.
+            scale: bool --> Standardize structural features before clustering.
+        Returns: A dataframe of node|cluster assignment
+        """
+        self._require_features()
+        X = self.node_X.drop(columns=["node"]).copy()
+        if scale:
+            X_model = StandardScaler().fit_transform(X)
+        else:
+            X_model = X.to_numpy()
+        if method == "kmeans":
+            model = KMeans(n_clusters=n_clusters, random_state=random_state, n_init=10,)
+        elif method == "hierarchical":
+            model = AgglomerativeClustering(n_clusters=n_clusters,)
+        else:
+            raise ValueError( "method must be 'kmeans' or 'hierarchical'." )
+        labels = model.fit_predict(X_model)
+        self.cluster_df = self.node_X[["node"]].copy()
+        self.cluster_df["cluster"] = labels
+        return self.cluster_df
+
+    # Random Forest
+    def fit_random_forest(self, classification:bool=False, test_size:float=0.2, random_state:int=123, n_estimators:int=300,) -> pd.DataFrame:
+        """
+        Fit a Random Forest to stochastic simulation outcomes.
+
+        X = component operational states
+        y = optimization outcome
+        """
+        if self.simulation_X is None:
+            self.get_simulation_matrix()
+        X = self.simulation_X
+        y = self.simulation_y
+        X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=test_size, random_state=random_state, )
+        if classification:
+            model = RandomForestClassifier( n_estimators=n_estimators, random_state=random_state, n_jobs=-1, )
+        else:
+            model = RandomForestRegressor( n_estimators=n_estimators, random_state=random_state, n_jobs=-1, )
+        model.fit(X_train, y_train)
+        self.rf_model = model
+        if classification:
+            prediction = model.predict(X_test)
+            self.rf_metrics = { "accuracy": accuracy_score( y_test, prediction, ) }
+        else:
+            prediction = model.predict(X_test)
+            self.rf_metrics = {"r2": r2_score( y_test, prediction, ), "mae": mean_absolute_error( y_test, prediction,),}
+        self.rf_importance = (
+            pd.DataFrame({"component": X.columns, "importance": model.feature_importances_,})
+            .sort_values("importance", ascending=False,).reset_index(drop=True))
+        return self.rf_importance
+
+    # Permutation importance
+    def get_permutation_importance(self, n_repeats:int=10, random_state:int=123,) -> pd.DataFrame:
+        """Calculate permutation importance for the fitted Random Forest"""
+        if self.rf_model is None:
+            raise ValueError( "Random Forest has not been fitted." )
+        if self.simulation_X is None:
+            raise ValueError( "Simulation matrix has not been constructed." )
+        X = self.simulation_X
+        y = self.simulation_y
+        X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.2, random_state=random_state, )
+        result = permutation_importance( self.rf_model, X_test, y_test, n_repeats=n_repeats, random_state=random_state, n_jobs=-1, )
+        self.permutation_importance = (
+            pd.DataFrame({"component": X.columns, "importance_mean": result.importances_mean, "importance_std": result.importances_std,})
+            .sort_values("importance_mean", ascending=False,).reset_index(drop=True))
+        return self.permutation_importance
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+display.py
+File type: .py
+import matplotlib.colors as mcolors
+import matplotlib.lines as mlines
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import networkx as nx
+import numpy as np
+
+class GraphDrawer:
+
+    DRAWING_CONFIG = {
+        'flow': {'builder': '_draw_flow', 'models': {'max_flow'},},
+        'residual': {'builder': '_draw_residual', 'models': {'max_flow'},},
+        'demand': {'builder': '_draw_demand', 'models': {'max_flow'},},
+        'cost': {'builder': '_draw_cost', 'models': {'max_flow'},},
+        'cut': {'builder': '_draw_cut', 'models': {'min_cut', 'node_interdiction'},},
+        'interdiction': {'builder': '_draw_interdiction', 'models': {'node_interdiction'},},
+        }
+    DEFAULT_DRAWING_MODE = {
+        'max_flow': 'flow',
+        'min_cut': 'cut',
+        'node_interdiction': 'interdiction',
+    }
+    colormap = lambda cm,x,y: mcolors.LinearSegmentedColormap.from_list("", cm(np.linspace(x, y, 256)))
+    int_cm = lambda x, y: mcolors.LinearSegmentedColormap.from_list("custom_cmap", [x,y])
+
+    CMAPS = {
+        'flow': colormap(plt.cm.gist_earth_r, 0.5, 0.9),
+        'residual': colormap(plt.cm.gist_earth_r, 0.5, 0.9),
+        'demand': colormap(plt.cm.gist_earth_r, 0.5, 0.9),
+        'cost': colormap(plt.cm.gist_earth_r, 0.5, 0.9),
+        'cut': int_cm("#0077ff", "#ffc400"),
+        'interdiction': int_cm("#0077ff", "#ffc400"),
+        }
+
+    def __init__(self, solver, node_size=500, cut_color='#ff0000'):
+        self.solver = solver
+        self.lp = solver.lp
+        self.g = solver.g
+        self.model = solver.model
+        self.model_type = solver.model_type
+        self.node_size=node_size
+        self.cut_color = cut_color
+
+        self.node_results = solver.get_node_results()
+        self.edge_results = solver.get_edge_results()
+        self.metrics = solver.get_metrics()
+
+        self.cmap = mcolors.LinearSegmentedColormap.from_list(
+            "edge_cmap",plt.cm.gist_earth_r(np.linspace(0.05, 0.90, 256))
+        )
+
+    def draw(self, mode=None, pos=None, figsize=(24, 8), **kwargs):
+        if mode is None:
+            mode = self.DEFAULT_DRAWING_MODE[self.model_type]
+        self._validate_mode(mode)
+        config = self.DRAWING_CONFIG[mode]
+        self.cmap = self.CMAPS[mode]
+        builder = getattr(self, config['builder'])
+        if pos is None:
+            pos = nx.multipartite_layout(self.g, subset_key="layer")
+        fig, ax = plt.subplots(figsize=figsize)
+        builder(pos=pos, ax=ax, **kwargs)
+        ax.set_axis_off()
+        plt.show()
+
+    def _validate_mode(self, mode):
+        if mode not in self.DRAWING_CONFIG:
+            valid = ", ".join(self.DRAWING_CONFIG)
+            raise ValueError(f"Unknown drawing mode '{mode}'. Valid modes: {valid}")
+        valid_models = self.DRAWING_CONFIG[mode]['models']
+        if self.model_type not in valid_models:
+            raise ValueError(
+                f"Drawing mode '{mode}' is not available for "
+                f"model type '{self.model_type}'. "
+                f"Valid models: {', '.join(valid_models)}"
+            )
+
+    def _get_flow_node_colors(self):
+        colors = []
+        for n in self.g.nodes:
+            data = self.node_results[n]
+            if data['node_type'] != 'transshipment':
+                rate = max(0.0, min(1.0, data['satisfaction_rate']))
+                colors.append(self.cmap(rate))
+            else:
+                colors.append("#aaaaaa")
+        return colors
+
+    def _get_cut_node_colors(self):
+        colors = []
+        for n in self.g.nodes:
+            alpha = self.node_results[n]['alpha']
+            colors.append(self.cmap(alpha))
+        return colors
+    
+    def _get_interdiction_node_colors(self):
+        colors = []
+        for n in self.g.nodes:
+            data = self.node_results[n]
+            if data['interdicted']:
+                colors.append("red")
+            else:
+                colors.append(self.cmap(data['alpha']))
+        return colors
+
+    def _draw_flow(self, pos, ax=None, **kwargs):
+        if ax is None:
+            _, ax = plt.subplots()
+        edge_widths, edge_colors = [], []
+        for u, v in self.g.edges:
+            data = self.edge_results[(u, v)]
+            utilization = data['utilization']
+            edge_widths.append(1 + 2 * utilization)
+            if utilization > 0:
+                edge_colors.append(self.cmap(utilization))
+            else:
+                edge_colors.append("#cccccc")
+        node_colors = self._get_flow_node_colors()
+        nx.draw_networkx_nodes(self.g,pos,node_color=node_colors,node_size=self.node_size,ax=ax)
+        nx.draw_networkx_edges(self.g,pos,width=edge_widths,arrows=True,edge_color=edge_colors,ax=ax)
+        nx.draw_networkx_labels(self.g,pos,ax=ax,font_weight='bold')
+        self._add_edge_colorbar(ax,label="Capacity Utilization")
+        self._add_node_colorbar(ax,label="Node Satisfaction Rate")
+        ax.set_title("Maximum Flow", weight='bold')
+
+    def _add_node_colorbar(self, ax, label="Node Satisfaction Rate"):
+        norm = mpl.colors.Normalize(vmin=0,vmax=1)
+        sm = mpl.cm.ScalarMappable(norm=norm,cmap=self.cmap)
+        sm.set_array([])
+        cbar = ax.figure.colorbar(sm,ax=ax,location="left",pad=0.08,shrink=0.8)
+        cbar.set_label(label)
+
+    def _add_edge_colorbar(self, ax, label="Capacity Utilization"):
+        norm = mpl.colors.Normalize(vmin=0,vmax=1)
+        sm = mpl.cm.ScalarMappable(norm=norm,cmap=self.cmap)
+        sm.set_array([])
+        cbar = ax.figure.colorbar(sm,ax=ax,location="right",pad=0.02,shrink=0.8)
+        cbar.set_label(label)
+
+    def _draw_demand(self, pos, ax=None, **kwargs):
+        if ax is None:
+            _, ax = plt.subplots()
+        node_colors = self._get_flow_node_colors()
+        nx.draw_networkx_nodes(self.g,pos,node_color=node_colors,node_size=self.node_size,ax=ax)
+        nx.draw_networkx_edges(self.g,pos,arrows=True,ax=ax)
+        labels = {}
+        for n in self.g.nodes:
+            data = self.node_results[n]
+            if data['node_type'] == 'demand':
+                labels[n] = (
+                    f"{n}\n"f"D: {data['demand']:.1f}\nS: {data['demand_satisfied']:.1f}\n"
+                    f"U: "f"{data['demand'] - data['demand_satisfied']:.1f}"
+                )
+            else:
+                labels[n] = str(n)
+        nx.draw_networkx_labels(self.g,pos,labels=labels,ax=ax,font_weight='bold')
+        self._add_node_colorbar(ax,label="Demand Satisfaction Rate")
+        ax.set_title("Demand Satisfaction")
+
+    def _draw_cut(self, pos, ax=None, **kwargs):
+        if ax is None:
+            _, ax = plt.subplots()
+        edge_colors, edge_widths, edge_styles = [], [], []
+        for u, v in self.g.edges:
+            if self.model.artificial_edge[u, v]:
+                edge_colors.append("#cccccc")
+                edge_widths.append(1)
+                edge_styles.append("dashed")
+                continue
+
+            data = self.edge_results[(u, v)]
+            edge_styles.append('solid')
+            if data['in_cut']:
+                edge_colors.append(self.cut_color)
+                edge_widths.append(4)
+            else:
+                edge_colors.append("#aaaaaa")
+                edge_widths.append(1)
+        if self.model_type == 'min_cut':
+            node_colors = self._get_cut_node_colors()
+        else:
+            node_colors = self._get_interdiction_node_colors()
+        nx.draw_networkx_nodes(self.g,pos,node_color=node_colors,node_size=self.node_size,ax=ax,)
+        for (u,v), color, width, style in zip(self.g.edges, edge_colors, edge_widths, edge_styles):
+            nx.draw_networkx_edges(self.g,pos,edgelist=[(u, v)],edge_color=color,width=width,style=style,arrows=True,ax=ax)
+        nx.draw_networkx_labels(self.g,pos,ax=ax,font_weight='bold')
+        ax.set_title(f"Minimum Cut Capacity: ({self.metrics['cut_capacity']:.2f})", weight='bold')
+        self._add_legend(ax)
+
+    def _add_legend(self, ax):
+        artificial_edge = mlines.Line2D([],[],color="#aaaaaa",linewidth=1.25,linestyle="--",label="Artificial edge",)
+        if self.model_type == 'min_cut':
+            cut_edge = mlines.Line2D([],[],color=self.cut_color,linewidth=4,label="Minimum-cut edge",)
+            non_cut_edge = mlines.Line2D([],[],color="#aaaaaa",linewidth=1.5,label="Non-cut edge",)
+            source_side = mlines.Line2D([],[], marker='o',color='w',markerfacecolor=self.cmap(0.0),markersize=10,label=r"Source side ($\alpha=0$)",)
+            sink_side = mlines.Line2D([],[],marker='o',color='w',markerfacecolor=self.cmap(1.0),markersize=10,label=r"Sink side ($\alpha=1$)",)
+            handles = [cut_edge,non_cut_edge,artificial_edge,source_side,sink_side,]
+        else:
+            cut_edge = mlines.Line2D([],[],color=self.cut_color,linewidth=4,label=r"Cut edge ($\theta=1$)",)
+            interdicted_edge = mlines.Line2D([],[],color="darkorange",linewidth=2.5,linestyle="--",label=r"Interdiction-affected edge ($\omega_u+\omega_v>0$)",)
+            interdicted_cut = mlines.Line2D([],[],color="darkorange",linewidth=5,label=r"Interdiction cut contribution ($z=1$)",)
+            non_cut_edge = mlines.Line2D([],[],color="#aaaaaa",linewidth=1.5,label="Non-cut edge",)
+            interdicted = mlines.Line2D([],[],marker='o',color='w',markerfacecolor='red',markersize=10,label="Interdicted node",)
+            non_interdicted = mlines.Line2D([],[],marker='o',color='w',markerfacecolor=self.cmap(0.0),markersize=10,label="Non-interdicted node",)
+            handles = [cut_edge,interdicted_cut,interdicted_edge,non_cut_edge,artificial_edge,interdicted,non_interdicted,]
+        ax.legend(handles=handles,loc="best",frameon=True,)
+
+    def _draw_interdiction(self, pos, ax=None, **kwargs):
+        if ax is None:
+            _, ax = plt.subplots()
+        # Nodes
+        node_colors = []
+        node_linewidths = []
+        for n in self.g.nodes:
+            data = self.node_results[n]
+            if data["interdicted"]:
+                # Explicit interdiction decision
+                node_colors.append("red")
+                node_linewidths.append(1.5)
+            elif self.model.artificial_node[n]:
+                # Artificial nodes are structural, not decision nodes
+                node_colors.append("#dddddd")
+                node_linewidths.append(1.0)
+            else:
+                # alpha indicates cut partition
+                node_colors.append(self.cmap(data["alpha"]))
+                node_linewidths.append(1.0)
+        nx.draw_networkx_nodes(self.g, pos, node_color=node_colors, node_size=self.node_size, linewidths=node_linewidths, ax=ax,)
+        # Edges
+        artificial_edges = []
+        ordinary_edges = []
+        cut_edges = []
+        interdicted_edges = []
+        interdicted_cut_edges = []
+        for u, v in self.g.edges:
+            data = self.edge_results[(u, v)]
+            if data["artificial"]:
+                artificial_edges.append((u, v))
+            elif data["in_interdicted_cut"]:
+                # z = 1:
+                # edge actually contributes to interdicted cut objective
+                interdicted_cut_edges.append((u, v))
+            elif data["endpoint_interdicted"]:
+                # Touches an interdicted node, but does not contribute
+                # to the resulting cut.
+                interdicted_edges.append((u, v))
+            elif data["in_cut"]:
+                # Ordinary cut edge unaffected by interdiction
+                cut_edges.append((u, v))
+            else:
+                ordinary_edges.append((u, v))
+        # Draw in layers so important edges appear on top
+        nx.draw_networkx_edges( self.g, pos, edgelist=ordinary_edges, edge_color="#cccccc", width=1.25, alpha=0.55, arrows=True, arrowsize=10, ax=ax, )
+        nx.draw_networkx_edges( self.g, pos, edgelist=artificial_edges, edge_color="#aaaaaa", width=1.25, alpha=0.55, style="--", arrows=True, arrowsize=10, ax=ax, )
+        # Ordinary cut edges
+        nx.draw_networkx_edges( self.g, pos, edgelist=cut_edges, edge_color=self.cut_color, width=3.5, alpha=0.95, arrows=True, arrowsize=11, ax=ax, )
+        # Edges incident to an interdicted node
+        nx.draw_networkx_edges( self.g, pos, edgelist=interdicted_edges, edge_color="grey", width=2.25, alpha=0.8, style="dashed", arrows=True, arrowsize=10, ax=ax, )
+        # Edges actually contributing to interdicted cut
+        nx.draw_networkx_edges( self.g, pos, edgelist=interdicted_cut_edges, edge_color="purple", width=5.0, alpha=1.0, arrows=True, arrowsize=12, ax=ax, )
+        # Node labels
+        node_labels = {}
+        for n in self.g.nodes:
+            data = self.node_results[n]
+            if data["interdicted"]:
+                node_labels[n] = ( f"{n}\n" f"Cost: {data['interdiction_cost']:.1f}" )
+            elif self.model.artificial_node[n]:
+                node_labels[n] = f"{n}\nArtificial"
+            else:
+                node_labels[n] = str(n)
+        nx.draw_networkx_labels( self.g, pos, labels=node_labels, font_size=9, font_weight="bold", ax=ax, )
+        # Legend
+        self._add_interdiction_legend(ax)
+        # Metrics
+        cut_capacity = self.metrics["cut_capacity"]
+        interdicted_cut_capacity = self.metrics["interdicted_cut_capacity"]
+        capacity_removed = self.metrics["capacity_removed"]
+        interdiction_cost = self.metrics["interdiction_cost"]
+        budget = self.metrics["budget"]
+        ax.set_title( 
+            "Node Interdiction / Minimum Cut\n" f"Cut Capacity: {cut_capacity:.2f} | " 
+            f"Interdiction Cost: {interdiction_cost:.2f} / " f"{budget:.2f} | " 
+            f"Interdicted-Cut Capacity: {interdicted_cut_capacity:.2f}", 
+            fontsize=14, fontweight="bold", pad=15,
+        )
+    def _add_interdiction_legend(self, ax):
+        cut_edge = mlines.Line2D( [], [], color=self.cut_color, linewidth=4, label="Minimum-cut edge" )
+        interdicted_edge = mlines.Line2D( [], [], color="gray", linewidth=2.5, linestyle="--", label="Edge incident to interdicted node" )
+        interdicted_cut_edge = mlines.Line2D( [], [], color="purple", linewidth=5, label="Interdicted cut edge" )
+        artificial_edge = mlines.Line2D( [], [], color="#aaaaaa", linewidth=1.25, linestyle="--", label="Artificial edge" )
+        interdicted_node = mlines.Line2D( [], [], marker="o", color="w", markerfacecolor="red", markersize=10, label="Interdicted node" )
+        handles = [ cut_edge, interdicted_edge, interdicted_cut_edge, artificial_edge, interdicted_node, ]
+        ax.legend(handles=handles, loc="best", frameon=True)
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+equations.py
+File type: .py
+from pyomo import environ as pyo
+
+class Objectives:
+    @staticmethod
+    def max_flow(m:pyo.ConcreteModel) -> pyo.Objective:
+        """Primal maxflow problem"""
+        return pyo.Objective(expr=m.F, sense=pyo.maximize)
+
+    @staticmethod
+    def min_cut_flow2(m:pyo.ConcreteModel) -> pyo.Objective:
+        """Dual maxflow problem"""
+        return pyo.Objective(expr=sum(m.capacity[u,v]*m.theta[u,v] for u, v in m.edges), sense=pyo.minimize)
+
+    @staticmethod
+    def min_cut_flow(m):
+        return pyo.Objective(
+            expr=sum(m.capacity[u, v] * m.theta[u, v] for u, v in m.edges if not m.artificial_edge[u, v]),sense=pyo.minimize,
+        )
+
+    @staticmethod
+    def interdicted_min_cut_flow(m:pyo.ConcreteModel) -> pyo.Objective:
+        return pyo.Objective(expr=sum(m.capacity[u,v]*m.z[u,v] for u, v in m.edges), sense=pyo.minimize)
+
+    @staticmethod
+    def min_cost_flow(m:pyo.ConcreteModel) -> pyo.Objective:
+        """Minimization of the weighted sum of an s-t path"""
+        expr = sum(m.cost[u, v] * m.x[u, v] for (u, v) in m.edges)
+        return pyo.Objective(expr=expr, sense=pyo.minimize)
+
+    REGISTRY = {
+        'max_flow': max_flow,
+        'min_cost_flow': min_cost_flow,
+        'min_cut': min_cut_flow, 
+        'interdicted_min_cut_flow': interdicted_min_cut_flow
+        }
+
+    @classmethod
+    def apply(cls, problem_type, model):
+        try:
+            objective = cls.REGISTRY[problem_type]
+        except KeyError:
+            raise ValueError(f"Unknown objective '{problem_type}'")
+        model.obj = objective(model)
+        return model
+
+class Rules:
+    @staticmethod
+    def edge_cap_rule(m:pyo.ConcreteModel, u:pyo.Param, v:pyo.Param,) -> pyo.Constraint:
+        """Capacity can be bandwidth, time-requirement, or 1 if assessing count of independent paths"""
+        return m.x[u, v] <= m.capacity[u, v] * m.node_state[u] * m.node_state[v] * m.edge_state[u,v]
+     
+    @staticmethod
+    def edge_flow_rule(m:pyo.ConcreteModel, n:pyo.Param) -> pyo.Constraint:
+        """Flow out = Flow in for all nodes; originator demand=-1, endpoint demand=1"""
+        if n in (m.s, m.t):
+            return pyo.Constraint.Skip
+        inflow = sum(m.x[u, v] for (u, v) in m.edges if v == n)
+        outflow = sum(m.x[u, v] for (u, v) in m.edges if u == n)
+        return inflow == outflow
+    
+    @staticmethod
+    def source_flow_rule(m:pyo.ConcreteModel) -> pyo.Constraint:
+        """Controls flow from artificial source s"""
+        outflow = sum(m.x[u, v] for (u, v) in m.edges if u == m.s)
+        inflow = sum(m.x[u, v] for (u, v) in m.edges if v == m.s)
+        return outflow - inflow == m.F
+    
+    @staticmethod
+    def sink_flow_rule(m:pyo.ConcreteModel) -> pyo.Constraint:
+        """Controls flow to artificial terminus t"""
+        inflow = sum(m.x[u, v] for (u, v) in m.edges if v == m.t)
+        outflow = sum(m.x[u, v] for (u, v) in m.edges if u == m.t)
+        return inflow - outflow == m.F
+
+    @staticmethod
+    def cutset_rule(m, u, v):
+        """theta -> interdicted edge signal; alpha -> S/T set allocation --> theta is used to create the S/T set"""
+        if m.artificial_edge[u, v]:
+            # Infinite-capacity artificial edges cannot cross the cut.
+            return m.alpha[u] <= m.alpha[v]
+        return m.theta[u, v] >= m.alpha[u] - m.alpha[v]
+
+    @staticmethod
+    def st_boundary_rule(m:pyo.ConcreteModel) -> pyo.Constraint:
+        """artificial source and sink but be in different parts of the cutset"""
+        return m.alpha[m.s] - m.alpha[m.t] >= 1
+
+    @staticmethod
+    def interdiction_budget_rule(m: pyo.ConcreteModel) -> pyo.Constraint:
+        """weighted cost must be less than the assigned bugdet"""
+        return sum(m.interdiction_cost[n]*m.omega[n] for n in m.nodes) <= m.budget
+
+    @staticmethod
+    def artificial_node_interdiction_rule(m, n):
+        """artificial nodes cannot be interdicted (they are conceptual devices used to control the graph)"""
+        if m.artificial_node[n]:
+            return m.omega[n] == 0
+        return pyo.Constraint.Skip
+
+    @staticmethod
+    def cut_capacity_upper_rule(m, u, v):
+        """linearization of node interdict multiplication constraints: part1"""
+        if m.artificial_edge[u, v]:
+            return pyo.Constraint.Skip
+        return m.z[u, v] <= m.theta[u, v]
+
+    @staticmethod
+    def cut_capacity_node_u_rule(m, u, v):
+        """linearization of node interdict multiplication constraints: part2"""
+        if m.artificial_edge[u, v]:
+            return pyo.Constraint.Skip
+        return m.z[u, v] <= 1 - m.omega[u]
+
+    @staticmethod
+    def cut_capacity_node_v_rule(m, u, v):
+        """linearization of node interdict multiplication constraints: part3"""
+        if m.artificial_edge[u, v]:
+            return pyo.Constraint.Skip
+        return m.z[u, v] <= 1 - m.omega[v]
+
+    @staticmethod
+    def cut_capacity_lower_rule(m, u, v):
+        """linearization of node interdict multiplication constraints: part4"""
+        return m.z[u, v] >= m.theta[u, v]- m.omega[u] - m.omega[v]
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+models.py
+File type: .py
+from equations import Objectives, Rules
+from toy_models.create import ToyGraph
+from display import GraphDrawer
+from analysis import Analysis
+from pyomo import environ as pyo
+import networkx as nx
+import numpy as np
+
+class LP:
+
+    MODEL_CONFIGS = {
+        'max_flow': {'model': 'primal', 'objective': 'max_flow',},
+        'min_cut': {'model': 'min_cut', 'objective': 'min_cut',},
+        'node_interdiction': {'model': 'interdiction','objective': 'min_cut','M':1, 'budget':9},
+    }
+    ALTERNATE_NAMES = {
+    'max_flow': 'max_flow', 'mf': 'max_flow','standard_max_flow': 'max_flow','standard_mf': 'max_flow',
+    'dual_maxflow': 'min_cut','min_cut': 'min_cut','min_cut_flow': 'min_cut',
+    'zerosum_mf_static_nodes': 'node_interdiction', 'interdiction':'node_interdiction', 'node_interdiction': 'node_interdiction',
+    'min_cost_flow': 'min_cost_flow','k_shortest_paths': 'k_shortest_paths',
+    }
+
+    def __init__(self,G:nx.DiGraph|ToyGraph ,model_type:str='max_flow',solver_str:str='appsi_highs',s:str='s',t:str='t',):
+        self.g = G.G.copy() if hasattr(G, 'G') else G.copy()
+        self.r = Rules()
+        self.s = s
+        self.t = t
+        self.solver_str = solver_str
+        try:
+            self.model_type = self.ALTERNATE_NAMES[model_type]
+        except KeyError:
+            valid = ', '.join(self.ALTERNATE_NAMES)
+            raise ValueError(f"Unknown model type '{model_type}\nValid types: {valid}")
+        self.g = self.__configure_graph()
+        self._create_problem_model()
+
+    def _create_problem_model(self):
+        config = self.MODEL_CONFIGS[self.model_type]
+        if config['model'] == 'primal':
+            self.model = self._create_primal_model()
+        elif config['model'] == 'min_cut':
+            self.model = self._create_min_cut_model()
+        elif config['model'] == 'interdiction':
+            self.model = self._create_node_interdiction_model(budget=config['budget'],M=config['M'],)
+        else:
+            raise ValueError(f"Unknown model class: {config['model']}")
+
+    def _create_base_model(self) -> pyo.ConcreteModel:
+        model = pyo.ConcreteModel()
+        model.nodes = pyo.Set(initialize=list(self.g.nodes()))
+        model.edges = pyo.Set(initialize=list(self.g.edges()), dimen=2)
+        # used for monte-carlo simulation
+        model.node_state = pyo.Param(model.nodes, within=pyo.Binary, mutable=True, initialize=1)
+        model.edge_state = pyo.Param(model.edges, within=pyo.Binary, mutable=True, initialize=1)
+        model.capacity = pyo.Param(model.edges,initialize={(u, v): self.g.edges[u, v]['capacity'] for u, v in self.g.edges()})
+        model.cost = pyo.Param(model.edges, initialize={(u,v): self.g.edges[u,v]['cost'] for u,v in self.g.edges()})
+        model.artificial_edge = pyo.Param(
+            model.edges, within=pyo.Binary, 
+            initialize={(u,v): int(self.g.edges[u,v].get('artificial', False)) for u,v in self.g.edges()}
+            )
+        model.artificial_node = pyo.Param(
+            model.nodes, within=pyo.Binary, 
+            initialize={n: int(self.g.nodes[n].get('artificial', False)) for n in self.g.nodes()}
+            )
+        model.s = self.s
+        model.t = self.t
+        return model
+    
+    def _create_primal_model(self) -> pyo.ConcreteModel:
+        "Standard maxflow problem"
+        model = self._create_base_model()
+        # Decisions
+        model.x = pyo.Var(model.edges, within=pyo.NonNegativeReals)
+        model.F = pyo.Var(within=pyo.NonNegativeReals)
+        # Params
+        model.demand = pyo.Param(model.nodes,initialize={n: self.g.nodes[n]['demand'] for n in self.g.nodes()})
+        # Constraints
+        model.cap = pyo.Constraint(model.edges, rule=self.r.edge_cap_rule)
+        model.flow = pyo.Constraint(model.nodes, rule=self.r.edge_flow_rule)
+        model.source = pyo.Constraint(rule=self.r.source_flow_rule)
+        model.sink = pyo.Constraint(rule=self.r.sink_flow_rule)
+        model.dual = pyo.Suffix(direction=pyo.Suffix.IMPORT)
+        Objectives.apply('max_flow', model)
+        return model
+
+    def _create_min_cut_model(self) -> pyo.ConcreteModel:
+        "Standard mincut problem (dual of maxflow)"
+        model = self._create_base_model()
+        model.theta = pyo.Var(model.edges, within=pyo.NonNegativeReals) # ST-cut indicator variable
+        model.alpha = pyo.Var(model.nodes, within=pyo.UnitInterval) # ST-cut forcing variable -- range: [0,1]
+        model.cutset = pyo.Constraint(model.edges,rule=self.r.cutset_rule)
+        model.stflow = pyo.Constraint(rule=self.r.st_boundary_rule)
+        Objectives.apply('min_cut', model)
+        return model
+
+    def _create_node_interdiction_model(self,budget:float=9,M:int=1,) -> pyo.ConcreteModel:
+        model = self._create_base_model()
+        # P1 maxflow variables
+        model.theta = pyo.Var(model.edges,within=pyo.NonNegativeReals)
+        model.alpha = pyo.Var(model.nodes,within=pyo.UnitInterval)
+        # P2 interdiction variables
+        model.omega = pyo.Var(model.nodes,within=pyo.Binary)
+        model.z = pyo.Var(model.edges,within=pyo.Binary)
+        # Aux params
+        model.M = pyo.Param(initialize=M,within=pyo.PositiveReals)
+        model.interdiction_cost = pyo.Param(model.nodes,initialize={n: self.g.nodes[n].get('cost', 0) for n in model.nodes})
+        model.budget = pyo.Param(initialize=budget,within=pyo.NonNegativeReals)
+        # Constraints
+        model.cutset = pyo.Constraint(model.edges,rule=self.r.cutset_rule)
+        model.stflow = pyo.Constraint(rule=self.r.st_boundary_rule)
+        model.budget_limit = pyo.Constraint(rule=self.r.interdiction_budget_rule)
+        model.artificial_protection = pyo.Constraint(model.nodes,rule=self.r.artificial_node_interdiction_rule)
+        # Z linearization
+        model.z1 = pyo.Constraint(model.edges, rule=self.r.cut_capacity_upper_rule)
+        model.z2 = pyo.Constraint(model.edges, rule=self.r.cut_capacity_lower_rule)
+        model.z3 = pyo.Constraint(model.edges, rule=self.r.cut_capacity_node_u_rule)
+        model.z4 = pyo.Constraint(model.edges, rule=self.r.cut_capacity_node_v_rule)
+        Objectives.apply('interdicted_min_cut_flow',model)
+        return model
+
+    def solve(self):
+        return Solver(self)
+
+    def _solve_model(self):
+        solver = pyo.SolverFactory(self.solver_str)
+        return solver.solve(self.model)
+
+    def __configure_graph(self, source='s', sink='t', artificial_source='dS', artificial_sink='dT'):
+        """
+        Standardizes the graph for LPs including:
+        1. Creating super-source/sink artificial nodes
+        2. Standardizing cost/capacity parameters for edges
+        3. Standardizing demand parameter for nodes 
+        4. Create an artificial source/sink to preserve demand balance 
+        """
+        H = self.g.copy()
+        if not H.is_directed():
+            H = H.to_directed()
+        for _,_,d in H.edges(data=True):
+            d.setdefault('capacity', 1)
+            d.setdefault('cost', 0)
+        for n, data in H.nodes(data=True):
+            data.setdefault('demand', 0)
+        finite_capacities = [d["capacity"] for _, _, d in H.edges(data=True) if np.isfinite(d["capacity"])]
+        artificial_capacity = sum(finite_capacities)
+        # Add super source/sink
+        H.add_node(source, demand=0, layer=-1, artificial=True)
+        H.add_node(sink, demand=0, layer=1+max(d['layer'] for _,d in H.nodes(data=True)), artificial=True)
+        supply = [n for n in H.nodes if H.nodes[n].get('demand') < 0]
+        demand = [n for n in H.nodes if H.nodes[n].get('demand') > 0]
+        for n in supply:
+            H.add_edge(source, n, capacity=artificial_capacity, cost=0, artificial=True)
+        for n in demand:
+            H.add_edge(n, sink, capacity=artificial_capacity, cost=0, artificial=True)
+        # Normalize demand balance
+        demand_imbalance = sum(-H.nodes[n]['demand'] for n in supply) - sum(H.nodes[n]['demand'] for n in demand)
+        if demand_imbalance > 0:
+            H.add_node(artificial_sink, demand=0, artificial=True, layer=-1)
+            H.add_edge(source, artificial_sink, capacity=demand_imbalance, cost=0, artificial=True)
+            H.add_edge(artificial_sink, sink, capacity=demand_imbalance, cost=0, artificial=True)
+        elif demand_imbalance < 0:
+            H.add_node(artificial_source, demand=0, artificial=True, layer=1+max(d['layer'] for _,d in H.nodes(data=True)))
+            H.add_edge(artificial_source, sink, capacity=-demand_imbalance, cost=0, artificial=True)
+            H.add_edge(source, artificial_source, capacity=-demand_imbalance, cost=0, artificial=True)
+        return H
+    
+    def fix_interdiction(self, interdictions):
+        """
+        Fix omega based on an iterable of nodes to interdict.
+        Only valid for node-interdiction models.
+        """
+        if self.model_type != 'node_interdiction':
+            raise ValueError("Interdiction decisions only exist for node_interdiction models.")
+        interdictions = set(interdictions)
+        for n in self.model.nodes:
+            self.model.omega[n].fix(1 if n in interdictions else 0)
+
+class Solver:
+    RESULT_BUILDERS = {
+        'max_flow': '_build_max_flow_results',
+        'min_cut': '_build_min_cut_results',
+        'node_interdiction': '_build_node_interdiction_results',
+    }
+
+    def __init__(self, lp: LP):
+        self.lp = lp
+        self.g = lp.g
+        self.model = lp.model
+        self.model_type = lp.model_type
+
+        self.solver_result = lp._solve_model()
+        self.results = self._build_results()
+
+    # Complete Functions
+    def get_node_results(self):
+        return self.results['node_results']
+
+    def get_edge_results(self):
+        return self.results['edge_results']
+
+    def get_metrics(self):
+        return self.results['metrics']
+
+    def analyze(self):
+        return Analysis(self)
+
+    def draw(self):
+        return GraphDrawer(self)
+
+    # Result allocator from model type
+    def _build_results(self):
+        try:
+            builder_name = self.RESULT_BUILDERS[self.model_type]
+        except KeyError:
+            raise NotImplementedError(f"No result generator for model type: {self.model_type}")
+        return getattr(self, builder_name)()
+
+    # Common results
+    def _base_results(self):
+        return {'problem': self._get_problem_results(),'solver': self._get_solver_results(),}
+    
+    def _get_problem_results(self):
+        result = self.solver_result
+        return {
+            'lower_bound': result['Problem']()['Lower bound'],'upper_bound': result['Problem']()['Upper bound'],
+            'objective_value': pyo.value(self.model.obj), 'obj_function_count': self.model.nobjectives(),
+            'constraint_count': self.model.nconstraints(),'variable_count': self.model.nvariables(),'sense': str(self.model.obj.sense),
+        }
+
+    def _get_solver_results(self):
+        result = self.solver_result
+        return {
+            'status': str(result['Solver']()['Status']),
+            'termination_condition': str(result['Solver']()['Termination condition']),
+            'termination_message': str(result['Solver']()['Termination message']),
+        }
+
+    # Result builders
+    def _build_max_flow_results(self):
+        results = self._base_results()
+        node_results = self._get_primal_node_results()
+        edge_results = self._get_primal_edge_results()
+        # Statistics
+        supply_nodes = [r for r in node_results.values() if r['node_type'] == 'supply']
+        demand_nodes = [r for r in node_results.values() if r['node_type'] == 'demand']
+        total_supply = sum(-r['demand'] for r in supply_nodes)
+        total_used_supply = sum(r['demand_satisfied'] for r in supply_nodes)
+        total_demand = sum(r['demand'] for r in demand_nodes)
+        total_satisfied = sum(r['demand_satisfied']for r in demand_nodes)
+        total_unmet = total_demand - total_satisfied
+        # Record Results
+        results['node_results'] = node_results
+        results['edge_results'] = edge_results
+        results['metrics'] = {
+            'total_supply': total_supply,
+            'total_used_supply': total_used_supply,
+            'total_unused_supply': (total_supply - total_used_supply),
+            'total_demand': total_demand,
+            'total_satisfied': total_satisfied,
+            'total_unmet': total_unmet,
+            'bottlenecks': self._get_bottlenecks(),
+            'total_satisfaction_rate': (total_satisfied / total_demand if total_demand > 0 else None),
+        }
+        return results
+
+    def _build_min_cut_results(self):
+        results = self._base_results()
+        node_results = self._get_dual_node_results()
+        edge_results = self._get_dual_edge_results()
+        metrics = self._get_dual_metrics(edge_results)
+        results["node_results"] = node_results
+        results["edge_results"] = edge_results
+        results["metrics"] = metrics
+        return results
+    
+    def _build_node_interdiction_results(self):
+        results = self._base_results()
+
+        node_results = self._get_interdiction_node_results()
+        edge_results = self._get_interdiction_edge_results()
+        metrics = self._get_interdiction_metrics(edge_results)
+
+        results["node_results"] = node_results
+        results["edge_results"] = edge_results
+        results["metrics"] = metrics
+
+        return results
+    
+    # Edge results
+    def _get_primal_edge_results(self):
+        edge_results = {}
+        for u, v in self.model.edges:
+            flow = pyo.value(self.model.x[u, v])
+            capacity = pyo.value(self.model.capacity[u, v])
+            cost = pyo.value(self.model.cost[u, v])
+            edge_results[(u, v)] = {
+                'flow': flow, 
+                'capacity': capacity, 
+                'residual': capacity - flow,
+                'utilization': (flow / capacity if capacity > 0 and capacity != float('inf') else 0),
+                'cost': cost,
+                'total_cost': flow * cost,
+                'artificial': self.g.edges[u, v].get('artificial', False)
+            }
+        return edge_results
+
+    def _get_dual_edge_results(self):
+        """Collect edge-level results for the standard min-cut model."""
+        edge_results = {}
+        for u, v in self.model.edges:
+            artificial = bool(pyo.value(self.model.artificial_edge[u, v]))
+            # Artificial edges are visualization-only.
+            # Their theta variables are intentionally irrelevant
+            if artificial:
+                edge_results[(u, v)] = {
+                    "theta": None,
+                    "in_cut": False,
+                    "capacity": pyo.value(self.model.capacity[u, v]),
+                    "cut_capacity": 0.0,
+                    "artificial": True,
+                }
+                continue
+            theta = pyo.value(self.model.theta[u, v])
+            capacity = pyo.value(self.model.capacity[u, v])
+            edge_results[(u, v)] = {
+                "theta": theta,
+                "in_cut": theta > 0.5,
+                "capacity": capacity,
+                "cut_capacity": theta * capacity,
+                "artificial": False,
+            }
+        return edge_results
+
+    def _get_interdiction_edge_results(self):
+        """Collect edge-level results for the node-interdiction min-cut model."""
+        edge_results = {}
+        for u, v in self.model.edges:
+            theta = pyo.value(self.model.theta[u, v])
+            z = pyo.value(self.model.z[u, v])
+            capacity = pyo.value(self.model.capacity[u, v])
+            omega_u = pyo.value(self.model.omega[u])
+            omega_v = pyo.value(self.model.omega[v])
+            artificial = bool(pyo.value(self.model.artificial_edge[u, v]))
+            endpoint_interdicted = (omega_u > 0.5 or omega_v > 0.5)
+            in_cut = theta > 0.5
+            in_interdicted_cut = z > 0.5
+            edge_results[(u, v)] = {
+                "theta": theta,         # Cut variables
+                "in_cut": in_cut,
+                "z": z,                 # Interdiction
+                "in_interdicted_cut": in_interdicted_cut,
+                "omega_u": omega_u,     # Endpoint Interdiction
+                "omega_v": omega_v,
+                "endpoint_interdicted": endpoint_interdicted,
+                "capacity": capacity,   # Capacity
+                "cut_capacity": capacity * theta,
+                "interdicted_cut_capacity": capacity * z,
+                "capacity_removed": capacity * (theta - z), # Impact classification
+                "artificial": artificial,
+            }
+        return edge_results
+
+    # Node results
+    def _get_primal_node_results(self):
+        node_results = {}
+        for n, d in self.g.nodes(data=True):
+            demand = d.get('demand', 0)
+            node_type = 'supply' if demand < 0 else 'demand' if demand > 0 else 'transshipment'
+            inflow = sum(pyo.value(self.model.x[u, n]) for u in self.g.nodes if (u,n) in self.model.edges)
+            outflow = sum(pyo.value(self.model.x[n,v]) for v in self.g.nodes if (n,v) in self.model.edges)
+            if (self.model.s, n) in self.model.edges:
+                satisfied = pyo.value(self.model.x[self.model.s, n]) 
+            elif (n, self.model.t) in self.model.edges:
+                satisfied = pyo.value(self.model.x[n, self.model.t])
+            else:
+                satisfied = 0
+            node_results[n] = {
+                'node_type': node_type,
+                'inflow': inflow,
+                'outflow': outflow,
+                'demand': demand,
+                'remaining_supply': -(demand + inflow - outflow) if node_type == 'supply' else 0,
+                'demand_satisfied': satisfied,
+                'satisfaction_rate': abs(satisfied/demand) if demand != 0 else 0, 
+                'cutset_group': self._get_dual(self.model.flow[n]) if n not in ('s', 't') else None 
+            }
+        return node_results 
+
+    def _get_dual_node_results(self):
+        """Collect node-level results for the standard min-cut model."""
+        node_results = {}
+        for n in self.model.nodes:
+            alpha = pyo.value(self.model.alpha[n])
+            artificial = bool(pyo.value(self.model.artificial_node[n]))
+            node_results[n] = {
+                "alpha": alpha,"source_side": alpha < 0.5,"sink_side": alpha >= 0.5,"artificial": artificial,
+            }
+        return node_results
+
+    def _get_interdiction_node_results(self):
+        """Collect node-level results for the node-interdiction model."""
+        node_results = {}
+        for n in self.model.nodes:
+            omega = pyo.value(self.model.omega[n])
+            alpha = pyo.value(self.model.alpha[n])
+            interdiction_cost = pyo.value(self.model.interdiction_cost[n])
+            artificial = bool(pyo.value(self.model.artificial_node[n]))
+            node_results[n] = {
+                # Interdiction
+                "omega": omega,
+                "interdicted": omega > 0.5,
+                "interdiction_cost": interdiction_cost,
+                # Cut partition
+                "alpha": alpha,
+                "source_side": alpha < 0.5,
+                "sink_side": alpha >= 0.5,
+                # Graph metadata
+                "artificial": artificial,
+            }
+        return node_results
+
+    def _get_dual_metrics(self, edge_results):
+        """Calculate aggregate metrics for the standard min-cut."""
+        cut_edges = [edge for edge, data in edge_results.items() if data["in_cut"]]
+        cut_capacity = sum(edge_results[edge]["cut_capacity"] for edge in cut_edges if not edge_results[edge]["artificial"])
+        return {"cut_capacity": cut_capacity, "cut_edges": cut_edges, "cut_size": len(cut_edges),}
+
+    def _get_interdiction_metrics(self, edge_results):
+        """Calculate aggregate metrics for the node-interdiction solution."""
+        real_edges = { edge: data for edge, data in edge_results.items() if not data["artificial"] }
+        cut_edges = [ edge for edge, data in real_edges.items() if data["in_cut"] ]
+        interdicted_cut_edges = [ edge for edge, data in real_edges.items() if data["in_interdicted_cut"] ]
+        interdicted_edges = [ edge for edge, data in real_edges.items() if data["endpoint_interdicted"] ]
+        cut_capacity = sum( data["cut_capacity"] for data in real_edges.values() )
+        interdicted_cut_capacity = sum( data["interdicted_cut_capacity"] for data in real_edges.values() )
+        capacity_removed = sum( data["capacity_removed"] for data in real_edges.values() )
+        interdicted_nodes = [ n for n in self.model.nodes if pyo.value(self.model.omega[n]) > 0.5 and not pyo.value(self.model.artificial_node[n]) ]
+        interdiction_cost = sum( 
+            pyo.value(self.model.interdiction_cost[n]) * pyo.value(self.model.omega[n]) for n in self.model.nodes if not pyo.value(self.model.artificial_node[n]) 
+        )
+        budget = pyo.value(self.model.budget)
+        return {
+            "cut_capacity": cut_capacity,
+            "interdicted_cut_capacity": interdicted_cut_capacity,
+            "capacity_removed": capacity_removed,
+            # Edge metrics
+            "cut_edges": cut_edges,
+            "interdicted_cut_edges": interdicted_cut_edges,
+            "interdicted_edges": interdicted_edges,
+            "cut_size": len(cut_edges),
+            "interdicted_cut_size": len(interdicted_cut_edges),
+            # Node interdiction 
+            "interdicted_nodes": interdicted_nodes,
+            "interdiction_count": len(interdicted_nodes),
+            "interdiction_cost": interdiction_cost,
+            "budget": budget,
+        }
+
+    # Graph results
+    def draw_modified_graph(self):
+        pos = nx.art_layout(self.g)
+        nx.draw(self.g, pos=pos, with_labels=True, node_color='lightblue', 
+                node_size=self.node_size, font_size=16, font_weight='bold', arrowsize=20
+        )
+
+    def get_residual_graph(self):
+        if not hasattr(self.model, 'x'):
+            raise AttributeError(f"Model '{self.model_type}' does not have primal flow variable 'x'")
+        R = nx.DiGraph()
+        for u,v in self.model.edges:
+            capacity = pyo.value(self.model.capacity[u,v])
+            flow = pyo.value(self.model.x[u,v])
+            forward = capacity - flow
+            reverse = flow
+            if forward > 0:
+                R.add_edge(u,v,residual=forward)
+            if reverse > 0:
+                R.add_edge(v,u, residual=reverse)
+        return R  
+
+    # Aux Statistics
+    def _get_bottlenecks(self):
+        if not hasattr(self.model, 'dual'):
+            return None
+        bottlenecks = []
+        for edge in self.model.edges:
+            constraint = self.model.cap[edge]
+            dual = self.model.dual.get(constraint)
+            if dual is not None and dual > 0:
+                bottlenecks.append(edge)
+        return bottlenecks
+
+    def _get_dual(self, constraint:pyo.Constraint) -> pyo.Constraint:
+        return None if not hasattr(self.model, 'dual') else self.model.dual.get(constraint)
+
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+pyproject.toml
+File type: .toml
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+pythonpath = ["."]
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+run.py
+File type: .py
+from toy_models.create import ToyGraph
+from models import LP
+if __name__ == "__main__":
+    toy = ToyGraph()
+    solution = LP(toy,model_type='zerosum_mf_static_nodes').solve()
+    drawer = solution.draw()
+    analysis = solution.analyze()
+    ml = analysis.ml()
+
+""" 
+Workflow options include:
+
+model_type in ['max_flow','min_cost_flow','min_cut','interdicted_min_cut_flow']
+df --> analysis.stochastic_analysis(n_sim=50,seed=123,)
+
+
+# Inspection based on problem type
+analysis.summary()
+analysis.get_node_results()
+analysis.get_edge_results()
+analysis.get_metrics()
+
+if model_type == 'min_cut':
+    analysis.get_cut_edges()
+    cut_frequency = analysis.cut_frequency(df)
+    cut_persistence = analysis.cut_persistence(df)
+    cut_diversity = analysis.cut_diversity(df)
+    bottlenecks = analysis.bottleneck_analysis(df)
+
+if model_type == 'interdiction':
+    analysis.get_interdicted_nodes()
+    analysis.get_interdicted_cut_edges()
+    analysis.get_interdiction_cost()
+    analysis.get_interdiction_efficiency()
+    attack_surface = analysis.attack_surface(df)
+    efficiency = analysis.interdiction_efficiency(df)
+    natural_vs_adversarial = analysis.natural_failure_vs_adversarial_failure(df)
+    capacity_loss = analysis.capacity_loss(df)
+
+# Stochastic dataframe & analysis
+df = analysis.stochastic_analysis(n_sim=50,seed=123,)
+analysis.performance_summary(df, y_column="objective",)
+analysis.reliability(df,threshold=10,)
+analysis.failure_probability(df,threshold=10,)
+analysis.plot_reliability_curve(df,threshold=10,)
+node_influence, edge_influence = analysis.get_component_influence(df,y_column="objective",)
+reliability = analysis.get_component_reliability(df,threshold=10,)
+"""
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+test_config.ipynb
+File type: .ipynb
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "267deca7",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "100%|██████████| 50/50 [00:00<00:00, 217.93it/s]\n"
+     ]
+    }
+   ],
+   "source": [
+    "from toy_models.create import ToyGraph\n",
+    "from models import LP\n",
+    "toy = ToyGraph()\n",
+    "solution = LP(toy,model_type='zerosum_mf_static_nodes').solve()\n",
+    "drawer = solution.draw()\n",
+    "analysis = solution.analyze()\n",
+    "ml = analysis.ml()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "4481ef01",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pytest\n",
+    "\n",
+    "from toy_models.create import ToyGraph\n",
+    "from models import LP, Solver\n",
+    "from analysis import Analysis\n",
+    "from analysis import GraphMetrics\n",
+    "\n",
+    "\n",
+    "@pytest.fixture\n",
+    "def toy_graph():\n",
+    "    return ToyGraph(layer_list=[1, 2, 2, 1], seed=123)\n",
+    "\n",
+    "@pytest.fixture\n",
+    "def lp(toy_graph):\n",
+    "    return LP(toy_graph.G, model_type=\"max_flow\")\n",
+    "\n",
+    "@pytest.fixture\n",
+    "def solver(lp):\n",
+    "    return Solver(lp)\n",
+    "\n",
+    "@pytest.fixture\n",
+    "def analysis(solver):\n",
+    "    return Analysis(solver)\n",
+    "\n",
+    "@pytest.fixture\n",
+    "def graph_metrics(analysis):\n",
+    "    return GraphMetrics(analysis)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "6d1452a9",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def test_graph_info(graph_metrics):\n",
+    "    info = graph_metrics.graph_info()\n",
+    "\n",
+    "    assert info[\"nodes\"] == 6\n",
+    "    assert info[\"directed\"] is True\n",
+    "\n",
+    "def test_degree_metrics(graph_metrics):\n",
+    "    df = graph_metrics.degree_metrics()\n",
+    "\n",
+    "    assert len(df) == 6\n",
+    "    assert \"node\" in df.columns\n",
+    "    assert \"degree\" in df.columns\n",
+    "\n",
+    "def test_graph_info(graph_metrics):\n",
+    "    info = graph_metrics.graph_info()\n",
+    "\n",
+    "    assert info[\"nodes\"] == graph_metrics.g.number_of_nodes()\n",
+    "    assert info[\"edges\"] == graph_metrics.g.number_of_edges()\n",
+    "    assert info[\"directed\"] == graph_metrics.g.is_directed()\n",
+    "\n",
+    "def test_degree_metrics(graph_metrics):\n",
+    "    df = graph_metrics.degree_metrics()\n",
+    "    assert len(df) == graph_metrics.g.number_of_nodes()\n",
+    "    assert df[\"node\"].is_unique\n",
+    "    for node in graph_metrics.g.nodes:\n",
+    "        row = df.loc[df[\"node\"] == node].iloc[0]\n",
+    "        assert row[\"degree\"] == graph_metrics.g.degree(node)\n",
+    "\n",
+    "\n",
+    "def test_centrality_metrics(graph_metrics):\n",
+    "    df = graph_metrics.centrality_metrics()\n",
+    "    expected_columns = {\"node\", \"degree_centrality\", \"betweenness_centrality\", \"closeness_centrality\", \"eigenvector_centrality\",}\n",
+    "    assert expected_columns.issubset(df.columns)\n",
+    "    assert len(df) == graph_metrics.g.number_of_nodes()\n",
+    "    assert df[\"node\"].is_unique\n",
+    "    assert df[\"eigenvector_centrality\"].notna().all()\n",
+    "\n",
+    "def test_spectral_metrics(graph_metrics):\n",
+    "    metrics = graph_metrics.spectral_metrics()\n",
+    "\n",
+    "    assert metrics[\"adjacency_spectral_radius\"] >= 0\n",
+    "    assert metrics[\"laplacian_algebraic_connectivity\"] >= 0\n",
+    "\n",
+    "def test_centrality_no_nan(graph_metrics):\n",
+    "    df = graph_metrics.centrality_metrics()\n",
+    "\n",
+    "    assert df[\"eigenvector_centrality\"].notna().all()\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b05279c9",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "base",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.13.9"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+__init__.py
+File type: .py
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+.vscode\settings.json
+File type: .json
+{
+    "python-envs.defaultEnvManager": "ms-python.python:conda",
+    "python-envs.defaultPackageManager": "ms-python.python:conda",
+    "python.testing.pytestArgs": [
+        "."
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+tests\conftest.py
+File type: .py
+import pytest
+from toy_models.create import ToyGraph
+from models import LP, Solver
+from analysis import Analysis
+from analysis import GraphMetrics
+
+@pytest.fixture
+def toy_graph():
+    return ToyGraph(layer_list=[1, 2, 2, 1], seed=123)
+
+@pytest.fixture
+def lp(toy_graph):
+    return LP(toy_graph.G, model_type="max_flow")
+
+@pytest.fixture
+def solver(lp):
+    return Solver(lp)
+
+@pytest.fixture
+def analysis(solver):
+    return Analysis(solver)
+
+@pytest.fixture
+def graph_metrics(analysis):
+    return GraphMetrics(analysis)
+
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+tests\test_analysis.py
+File type: .py
+import numpy as np
+import pandas as pd
+import pytest
+
+from toy_models.create import ToyGraph
+from models import LP
+from analysis import Analysis
+
+# Fixtures
+@pytest.fixture
+def toy_graph():
+    return ToyGraph()
+
+@pytest.fixture
+def max_flow_analysis(toy_graph):
+    lp = LP(toy_graph, model_type="max_flow")
+    solver = lp.solve()
+    return Analysis(solver)
+
+@pytest.fixture
+def simulation_df():
+    return pd.DataFrame(
+        {
+            "objective": [10, 8, 6, 4, 0],
+            "node_failed": [0, 1, 2, 2, 3],
+            "edge_failed": [0, 0, 1, 2, 3],
+            "node_0": [1, 1, 0, 0, 0],
+            "node_1": [1, 0, 1, 0, 0],
+            "edge_(0,1)": [1, 1, 1, 0, 0],
+            "edge_(1,2)": [1, 1, 0, 0, 0],
+        }
+    )
+
+# Construction
+class TestAnalysisInitialization:
+
+    def test_initialization(self, max_flow_analysis):
+        analysis = max_flow_analysis
+
+        assert analysis.solver is not None
+        assert analysis.g is analysis.solver.g
+        assert analysis.model is analysis.solver.model
+        assert analysis.model_type == analysis.solver.model_type
+
+        assert isinstance(analysis.results, dict)
+        assert isinstance(analysis.node_results, dict)
+        assert isinstance(analysis.edge_results, dict)
+        assert isinstance(analysis.metrics, dict)
+        assert isinstance(analysis.problem, dict)
+        assert isinstance(analysis.solver_results, dict)
+
+    def test_simulation_attributes_start_uninitialized(self, max_flow_analysis):
+        analysis = max_flow_analysis
+
+        assert analysis.nodes is None
+        assert analysis.edges is None
+        assert analysis.node_p is None
+        assert analysis.edge_p is None
+
+
+
+# Summary / result access
+class TestAnalysisResults:
+
+    def test_summary(self, max_flow_analysis):
+        analysis = max_flow_analysis
+
+        summary = analysis.summary()
+
+        expected = {
+            "model_type",
+            "objective_value",
+            "status",
+            "termination_condition",
+            "cut_capacity",
+            "capacity_removed",
+            "interdiction_cost",
+            "budget",
+        }
+
+        assert set(summary) == expected
+        assert summary["model_type"] == "max_flow"
+
+    def test_get_objective_value(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        assert (analysis.get_objective_value() == analysis.problem.get("objective_value"))
+
+    def test_get_node_results(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        assert analysis.get_node_results() is analysis.node_results
+
+    def test_get_edge_results(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        assert analysis.get_edge_results() is analysis.edge_results
+
+    def test_get_metrics(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        assert analysis.get_metrics() is analysis.metrics
+
+
+# Cut analysis
+class TestCutAnalysis:
+
+    def test_get_cut_edges(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        analysis.edge_results = {(0, 1): {"in_cut": True}, (1, 2): {"in_cut": False}, (2, 3): {"in_cut": True},}
+        assert set(analysis.get_cut_edges()) == {(0, 1), (2, 3),}
+
+    def test_get_interdicted_cut_edges(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        analysis.edge_results = {
+            (0, 1): {"in_interdicted_cut": True},
+            (1, 2): {"in_interdicted_cut": False},
+            (2, 3): {"in_interdicted_cut": True},
+        }
+        assert set(analysis.get_interdicted_cut_edges()) == {(0, 1), (2, 3),}
+
+    def test_get_cut_capacity(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        analysis.metrics = {"cut_capacity": 12}
+        assert analysis.get_cut_capacity() == 12
+
+    def test_get_capacity_removed(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        analysis.metrics = {"capacity_removed": 7}
+        assert analysis.get_capacity_removed() == 7
+
+    def test_default_capacity_removed(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        analysis.metrics = {}
+        assert analysis.get_capacity_removed() == 0
+
+
+
+# Interdiction analysis
+class TestInterdictionAnalysis:
+
+    def test_get_interdicted_nodes(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        analysis.node_results = {
+            0: {"interdicted": True},
+            1: {"interdicted": False},
+            2: {"interdicted": True},
+        }
+        assert set(analysis.get_interdicted_nodes()) == {0, 2}
+
+    def test_get_interdiction_cost(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        analysis.metrics = {"interdiction_cost": 15}
+        assert analysis.get_interdiction_cost() == 15
+
+    def test_get_interdiction_cost_default(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        analysis.metrics = {}
+        assert analysis.get_interdiction_cost() == 0
+
+    def test_interdiction_efficiency(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        analysis.metrics = {"interdiction_cost": 5, "capacity_removed": 20,}
+        assert analysis.get_interdiction_efficiency() == 4
+
+    def test_interdiction_efficiency_zero_cost(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        analysis.metrics = {"interdiction_cost": 0, "capacity_removed": 20,}
+        assert analysis.get_interdiction_efficiency() is None
+
+
+
+# Simulation preprocessing
+class TestSimulationHelpers:
+
+    def test_preprocess_excludes_artificial_components(self, max_flow_analysis,):
+        analysis = max_flow_analysis
+        analysis._preprocess_network_simulation()
+        assert analysis.nodes is not None
+        assert analysis.edges is not None
+        assert analysis.node_p is not None
+        assert analysis.edge_p is not None
+        for node in analysis.nodes:
+            assert not analysis.g.nodes[node].get("artificial", False)
+
+        for u, v in analysis.edges:
+            assert not analysis.g.edges[u, v].get("artificial", False)
+
+    def test_probability_arrays_match_components(self, max_flow_analysis,):
+        analysis = max_flow_analysis
+        analysis._preprocess_network_simulation()
+        assert len(analysis.node_p) == len(analysis.nodes)
+        assert len(analysis.edge_p) == len(analysis.edges)
+        assert np.all((analysis.node_p >= 0) & (analysis.node_p <= 1))
+        assert np.all((analysis.edge_p >= 0) & (analysis.edge_p <= 1))
+
+    def test_sample_states_are_binary(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        analysis._preprocess_network_simulation()
+        rng = np.random.default_rng(123)
+        node_state, edge_state = analysis._sample_states(rng)
+        assert len(node_state) == len(analysis.nodes)
+        assert len(edge_state) == len(analysis.edges)
+        assert set(node_state).issubset({0, 1})
+        assert set(edge_state).issubset({0, 1})
+
+# Monte Carlo simulation
+class TestStochasticAnalysis:
+
+    def test_stochastic_analysis_shape(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        df = analysis.stochastic_analysis(n_sim=5, seed=123,)
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 5
+
+    def test_stochastic_analysis_columns(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        df = analysis.stochastic_analysis(n_sim=3, seed=123,)
+        expected = {
+            "sim_number",
+            "objective",
+            "node_operational",
+            "node_failed",
+            "edge_operational",
+            "edge_failed",
+            "node_opr_ratio",
+            "edge_opr_ratio",
+            "termination_condition",
+            "flow",
+            "flow_failure_indicator",
+        }
+        assert expected.issubset(df.columns)
+
+    def test_stochastic_analysis_reproducible(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        df1 = analysis.stochastic_analysis(n_sim=5, seed=123,)
+        df2 = analysis.stochastic_analysis(n_sim=5, seed=123,)
+        pd.testing.assert_frame_equal(df1, df2)
+
+    def test_simulation_numbers(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        df = analysis.stochastic_analysis(n_sim=5, seed=123,)
+        assert df["sim_number"].tolist() == [0, 1, 2, 3, 4]
+
+    def test_component_state_columns_are_binary(self, max_flow_analysis):
+        analysis = max_flow_analysis
+        df = analysis.stochastic_analysis(n_sim=5, seed=123,)
+        node_cols, edge_cols = analysis._get_component_columns(df)
+        for column in node_cols + edge_cols:
+            assert set(df[column].unique()).issubset({0, 1})
+
+# Reliability
+class TestReliability:
+
+    def test_reliability(self, simulation_df):
+        result = Analysis.reliability(simulation_df, threshold=6,)
+        assert result == pytest.approx(3 / 5)
+
+    def test_failure_probability(self, simulation_df):
+        result = Analysis.failure_probability(simulation_df, threshold=6,)
+        assert result == pytest.approx(2 / 5)
+
+    def test_reliability_curve(self, simulation_df):
+        curve = Analysis.reliability_curve(simulation_df)
+        assert list(curve.columns) == ["requirement", "reliability",]
+        assert curve["requirement"].tolist() == [0, 4, 6, 8, 10,]
+        assert curve.loc[curve["requirement"] == 6, "reliability",].iloc[0] == pytest.approx(3 / 5)
+
+    def test_performance_distribution(self, simulation_df):
+        result = Analysis.performance_distribution(simulation_df, threshold=6,)
+        assert result["mean"] == pytest.approx(5.6)
+        assert result["median"] == 6
+        assert result["min"] == 0
+        assert result["max"] == 10
+        assert result["zero_probability"] == pytest.approx(1 / 5)
+        assert result["reliability"] == pytest.approx(3 / 5)
+        assert result["probability_of_failure"] == pytest.approx(2 / 5)
+
+    def test_performance_distribution_empty(self):
+        df = pd.DataFrame({"objective": []})
+        result = Analysis.performance_distribution(df)
+        assert result == {}
+
+    def test_expected_shortfall(self, simulation_df):
+        result = Analysis.expected_shortfall(simulation_df, threshold=6,)
+        # Values below 6 are 4 and 0.
+        assert result == pytest.approx(2)
+
+    def test_expected_shortfall_without_failures(self, simulation_df):
+        result = Analysis.expected_shortfall(simulation_df, threshold=0,)
+        assert np.isnan(result)
+
+# Performance summary / resilience
+class TestPerformanceSummary:
+
+    def test_performance_summary_without_threshold(self, simulation_df,):
+        result = Analysis.performance_summary(Analysis.__new__(Analysis), simulation_df,)
+        assert "mean" in result
+        assert "median" in result
+        assert "std" in result
+        assert "variance" in result
+
+    def test_performance_summary_with_threshold(self, max_flow_analysis, simulation_df,):
+        result = max_flow_analysis.performance_summary(simulation_df, threshold=6,)
+        assert result["reliability"] == pytest.approx(3 / 5)
+        assert result["failure_probability"] == pytest.approx(2 / 5)
+        assert result["expected_shortfall"] == pytest.approx(2)
+
+
+class TestResilience:
+
+    def test_resilience_curve(self, simulation_df):
+        curve = Analysis.resilience_curve(simulation_df, y_column="objective", failure_column="node_failed", baseline=10,)
+        assert list(curve.columns) == ["node_failed", "mean", "median", "std", "count", "relative_performance",]
+        row = curve[curve["node_failed"] == 2].iloc[0]
+        assert row["mean"] == pytest.approx(5)
+        assert row["count"] == 2
+        assert row["relative_performance"] == pytest.approx(0.5)
+
+    def test_resilience_curve_automatic_baseline(self, simulation_df,):
+        curve = Analysis.resilience_curve(simulation_df, y_column="objective", failure_column="node_failed",)
+        assert curve["relative_performance"].max() == pytest.approx(1)
+
+    def test_resilience_curve_empty(self):
+        df = pd.DataFrame(columns=["objective", "node_failed"])
+        curve = Analysis.resilience_curve(df, y_column="objective", failure_column="node_failed",)
+        assert curve.empty
+
+# Component influence
+class TestComponentInfluence:
+
+    def test_get_component_columns(self, simulation_df):
+        node_cols, edge_cols = Analysis._get_component_columns(simulation_df)
+        assert node_cols == ["node_0", "node_1",]
+        assert edge_cols == ["edge_(0,1)", "edge_(1,2)",]
+
+    def test_influence_logic(self, simulation_df):
+        node_cols, _ = Analysis._get_component_columns(simulation_df)
+        result = Analysis._get_influence_logic(simulation_df, node_cols,)
+        assert isinstance(result, pd.DataFrame)
+        expected = {
+            "component",
+            "value_if_operational",
+            "value_if_failed",
+            "value_difference",
+            "relative_impact",
+            "n_operational",
+            "n_failed",
+            "observed_performance_rate",
+        }
+        assert expected.issubset(result.columns)
+
+    def test_get_component_influence(self, max_flow_analysis, simulation_df,):
+        node_results, edge_results = (max_flow_analysis.get_component_influence(simulation_df))
+        assert isinstance(node_results, pd.DataFrame)
+        assert isinstance(edge_results, pd.DataFrame)
+        assert len(node_results) == 2
+        assert len(edge_results) == 2
+        assert set(node_results["component"]) == {"node_0", "node_1",}
+        assert set(edge_results["component"]) == {"edge_(0,1)", "edge_(1,2)",}
+
+
+
+# Component reliability
+class TestComponentReliability:
+
+    def test_component_reliability(self, max_flow_analysis, simulation_df,):
+        result = max_flow_analysis.get_component_reliability(simulation_df, threshold=6,)
+        assert isinstance(result, pd.DataFrame)
+        expected = {
+            "component",
+            "component_type",
+            "reliability_if_operational",
+            "reliability_if_failed",
+            "reliability_impact",
+            "n_operational",
+            "n_failed",
+            "observed_failure_rate",
+        }
+        assert expected.issubset(result.columns)
+        assert len(result) == 4
+        assert set(result["component_type"]) == {"node", "edge",}
+
+# Workflow metadata
+class TestAnalysisWorkflow:
+
+    def test_analysis_step_metadata(self):
+        assert hasattr(Analysis.summary, "_analysis_category")
+        assert hasattr(Analysis.summary, "_analysis_description")
+        assert Analysis.summary._analysis_category == "Solution"
+        assert (Analysis.summary._analysis_description == "General solution information")
+
+    def test_workflow_runs(self, capsys):
+        Analysis.show_workflow()
+        captured = capsys.readouterr()
+        assert "Analysis — Analysis Workflow" in captured.out
+        assert "Solution" in captured.out
+        assert "Reliability" in captured.out
+        assert "Monte Carlo" in captured.out
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+tests\test_graphdrawer.py
+File type: .py
+import matplotlib.pyplot as plt
+import pytest
+
+from toy_models.create import ToyGraph
+from models import LP
+from display import GraphDrawer
+
+@pytest.fixture
+def toy_graph():
+    return ToyGraph()
+
+@pytest.fixture
+def max_flow_solver(toy_graph):
+    lp = LP(toy_graph, model_type="max_flow")
+    return lp.solve()
+
+@pytest.fixture
+def min_cut_solver(toy_graph):
+    lp = LP(toy_graph, model_type="min_cut")
+    return lp.solve()
+
+@pytest.fixture
+def interdiction_solver(toy_graph):
+    lp = LP(toy_graph, model_type="node_interdiction")
+    return lp.solve()
+
+@pytest.fixture
+def max_flow_drawer(max_flow_solver):
+    return GraphDrawer(max_flow_solver)
+
+@pytest.fixture
+def min_cut_drawer(min_cut_solver):
+    return GraphDrawer(min_cut_solver)
+
+@pytest.fixture
+def interdiction_drawer(interdiction_solver):
+    return GraphDrawer(interdiction_solver)
+
+@pytest.fixture
+def positions(max_flow_drawer):
+    return {node: (float(i), 0.0) for i, node in enumerate(max_flow_drawer.g.nodes())}
+
+
+class TestGraphDrawerInitialization:
+
+    def test_initialization(self, max_flow_drawer, max_flow_solver):
+        assert max_flow_drawer.solver is max_flow_solver
+        assert max_flow_drawer.lp is max_flow_solver.lp
+        assert max_flow_drawer.g is max_flow_solver.g
+        assert max_flow_drawer.model is max_flow_solver.model
+        assert max_flow_drawer.model_type == max_flow_solver.model_type
+
+    def test_default_properties(self, max_flow_drawer):
+        assert max_flow_drawer.node_size == 500
+        assert max_flow_drawer.cut_color == "#ff0000"
+        assert max_flow_drawer.cmap is not None
+
+    def test_custom_properties(self, max_flow_solver):
+        drawer = GraphDrawer(max_flow_solver, node_size=750, cut_color="#00ff00",)
+        assert drawer.node_size == 750
+        assert drawer.cut_color == "#00ff00"
+
+
+class TestDrawingConfiguration:
+
+    def test_all_drawing_modes_have_configuration(self):
+        expected_modes = {"flow", "residual", "demand", "cost", "cut", "interdiction",}
+        assert set(GraphDrawer.DRAWING_CONFIG) == expected_modes
+
+    def test_default_modes(self):
+        assert GraphDrawer.DEFAULT_DRAWING_MODE == {"max_flow": "flow", "min_cut": "cut", "node_interdiction": "interdiction",}
+
+    def test_every_mode_has_builder(self):
+        for mode, config in GraphDrawer.DRAWING_CONFIG.items():
+            assert "builder" in config
+            assert "models" in config
+            assert isinstance(config["models"], set)
+
+    def test_every_mode_has_colormap(self):
+        for mode in GraphDrawer.DRAWING_CONFIG:
+            assert mode in GraphDrawer.CMAPS
+            assert GraphDrawer.CMAPS[mode] is not None
+
+
+class TestModeValidation:
+
+    def test_valid_max_flow_modes(self, max_flow_drawer):
+        for mode in ["flow", "residual", "demand", "cost"]:
+            max_flow_drawer._validate_mode(mode)
+
+    def test_valid_min_cut_mode(self, min_cut_drawer):
+        min_cut_drawer._validate_mode("cut")
+
+    def test_valid_interdiction_modes(self, interdiction_drawer):
+        interdiction_drawer._validate_mode("cut")
+        interdiction_drawer._validate_mode("interdiction")
+
+    def test_invalid_mode(self, max_flow_drawer):
+        with pytest.raises(ValueError, match="Unknown drawing mode",):
+            max_flow_drawer._validate_mode("invalid")
+
+    def test_incompatible_mode(self, max_flow_drawer):
+        with pytest.raises(ValueError, match="not available for model type",):
+            max_flow_drawer._validate_mode("cut")
+
+    def test_interdiction_not_available_for_max_flow(self, max_flow_drawer,):
+        with pytest.raises(ValueError, match="not available for model type",):
+            max_flow_drawer._validate_mode("interdiction")
+
+
+class TestFlowNodeColors:
+
+    def test_flow_node_colors(self, max_flow_drawer):
+        colors = max_flow_drawer._get_flow_node_colors()
+        assert len(colors) == max_flow_drawer.g.number_of_nodes()
+
+    def test_flow_node_colors_are_valid(self, max_flow_drawer):
+        colors = max_flow_drawer._get_flow_node_colors()
+
+        for color in colors:
+            # Matplotlib should be able to interpret every returned color.
+            from matplotlib.colors import to_rgba
+            rgba = to_rgba(color)
+            assert len(rgba) == 4
+            assert all(0 <= value <= 1 for value in rgba)
+
+
+class TestCutNodeColors:
+
+    def test_cut_node_colors(self, min_cut_drawer):
+        colors = min_cut_drawer._get_cut_node_colors()
+        assert len(colors) == min_cut_drawer.g.number_of_nodes()
+
+    def test_cut_node_colors_are_valid(self, min_cut_drawer):
+        colors = min_cut_drawer._get_cut_node_colors()
+        from matplotlib.colors import to_rgba
+        for color in colors:
+            rgba = to_rgba(color)
+            assert len(rgba) == 4
+
+
+class TestInterdictionNodeColors:
+
+    def test_interdiction_node_colors(self, interdiction_drawer):
+        colors = interdiction_drawer._get_interdiction_node_colors()
+        assert len(colors) == interdiction_drawer.g.number_of_nodes()
+
+    def test_interdicted_nodes_are_red(self, interdiction_drawer):
+        colors = interdiction_drawer._get_interdiction_node_colors()
+        for node, color in zip(interdiction_drawer.g.nodes(), colors,):
+            if interdiction_drawer.node_results[node]["interdicted"]:
+                assert color == "red"
+
+
+class TestDrawingBuilders:
+
+    def test_draw_flow(self, max_flow_drawer, positions):
+        fig, ax = plt.subplots()
+        max_flow_drawer._draw_flow(pos=positions, ax=ax,)
+        assert len(ax.collections) > 0
+        plt.close(fig)
+
+    def test_draw_demand(self, max_flow_drawer, positions):
+        fig, ax = plt.subplots()
+        max_flow_drawer._draw_demand(pos=positions, ax=ax,)
+        assert len(ax.collections) > 0
+        plt.close(fig)
+
+    def test_draw_cut(self, min_cut_drawer, positions):
+        fig, ax = plt.subplots()
+        min_cut_drawer._draw_cut(pos=positions, ax=ax,)
+        assert len(ax.collections) > 0
+        plt.close(fig)
+
+    def test_draw_interdiction(self, interdiction_drawer, positions,):
+        fig, ax = plt.subplots()
+        interdiction_drawer._draw_interdiction(pos=positions, ax=ax,)
+        assert len(ax.collections) > 0
+        plt.close(fig)
+
+
+class TestColorbars:
+
+    def test_add_node_colorbar(self, max_flow_drawer):
+        fig, ax = plt.subplots()
+        max_flow_drawer._add_node_colorbar(ax, label="Test Node",)
+        # Colorbar creates an additional axes on the figure.
+        assert len(fig.axes) >= 2
+        plt.close(fig)
+
+    def test_add_edge_colorbar(self, max_flow_drawer):
+        fig, ax = plt.subplots()
+        max_flow_drawer._add_edge_colorbar(ax, label="Test Edge",)
+        assert len(fig.axes) >= 2
+        plt.close(fig)
+
+
+class TestLegends:
+
+    def test_add_legend_min_cut(self, min_cut_drawer):
+        fig, ax = plt.subplots()
+        min_cut_drawer._add_legend(ax)
+        assert len(ax.get_legend().legend_handles) > 0
+        plt.close(fig)
+
+    def test_add_legend_interdiction(self, interdiction_drawer):
+        fig, ax = plt.subplots()
+        interdiction_drawer._add_legend(ax)
+        assert len(ax.get_legend().legend_handles) > 0
+        plt.close(fig)
+
+    def test_add_interdiction_legend(self, interdiction_drawer):
+        fig, ax = plt.subplots()
+        interdiction_drawer._add_interdiction_legend(ax)
+        assert len(ax.get_legend().legend_handles) > 0
+        plt.close(fig)
+
+
+class TestPublicDraw:
+
+    def test_draw_default_max_flow(self, max_flow_drawer):
+        max_flow_drawer.draw(
+            pos={node: (float(i), 0.0) for i, node in enumerate(max_flow_drawer.g.nodes())},
+            figsize=(6, 4),
+        )
+        plt.close("all")
+
+    def test_draw_default_min_cut(self, min_cut_drawer):
+        min_cut_drawer.draw(
+            pos={node: (float(i), 0.0) for i, node in enumerate(min_cut_drawer.g.nodes())},
+            figsize=(6, 4),
+        )
+        plt.close("all")
+
+    def test_draw_default_interdiction(self, interdiction_drawer):
+        interdiction_drawer.draw(
+            pos={node: (float(i), 0.0) for i, node in enumerate(interdiction_drawer.g.nodes())}, 
+            figsize=(6, 4),
+            )
+        plt.close("all")
+
+    def test_draw_explicit_mode(self, max_flow_drawer):
+        max_flow_drawer.draw(
+            mode="flow", 
+            pos={node: (float(i), 0.0) for i, node in enumerate(max_flow_drawer.g.nodes())}, 
+            figsize=(6, 4),
+            )
+        plt.close("all")
+
+    def test_draw_invalid_mode(self, max_flow_drawer):
+        with pytest.raises(ValueError, match="Unknown drawing mode",):
+           max_flow_drawer.draw(mode="invalid", figsize=(6, 4),)
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+tests\test_graphmetrics.py
+File type: .py
+import numpy as np
+import pandas as pd
+import pytest
+
+from toy_models.create import ToyGraph
+from models import LP
+from analysis import Analysis, GraphMetrics
+
+@pytest.fixture
+def toy_graph():
+    return ToyGraph()
+
+@pytest.fixture
+def max_flow_analysis(toy_graph):
+    lp = LP(toy_graph, model_type="max_flow")
+    solver = lp.solve()
+    return Analysis(solver)
+
+@pytest.fixture
+def graph_metrics(max_flow_analysis):
+    return GraphMetrics(max_flow_analysis)
+
+
+class TestGraphMetricsInitialization:
+
+    def test_initialization_with_analysis(self, max_flow_analysis):
+        metrics = GraphMetrics(max_flow_analysis)
+
+        assert metrics.analysis is max_flow_analysis
+        assert metrics.solver is max_flow_analysis.solver
+        assert metrics.g is max_flow_analysis.g
+        assert metrics.results is max_flow_analysis.results
+        assert metrics.node_results is max_flow_analysis.node_results
+        assert metrics.edge_results is max_flow_analysis.edge_results
+        assert metrics.metrics is max_flow_analysis.metrics
+
+    def test_initialization_without_analysis(self):
+        metrics = GraphMetrics()
+
+        assert metrics.analysis is None
+        assert metrics.solver is None
+        assert metrics.g is None
+        assert metrics.results == {}
+        assert metrics.node_results == {}
+        assert metrics.edge_results == {}
+        assert metrics.metrics == {}
+
+
+class TestGraphValidation:
+
+    def test_require_graph_raises_without_analysis(self):
+        metrics = GraphMetrics()
+
+        with pytest.raises(ValueError, match="requires an Analysis object"):
+            metrics.graph_info()
+
+    def test_require_graph_raises_for_degree_metrics(self):
+        metrics = GraphMetrics()
+
+        with pytest.raises(ValueError, match="requires an Analysis object"):
+            metrics.degree_metrics()
+
+
+class TestGraphInfo:
+
+    def test_graph_info(self, graph_metrics):
+        info = graph_metrics.graph_info()
+        expected_keys = {"nodes", "edges", "density", "directed", "weighted", "connected",}
+        assert expected_keys.issubset(info.keys())
+        assert info["nodes"] == graph_metrics.g.number_of_nodes()
+        assert info["edges"] == graph_metrics.g.number_of_edges()
+        assert 0 <= info["density"] <= 1
+        assert isinstance(info["directed"], bool)
+        assert isinstance(info["weighted"], bool)
+        assert isinstance(info["connected"], bool)
+
+
+class TestDegreeMetrics:
+
+    def test_degree_metrics_columns(self, graph_metrics):
+        df = graph_metrics.degree_metrics()
+        expected_columns = {"node", "degree", "in_degree", "out_degree",}
+        assert expected_columns.issubset(df.columns)
+        assert len(df) == graph_metrics.g.number_of_nodes()
+        assert df["node"].is_unique
+
+    def test_degree_metrics_values(self, graph_metrics):
+        df = graph_metrics.degree_metrics()
+        for _, row in df.iterrows():
+            node = row["node"]
+            assert row["degree"] == graph_metrics.g.degree(node)
+            assert row["in_degree"] == graph_metrics.g.in_degree(node)
+            assert row["out_degree"] == graph_metrics.g.out_degree(node)
+
+
+class TestCentralityMetrics:
+
+    def test_centrality_metrics(self, graph_metrics):
+        df = graph_metrics.centrality_metrics()
+        expected_columns = {"node", "degree_centrality", "betweenness_centrality", "closeness_centrality", "eigenvector_centrality",}
+        assert expected_columns.issubset(df.columns)
+        assert len(df) == graph_metrics.g.number_of_nodes()
+        assert df["node"].is_unique
+
+    def test_centrality_metrics_are_finite(self, graph_metrics):
+        df = graph_metrics.centrality_metrics()
+        numeric_columns = ["degree_centrality", "betweenness_centrality", "closeness_centrality", "eigenvector_centrality",]
+        assert np.isfinite(df[numeric_columns].to_numpy()).all()
+
+    def test_eigenvector_convergence_failure_returns_nan(self, graph_metrics):
+        df = graph_metrics.centrality_metrics(max_iter=1)
+        assert "eigenvector_centrality" in df.columns
+        assert len(df) == graph_metrics.g.number_of_nodes()
+
+
+class TestClusteringMetrics:
+
+    def test_clustering_metrics(self, graph_metrics):
+        df = graph_metrics.clustering_metrics()
+        assert set(["node", "clustering_coefficient"]).issubset(df.columns)
+        assert len(df) == graph_metrics.g.number_of_nodes()
+        assert df["node"].is_unique
+
+    def test_clustering_values_are_valid(self, graph_metrics):
+        df = graph_metrics.clustering_metrics()
+        assert (df["clustering_coefficient"] >= 0).all()
+        assert (df["clustering_coefficient"] <= 1).all()
+
+
+class TestSpectralMetrics:
+
+    def test_spectral_metrics_keys(self, graph_metrics):
+        result = graph_metrics.spectral_metrics()
+        expected_keys = {
+            "adjacency_spectral_radius",
+            "adjacency_largest_eigenvalue",
+            "laplacian_algebraic_connectivity",
+            "laplacian_spectral_gap",
+            "laplacian_largest_eigenvalue",
+            "adjacency_eigenvalues",
+            "laplacian_eigenvalues",
+            "fiedler_vector",
+        }
+        assert expected_keys.issubset(result.keys())
+
+    def test_spectral_metrics_shapes(self, graph_metrics):
+        result = graph_metrics.spectral_metrics()
+        n = graph_metrics.g.number_of_nodes()
+        assert len(result["adjacency_eigenvalues"]) == n
+        assert len(result["laplacian_eigenvalues"]) == n
+        assert len(result["fiedler_vector"]) == n
+
+    def test_spectral_metrics_are_finite(self, graph_metrics):
+        result = graph_metrics.spectral_metrics()
+        scalar_keys = [
+            "adjacency_spectral_radius",
+            "adjacency_largest_eigenvalue",
+            "laplacian_algebraic_connectivity",
+            "laplacian_spectral_gap",
+            "laplacian_largest_eigenvalue",
+        ]
+        assert np.isfinite([result[key] for key in scalar_keys]).all()
+        assert np.isfinite(result["adjacency_eigenvalues"]).all()
+        assert np.isfinite(result["laplacian_eigenvalues"]).all()
+        assert np.isfinite(result["fiedler_vector"]).all()
+
+    def test_spectral_radius_is_nonnegative(self, graph_metrics):
+        result = graph_metrics.spectral_metrics()
+        assert result["adjacency_spectral_radius"] >= 0
+        assert result["laplacian_largest_eigenvalue"] >= 0
+
+class TestSpectralNodeFeatures:
+
+    def test_spectral_node_features(self, graph_metrics):
+        df = graph_metrics.spectral_node_features()
+        expected_columns = {"node", "fiedler_value", "spectral_coordinate_0", "spectral_coordinate_1", "spectral_coordinate_2",}
+        assert expected_columns.issubset(df.columns)
+        assert len(df) == graph_metrics.g.number_of_nodes()
+        assert df["node"].is_unique
+
+    def test_spectral_node_features_are_finite(self, graph_metrics):
+        df = graph_metrics.spectral_node_features()
+        numeric = df.drop(columns=["node"]).to_numpy()
+        assert np.isfinite(numeric).all()
+
+class TestCommunityDetection:
+
+    def test_community_detection(self, graph_metrics):
+        df = graph_metrics.community_detection()
+        expected_columns = {"node", "community", "community_size",}
+        assert expected_columns.issubset(df.columns)
+        assert len(df) == graph_metrics.g.number_of_nodes()
+        assert df["node"].is_unique
+
+    def test_every_node_has_community(self, graph_metrics):
+        df = graph_metrics.community_detection()
+        expected_nodes = set(graph_metrics.g.nodes())
+        actual_nodes = set(df["node"])
+        assert actual_nodes == expected_nodes
+
+    def test_community_sizes_are_positive(self, graph_metrics):
+        df = graph_metrics.community_detection()
+        assert (df["community_size"] > 0).all()
+
+
+class TestNodeFeatures:
+
+    def test_node_features(self, graph_metrics):
+        df = graph_metrics.node_features()
+        expected_columns = {
+            "node",
+            "degree",
+            "in_degree",
+            "out_degree",
+            "degree_centrality",
+            "betweenness_centrality",
+            "closeness_centrality",
+            "eigenvector_centrality",
+            "clustering_coefficient",
+            "fiedler_value",
+            "spectral_coordinate_0",
+            "spectral_coordinate_1",
+            "spectral_coordinate_2",
+            "community",
+            "community_size",
+        }
+        assert expected_columns.issubset(df.columns)
+        assert len(df) == graph_metrics.g.number_of_nodes()
+        assert df["node"].is_unique
+
+    def test_node_features_have_no_missing_values(self, graph_metrics):
+        df = graph_metrics.node_features()
+        assert not df.isna().any().any()
+
+    def test_node_features_match_graph_nodes(self, graph_metrics):
+        df = graph_metrics.node_features()
+        assert set(df["node"]) == set(graph_metrics.g.nodes())
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+tests\test_graphml.py
+File type: .py
+import numpy as np
+import pandas as pd
+import pytest
+
+from toy_models.create import ToyGraph
+from models import LP
+from analysis import Analysis, GraphML
+
+@pytest.fixture
+def toy_graph():
+    return ToyGraph()
+
+@pytest.fixture
+def max_flow_analysis(toy_graph):
+    lp = LP(toy_graph, model_type="max_flow")
+    solver = lp.solve()
+    return Analysis(solver)
+
+@pytest.fixture
+def simulation_df(max_flow_analysis):
+    g = max_flow_analysis.g
+    nodes = [n for n in g.nodes() if not g.nodes[n].get("artificial", False)]
+    edges = [(u, v) for u, v in g.edges() if not g.edges[u, v].get("artificial", False)]
+    rows = []
+    # Deterministic scenarios with both operational and failed
+    # states for every component.
+    for i in range(20):
+        row = {"sim_number": i, "objective": float(i % 5),}
+        for j, node in enumerate(nodes):
+            row[f"node_{node}"] = int((i + j) % 2 == 0)
+        for j, (u, v) in enumerate(edges):
+            row[f"edge_({u},{v})"] = int((i + j) % 2 == 0)
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+@pytest.fixture
+def graph_ml(max_flow_analysis, simulation_df):
+    return GraphML(analysis=max_flow_analysis, df=simulation_df,)
+
+
+class TestGraphMLInitialization:
+
+    def test_initialization(self, graph_ml, max_flow_analysis, simulation_df):
+        assert graph_ml.analysis is max_flow_analysis
+        assert graph_ml.g is max_flow_analysis.g
+        assert graph_ml.df is simulation_df
+
+    def test_structural_features_initialized(self, graph_ml):
+        assert graph_ml.node_X is not None
+        assert isinstance(graph_ml.node_X, pd.DataFrame)
+
+    def test_ml_objects_start_empty(self, graph_ml):
+        assert graph_ml.edge_X is None
+        assert graph_ml.simulation_X is None
+        assert graph_ml.simulation_y is None
+        assert graph_ml.node_y is None
+        assert graph_ml.edge_y is None
+        assert graph_ml.cluster_df is None
+        assert graph_ml.rf_model is None
+        assert graph_ml.rf_importance is None
+        assert graph_ml.permutation_importance is None
+
+    def test_numeric_node_map(self, graph_ml):
+        encoder = graph_ml.graph_encoder
+        decoder = graph_ml.graph_decoder
+
+        assert len(encoder) == graph_ml.g.number_of_nodes()
+        assert len(decoder) == graph_ml.g.number_of_nodes()
+
+        for node, encoded in encoder.items():
+            assert decoder[encoded] == node
+
+
+class TestGraphMLValidation:
+
+    def test_require_data(self, max_flow_analysis):
+        ml = GraphML(analysis=max_flow_analysis, df=None,)
+        with pytest.raises(ValueError, match="stochastic simulation DataFrame",):
+            ml.get_simulation_matrix()
+
+    def test_require_features(self, max_flow_analysis, simulation_df):
+        ml = GraphML(analysis=max_flow_analysis, df=simulation_df,)
+        ml.node_X = None
+        with pytest.raises(ValueError, match="Node feature matrix",):
+            ml.cluster_nodes()
+
+
+class TestSimulationMatrix:
+
+    def test_get_simulation_matrix(self, graph_ml):
+        X, y = graph_ml.get_simulation_matrix()
+        assert isinstance(X, pd.DataFrame)
+        assert isinstance(y, pd.Series)
+        assert len(X) == len(graph_ml.df)
+        assert len(y) == len(graph_ml.df)
+        assert graph_ml.simulation_X is X
+        assert graph_ml.simulation_y is y
+
+    def test_simulation_matrix_contains_components(self, graph_ml):
+        X, y = graph_ml.get_simulation_matrix()
+        assert len(X.columns) > 0
+        assert "objective" not in X.columns
+        assert y.name == "objective"
+        assert all(column.startswith("node_") or column.startswith("edge_") for column in X.columns)
+
+    def test_simulation_matrix_is_binary(self, graph_ml):
+        X, _ = graph_ml.get_simulation_matrix()
+        assert set(X.to_numpy().ravel()).issubset({0, 1})
+
+
+class TestTargetMatrices:
+
+    def test_target_matrices(self, graph_ml):
+        node_y, edge_y = graph_ml.target_matrices()
+        assert isinstance(node_y, pd.DataFrame)
+        assert isinstance(edge_y, pd.DataFrame)
+        assert graph_ml.node_y is not None
+        assert graph_ml.edge_y is not None
+
+    def test_node_targets_have_expected_columns(self, graph_ml):
+        node_y, _ = graph_ml.target_matrices()
+        expected_columns = {
+            "component",
+            "value_if_operational",
+            "value_if_failed",
+            "value_difference",
+            "relative_impact",
+            "n_operational",
+            "n_failed",
+            "observed_performance_rate",
+        }
+        assert expected_columns.issubset(node_y.columns)
+
+    def test_edge_targets_have_expected_columns(self, graph_ml):
+        _, edge_y = graph_ml.target_matrices()
+        expected_columns = {
+            "component",
+            "value_if_operational",
+            "value_if_failed",
+            "value_difference",
+            "relative_impact",
+            "n_operational",
+            "n_failed",
+            "observed_performance_rate",
+        }
+        assert expected_columns.issubset(edge_y.columns)
+
+
+class TestNodeClustering:
+
+    def test_kmeans_clustering(self, graph_ml):
+        n_clusters = 2
+        result = graph_ml.cluster_nodes(n_clusters=n_clusters, method="kmeans", random_state=123,)
+        assert isinstance(result, pd.DataFrame)
+        assert set(result.columns) == {"node", "cluster"}
+        assert len(result) == graph_ml.g.number_of_nodes()
+        assert result["node"].is_unique
+        assert result["cluster"].nunique() <= n_clusters
+
+    def test_hierarchical_clustering(self, graph_ml):
+        result = graph_ml.cluster_nodes(n_clusters=2, method="hierarchical",)
+        assert isinstance(result, pd.DataFrame)
+        assert set(result.columns) == {"node", "cluster"}
+        assert len(result) == graph_ml.g.number_of_nodes()
+
+    def test_clustering_without_scaling(self, graph_ml):
+        result = graph_ml.cluster_nodes(n_clusters=2, method="kmeans", scale=False, random_state=123,)
+        assert len(result) == graph_ml.g.number_of_nodes()
+
+    def test_invalid_clustering_method(self, graph_ml):
+        with pytest.raises(ValueError, match="method must be 'kmeans' or 'hierarchical'",):
+            graph_ml.cluster_nodes(method="invalid")
+
+
+class TestRandomForest:
+
+    def test_random_forest_regression(self, graph_ml):
+        importance = graph_ml.fit_random_forest(classification=False, test_size=0.25, random_state=123, n_estimators=20,)
+        assert isinstance(importance, pd.DataFrame)
+        assert {"component", "importance"}.issubset(importance.columns)
+        assert graph_ml.rf_model is not None
+        assert graph_ml.rf_importance is not None
+        assert hasattr(graph_ml, "rf_metrics")
+        assert "r2" in graph_ml.rf_metrics
+        assert "mae" in graph_ml.rf_metrics
+
+    def test_random_forest_importance_matches_features(self, graph_ml):
+        importance = graph_ml.fit_random_forest(n_estimators=20, random_state=123,)
+        X, _ = graph_ml.get_simulation_matrix()
+        assert set(importance["component"]) == set(X.columns)
+        assert len(importance) == len(X.columns)
+
+    def test_random_forest_classification(self, graph_ml):
+        # Make the target explicitly binary for classification.
+        graph_ml.df["objective"] = (graph_ml.df["objective"] > 2).astype(int)
+        importance = graph_ml.fit_random_forest(classification=True, test_size=0.25, random_state=123, n_estimators=20,)
+        assert isinstance(importance, pd.DataFrame)
+        assert graph_ml.rf_model is not None
+        assert "accuracy" in graph_ml.rf_metrics
+
+    def test_random_forest_builds_simulation_matrix_automatically(self, graph_ml,):
+        assert graph_ml.simulation_X is None
+        graph_ml.fit_random_forest(n_estimators=20, random_state=123,)
+        assert graph_ml.simulation_X is not None
+        assert graph_ml.simulation_y is not None
+
+
+class TestPermutationImportance:
+
+    def test_requires_random_forest(self, graph_ml):
+        graph_ml.get_simulation_matrix()
+        with pytest.raises(ValueError, match="Random Forest has not been fitted",):
+            graph_ml.get_permutation_importance()
+
+    def test_requires_simulation_matrix(self, graph_ml):
+        graph_ml.fit_random_forest(n_estimators=20, random_state=123,)
+        graph_ml.simulation_X = None
+        with pytest.raises(ValueError, match="Simulation matrix has not been constructed",):
+            graph_ml.get_permutation_importance()
+
+    def test_permutation_importance(self, graph_ml):
+        graph_ml.fit_random_forest(n_estimators=20, random_state=123,)
+        result = graph_ml.get_permutation_importance(n_repeats=2, random_state=123,)
+        expected_columns = {"component", "importance_mean", "importance_std",}
+        assert expected_columns.issubset(result.columns)
+        assert len(result) == len(graph_ml.simulation_X.columns)
+        assert graph_ml.permutation_importance is not None
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+tests\test_lp.py
+File type: .py
+import pytest
+import networkx as nx
+import pyomo.environ as pyo
+from equations import Rules
+from toy_models.create import ToyGraph
+from models import LP
+
+
+class TestLP:
+
+    def test_default_initialization(self):
+        toy = ToyGraph()
+        lp = LP(toy)
+
+        assert isinstance(lp.g, nx.DiGraph)
+        assert lp.model_type == "max_flow"
+        assert lp.s == "s"
+        assert lp.t == "t"
+        assert lp.solver_str == "appsi_highs"
+        assert isinstance(lp.r, Rules)
+        assert lp.model is not None
+
+    def test_graph_is_copied(self):
+        toy = ToyGraph()
+        lp = LP(toy)
+
+        assert lp.g is not toy.G
+
+        original_nodes = set(toy.G.nodes)
+        lp.g.remove_node(next(iter(lp.g.nodes)))
+
+        assert set(toy.G.nodes) == original_nodes
+
+    def test_alternate_model_names(self):
+        toy = ToyGraph()
+
+        aliases = {
+            "max_flow": "max_flow",
+            "mf": "max_flow",
+            "standard_max_flow": "max_flow",
+            "standard_mf": "max_flow",
+            "dual_maxflow": "min_cut",
+            "min_cut": "min_cut",
+            "min_cut_flow": "min_cut",
+            "zerosum_mf_static_nodes": "node_interdiction",
+            "interdiction": "node_interdiction",
+            "node_interdiction": "node_interdiction",
+        }
+
+        for alias, expected in aliases.items():
+            lp = LP(toy, model_type=alias)
+            assert lp.model_type == expected
+
+    def test_invalid_model_type(self):
+        toy = ToyGraph()
+
+        with pytest.raises(ValueError, match="Unknown model type"):
+            LP(toy, model_type="not_a_model")
+
+    def test_graph_attributes_are_standardized(self):
+        toy = ToyGraph()
+        lp = LP(toy)
+
+        for _, _, data in lp.g.edges(data=True):
+            assert "capacity" in data
+            assert "cost" in data
+
+        for _, data in lp.g.nodes(data=True):
+            assert "demand" in data
+
+    def test_super_source_and_sink_exist(self):
+        toy = ToyGraph()
+        lp = LP(toy)
+
+        assert lp.s in lp.g.nodes
+        assert lp.t in lp.g.nodes
+
+        assert lp.g.nodes[lp.s]["artificial"] is True
+        assert lp.g.nodes[lp.t]["artificial"] is True
+
+    def test_base_model_sets(self):
+        toy = ToyGraph()
+        lp = LP(toy)
+
+        assert set(lp.model.nodes) == set(lp.g.nodes)
+        assert set(lp.model.edges) == set(lp.g.edges)
+
+    def test_base_model_parameters(self):
+        toy = ToyGraph()
+        lp = LP(toy)
+
+        model = lp.model
+
+        for node in model.nodes:
+            assert pyo.value(model.node_state[node]) == 1
+            assert pyo.value(model.artificial_node[node]) in (0, 1)
+
+        for edge in model.edges:
+            u, v = edge
+
+            assert pyo.value(model.capacity[u, v]) == lp.g.edges[u, v]["capacity"]
+            assert pyo.value(model.cost[u, v]) == lp.g.edges[u, v]["cost"]
+            assert pyo.value(model.edge_state[u, v]) in (0, 1)
+            assert pyo.value(model.artificial_edge[u, v]) in (0, 1)
+
+    def test_max_flow_model_structure(self):
+        toy = ToyGraph()
+        lp = LP(toy, model_type="max_flow")
+
+        model = lp.model
+
+        assert hasattr(model, "x")
+        assert hasattr(model, "F")
+        assert hasattr(model, "cap")
+        assert hasattr(model, "flow")
+        assert hasattr(model, "source")
+        assert hasattr(model, "sink")
+        assert hasattr(model, "dual")
+
+        assert model.x.is_indexed()
+        assert model.F.is_variable_type()
+
+    def test_min_cut_model_structure(self):
+        toy = ToyGraph()
+        lp = LP(toy, model_type="min_cut")
+
+        model = lp.model
+
+        assert hasattr(model, "theta")
+        assert hasattr(model, "alpha")
+        assert hasattr(model, "cutset")
+        assert hasattr(model, "stflow")
+
+        assert model.theta.is_indexed()
+        assert model.alpha.is_indexed()
+
+    def test_node_interdiction_model_structure(self):
+        toy = ToyGraph()
+        lp = LP(toy, model_type="node_interdiction")
+
+        model = lp.model
+
+        assert hasattr(model, "theta")
+        assert hasattr(model, "alpha")
+        assert hasattr(model, "omega")
+        assert hasattr(model, "z")
+
+        assert hasattr(model, "M")
+        assert hasattr(model, "interdiction_cost")
+        assert hasattr(model, "budget")
+
+        assert hasattr(model, "budget_limit")
+        assert hasattr(model, "artificial_protection")
+        assert hasattr(model, "z1")
+        assert hasattr(model, "z2")
+        assert hasattr(model, "z3")
+        assert hasattr(model, "z4")
+
+        assert model.M.value == 1
+        assert model.budget.value == 9
+
+    def test_solve_returns_solver(self):
+        toy = ToyGraph()
+        lp = LP(toy)
+
+        solver = lp.solve()
+
+        assert solver is not None
+
+    def test_fix_interdiction(self):
+        toy = ToyGraph()
+        lp = LP(toy, model_type="node_interdiction")
+
+        interdicted = [0, 1]
+        lp.fix_interdiction(interdicted)
+
+        for node in lp.model.nodes:
+            expected = 1 if node in interdicted else 0
+            assert lp.model.omega[node].fixed
+            assert pyo.value(lp.model.omega[node]) == expected
+
+    def test_fix_interdiction_rejects_non_interdiction_model(self):
+        toy = ToyGraph()
+        lp = LP(toy, model_type="max_flow")
+        with pytest.raises(ValueError, match="Interdiction decisions only exist",):
+            lp.fix_interdiction([0])
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+tests\test_pipeline.py
+File type: .py
+import numpy as np
+import pandas as pd
+import pytest
+
+from toy_models.create import ToyGraph
+from models import LP
+from analysis import Analysis, GraphMetrics, GraphML
+from display import GraphDrawer
+
+@pytest.fixture
+def toy_graph():
+    return ToyGraph()
+
+@pytest.fixture
+def lp(toy_graph):
+    return LP(toy_graph, model_type="max_flow",)
+
+@pytest.fixture
+def solver(lp):
+    return lp.solve()
+
+@pytest.fixture
+def analysis(solver):
+    return Analysis(solver)
+
+@pytest.fixture
+def graph_metrics(analysis):
+    return GraphMetrics(analysis)
+
+@pytest.fixture
+def simulation_df(analysis):
+    """
+    Small deterministic simulation dataset for testing the ML layer
+    without repeatedly running stochastic optimization.
+    """
+    nodes = [n for n in analysis.g.nodes() if not analysis.g.nodes[n].get("artificial", False)]
+    edges = [(u, v) for u, v in analysis.g.edges() if not analysis.g.edges[u, v].get("artificial", False)]
+    rows = []
+    for i in range(20):
+        row = {"sim_number": i, "objective": float(i % 5),}
+        for j, node in enumerate(nodes):
+            row[f"node_{node}"] = int((i + j) % 2 == 0)
+        for j, (u, v) in enumerate(edges):
+            row[f"edge_({u},{v})"] = int((i + j) % 2 == 0)
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+@pytest.fixture
+def graph_ml(analysis, simulation_df):
+    return GraphML(analysis=analysis, df=simulation_df,)
+
+
+class TestPipelineConstruction:
+
+    def test_toy_graph_to_lp(self, toy_graph, lp):
+        assert lp.g is not toy_graph.G
+        original_nodes = set(toy_graph.G.nodes())
+        original_edges = set(toy_graph.G.edges())
+        assert original_nodes.issubset(set(lp.g.nodes()))
+        assert original_edges.issubset(set(lp.g.edges()))
+        assert lp.model_type == "max_flow"
+        assert lp.model is not None
+
+    def test_lp_to_solver(self, lp, solver):
+        assert solver.lp is lp
+        assert solver.g is lp.g
+        assert solver.model is lp.model
+        assert solver.model_type == lp.model_type
+
+    def test_solver_to_analysis(self, solver, analysis):
+        assert analysis.solver is solver
+        assert analysis.g is solver.g
+        assert analysis.model is solver.model
+        assert analysis.model_type == solver.model_type
+        assert analysis.results is solver.results
+
+    def test_analysis_to_graph_metrics(self, analysis, graph_metrics):
+        assert graph_metrics.analysis is analysis
+        assert graph_metrics.solver is analysis.solver
+        assert graph_metrics.g is analysis.g
+        assert graph_metrics.results is analysis.results
+
+    def test_analysis_to_graph_ml(self, analysis, graph_ml):
+        assert graph_ml.analysis is analysis
+        assert graph_ml.g is analysis.g
+        assert graph_ml.df is not None
+        assert graph_ml.node_X is not None
+
+
+class TestPipelineDataFlow:
+
+    def test_solver_results_reach_analysis(self, solver, analysis):
+        assert analysis.results == solver.results
+        assert analysis.node_results == solver.results.get("node_results", {},)
+        assert analysis.edge_results == solver.results.get("edge_results", {},)
+        assert analysis.metrics == solver.results.get("metrics", {},)
+
+    def test_analysis_data_reaches_graph_metrics(self, analysis, graph_metrics,):
+        info = graph_metrics.graph_info()
+        assert info["nodes"] == analysis.g.number_of_nodes()
+        assert info["edges"] == analysis.g.number_of_edges()
+
+    def test_graph_metrics_produces_node_features(self, graph_metrics,):
+        df = graph_metrics.node_features()
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == graph_metrics.g.number_of_nodes()
+        assert "node" in df.columns
+        assert df["node"].is_unique
+
+    def test_graph_ml_consumes_node_features(self, graph_ml,):
+        assert isinstance(graph_ml.node_X, pd.DataFrame)
+        assert len(graph_ml.node_X) == graph_ml.g.number_of_nodes()
+        assert "node" in graph_ml.node_X.columns
+
+
+class TestPipelineAnalysis:
+
+    def test_analysis_summary(self, analysis):
+        summary = analysis.summary()
+
+        assert isinstance(summary, dict)
+        assert summary["model_type"] == "max_flow"
+        assert "objective_value" in summary
+        assert "status" in summary
+        assert "termination_condition" in summary
+
+    def test_analysis_accessors(self, analysis):
+        assert analysis.get_node_results() is analysis.node_results
+        assert analysis.get_edge_results() is analysis.edge_results
+        assert analysis.get_metrics() is analysis.metrics
+
+    def test_cut_analysis(self, analysis):
+        cut_edges = analysis.get_cut_edges()
+
+        assert isinstance(cut_edges, list)
+
+    def test_objective_is_numeric(self, analysis):
+        objective = analysis.get_objective_value()
+
+        assert objective is not None
+        assert np.isfinite(objective)
+
+
+class TestPipelineML:
+
+    def test_simulation_matrix(self, graph_ml,):
+        X, y = graph_ml.get_simulation_matrix()
+        assert isinstance(X, pd.DataFrame)
+        assert isinstance(y, pd.Series)
+        assert len(X) == len(graph_ml.df)
+        assert len(y) == len(graph_ml.df)
+        assert len(X.columns) > 0
+
+    def test_target_matrices(self, graph_ml,):
+        node_y, edge_y = graph_ml.target_matrices()
+        assert isinstance(node_y, pd.DataFrame)
+        assert isinstance(edge_y, pd.DataFrame)
+        assert graph_ml.node_y is not None
+        assert graph_ml.edge_y is not None
+
+    def test_node_clustering(self, graph_ml,):
+        result = graph_ml.cluster_nodes(n_clusters=2, method="kmeans", random_state=123,)
+        assert isinstance(result, pd.DataFrame)
+        assert set(result.columns) == {"node", "cluster"}
+        assert len(result) == graph_ml.g.number_of_nodes()
+
+    def test_random_forest(self, graph_ml,):
+        importance = graph_ml.fit_random_forest(n_estimators=20, test_size=0.25, random_state=123,)
+        assert isinstance(importance, pd.DataFrame)
+        assert "component" in importance.columns
+        assert "importance" in importance.columns
+        assert graph_ml.rf_model is not None
+
+    def test_permutation_importance(self, graph_ml,):
+        graph_ml.fit_random_forest(n_estimators=20, test_size=0.25, random_state=123,)
+        importance = graph_ml.get_permutation_importance(n_repeats=2, random_state=123,)
+        assert isinstance(importance, pd.DataFrame)
+        expected_columns = {"component", "importance_mean", "importance_std",}
+        assert expected_columns.issubset(importance.columns)
+
+
+class TestPipelineVisualization:
+
+    def test_graph_drawer_consumes_solver(self, solver,):
+        drawer = GraphDrawer(solver)
+        assert drawer.solver is solver
+        assert drawer.g is solver.g
+        assert drawer.model is solver.model
+        assert drawer.model_type == solver.model_type
+
+    def test_graph_drawer_default_mode(self, solver,):
+        drawer = GraphDrawer(solver)
+        expected_mode = GraphDrawer.DEFAULT_DRAWING_MODE[solver.model_type]
+        assert expected_mode in GraphDrawer.DRAWING_CONFIG
+        assert solver.model_type in GraphDrawer.DRAWING_CONFIG[expected_mode]["models"]
+
+
+class TestFullPipeline:
+
+    def test_complete_pipeline(self, toy_graph, lp, solver, analysis, graph_metrics, graph_ml,):
+
+        # ToyGraph
+        assert toy_graph.G.number_of_nodes() > 0
+        # LP
+        assert lp.model is not None
+        # Solver
+        assert solver.results is not None
+        # Analysis
+        summary = analysis.summary()
+        assert summary["model_type"] == "max_flow"
+
+        # GraphMetrics
+        info = graph_metrics.graph_info()
+        node_features = graph_metrics.node_features()
+        assert info["nodes"] == len(node_features)
+        assert node_features["node"].is_unique
+        # GraphML
+        X, y = graph_ml.get_simulation_matrix()
+        assert len(X) == len(y)
+        assert len(X) == len(graph_ml.df)
+        assert graph_ml.node_X is not None
+
+    def test_pipeline_preserves_graph_structure(self, toy_graph, lp, solver, analysis, graph_metrics, graph_ml):
+        expected_nodes = set(toy_graph.G.nodes())
+        expected_edges = set(toy_graph.G.edges())
+        for component in [lp, solver, analysis, graph_metrics, graph_ml]:
+            assert expected_nodes.issubset(set(component.g.nodes()))
+            assert expected_edges.issubset(set(component.g.edges()))
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+tests\test_solver.py
+File type: .py
+import networkx as nx
+import pytest
+
+from toy_models.create import ToyGraph
+from models import LP, Solver
+
+
+class TestSolver:
+
+    def test_initialization(self):
+        toy = ToyGraph()
+        lp = LP(toy)
+
+        solver = Solver(lp)
+
+        assert solver.lp is lp
+        assert solver.g is lp.g
+        assert solver.model is lp.model
+        assert solver.model_type == lp.model_type
+
+    def test_solver_has_solution_result(self):
+        toy = ToyGraph()
+        lp = LP(toy)
+
+        solver = Solver(lp)
+
+        assert solver.solver_result is not None
+
+    def test_max_flow_solves(self):
+        toy = ToyGraph()
+        lp = LP(toy, model_type="max_flow")
+
+        solver = Solver(lp)
+
+        assert solver.solver_result is not None
+        assert solver.results is not None
+
+    def test_min_cut_solves(self):
+        toy = ToyGraph()
+        lp = LP(toy, model_type="min_cut")
+
+        solver = Solver(lp)
+
+        assert solver.solver_result is not None
+        assert solver.results is not None
+
+    def test_node_interdiction_solves(self):
+        toy = ToyGraph()
+        lp = LP(toy, model_type="node_interdiction")
+
+        solver = Solver(lp)
+
+        assert solver.solver_result is not None
+        assert solver.results is not None
+
+    def test_results_are_built_after_solving(self):
+        toy = ToyGraph()
+        lp = LP(toy)
+
+        solver = Solver(lp)
+
+        assert isinstance(solver.results, dict)
+
+    def test_graph_matches_lp(self):
+        toy = ToyGraph()
+        lp = LP(toy)
+
+        solver = Solver(lp)
+
+        assert solver.g is lp.g
+        assert set(solver.g.nodes) == set(lp.g.nodes)
+        assert set(solver.g.edges) == set(lp.g.edges)
+
+    def test_model_matches_lp(self):
+        toy = ToyGraph()
+        lp = LP(toy)
+
+        solver = Solver(lp)
+
+        assert solver.model is lp.model
+
+    def test_solver_from_lp_solve(self):
+        toy = ToyGraph()
+        lp = LP(toy)
+
+        solver = lp.solve()
+
+        assert isinstance(solver, Solver)
+        assert solver.lp is lp
+        assert solver.solver_result is not None
+        assert solver.results is not None
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+tests\test_toy_graph.py
+File type: .py
+from toy_models.create import ToyGraph
+def test_toy_graph_creation():
+    toy = ToyGraph()
+    assert toy.G is not None
+    assert toy.G.number_of_nodes() > 0
+    assert toy.G.number_of_edges() > 0
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+toy_models\create.py
+File type: .py
+import networkx as nx
+import numpy as np
+
+class ToyGraph:
+    def __init__(self, layer_list=None, is_fully_connected=True, graph_type='DiGraph', seed=123, p=0.75):
+        self.G = nx.Graph() if graph_type != 'DiGraph' else nx.DiGraph() 
+        self.layer_list = [1,2,2,1] if layer_list is None else layer_list 
+        self.is_fully_connected = True if is_fully_connected == True else False  
+        self.seed = seed 
+        self.generate_p = p 
+        self.create_layers()
+        self.assign_properties()
+
+    def create_layers(self, node_id=0):
+        self.layers_by_idx = []
+        for i, size in enumerate(self.layer_list):
+            layer = []
+            for _ in range(size):
+                self.G.add_node(node_id, layer=i)
+                layer.append(node_id)
+                node_id += 1
+            self.layers_by_idx.append(layer)
+
+        for i in range(len(self.layers_by_idx)-1):
+            for u in self.layers_by_idx[i]:
+                for v in self.layers_by_idx[i+1]:
+                    if self.is_fully_connected == True:
+                        self.G.add_edge(u,v)
+                    else:
+                        rng = np.random(seed=self.seed)
+                        if rng.random() <= self.generate_p:
+                            self.G.add_edge(u,v)
+
+    def assign_properties(self):
+        largest_layer = max(self.layer_list)
+        layers = self.layers_by_idx
+        self.total_demand = np.random.randint(largest_layer, 3 * largest_layer)
+        self.layer_0_nodes = [n for n in self.G.nodes() if self.G.nodes[n]['layer'] == 0]
+        self.layer_n_nodes = [n for n in self.G.nodes() if self.G.nodes[n]['layer'] == len(layers) - 1]
+        self.roles = ['A', 'B', 'C']
+        self.power = ['low', 'medium', 'high']
+        self._demand_assignment()
+        self._node_data_assignment()
+        self._edge_data_assignment()
+
+    def _demand_assignment(self):
+        for n in self.G.nodes():
+            self.G.nodes[n]['demand'] = 0
+        while -sum(self.G.nodes[n]['demand'] for n in self.layer_0_nodes) < self.total_demand:
+            for n in self.layer_0_nodes:
+                if -sum(self.G.nodes[n]['demand'] for n in self.layer_0_nodes) == self.total_demand:
+                    break
+                if n in self.layers_by_idx[0]:  # Source layer
+                    self.G.nodes[n]['demand'] -= np.random.randint(0, 2)
+        while sum(self.G.nodes[n]['demand'] for n in self.layer_n_nodes) < self.total_demand:
+            for n in self.layer_n_nodes:
+                if sum(self.G.nodes[n]['demand'] for n in self.layer_n_nodes) == self.total_demand:
+                    break
+                if n in self.layers_by_idx[-1]:  # Sink layer
+                    self.G.nodes[n]['demand'] += np.random.randint(0, 2)
+
+    def _node_data_assignment(self, layer_role_assign=None, solid_layers=[]):
+        for n in self.G.nodes():
+            self.G.nodes[n]['probability1'] = np.random.uniform(0.6, 1)
+            self.G.nodes[n]['probability2'] = np.random.uniform(0.6, 1)
+            self.G.nodes[n]['cost'] = np.random.randint(1, 10)
+            self.G.nodes[n]['loc_region'] = (-5,5)
+            self.G.nodes[n]['loc'] = (np.random.uniform(-5, 5), np.random.uniform(-5,5))
+            if self.G.nodes[n]['layer'] in solid_layers:
+                    self.G.nodes[n]['probability1'] = 0.99
+                    self.G.nodes[n]['probability2'] = 0.99
+                    self.G.nodes[n]['power'] = self.power
+                    self.G.nodes[n]['role'] = ['A', 'B', 'C']
+            else:
+                self.G.nodes[n]['power'] = np.random.choice(self.power, size=np.random.randint(1, len(self.power)+1), replace=False).tolist()
+                if not layer_role_assign:
+                    self.G.nodes[n]['role'] = np.random.choice(self.roles, size=np.random.randint(2, len(self.power)+1), replace=False).tolist()
+                else:
+                    self.G.nodes[n]['role'] = layer_role_assign[self.G.nodes[n]['layer']]
+                    self.G.nodes[n]['power'] = np.random.choice(self.power, size=2, replace=False).tolist()
+
+    def _edge_data_assignment(self, constant_capacity=False):
+            for u, v in self.G.edges():
+                self.G.edges[u, v]['performance'] = np.random.rand()*100
+                self.G.edges[u, v]['cost'] = np.random.rand()*100
+                if constant_capacity == True:
+                    self.G.edges[u, v]['capacity'] = 1
+                else:
+                    self.G.edges[u,v]['capacity'] = np.random.randint(1, 6)
+
+
+
+
+
+
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------

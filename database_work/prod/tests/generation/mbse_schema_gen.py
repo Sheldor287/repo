@@ -1,10 +1,16 @@
 from __future__ import annotations
-import os
+import os, sys
+from pathlib import Path
 import random
 from uuid import uuid4
 from sqlalchemy import create_engine, func, select
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import CreateSchema
+
+# Locate repository root
+repo_root = Path(__file__).resolve().parents[4]/"prod/backend"
+sys.path.insert(0, str(repo_root))
+
 from prod.backend.app.models.database import MBSE
 from prod.backend.app.models.enum_objects import GovernanceStatus, RecordType
 from prod.backend.app.models.mbse.engineering_model import EngineeringModel
