@@ -1,142 +1,144 @@
 from __future__ import annotations
 
+import csv
 import hashlib
 import io
-from datetime import datetime, timezone
+from datetime import datetime
 from uuid import UUID
 
-from isort import file
-import pandas as pd
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-
-from app.models.database import get_db
+from app.db.session import get_db
+from app.models.enum_objects import GovernanceStatus, ValidationStatus
 from app.models.ingest import StagingRecord, StagingUpload
-from models.enum_objects import ValidationStatus as Status
 
-router = APIRouter(prefix="/api/ingest", tags=["ingest"],)
+router = APIRouter(prefix="/api/ingest", tags=["ingest"])
+
+EXPECTED_COLUMNS = [
+    "uuid",
+    "name",
+    "phone",
+    "job",
+    "vin",
+    "city",
+    "governance_status",
+    "created_at",
+]
+
+
+def parse_csv(content: bytes) -> list[dict[str, str]]:
+    """Parse and validate the prototype CSV contract before writing anything."""
+    try:
+        text = content.decode("utf-8-sig")
+    except UnicodeDecodeError as exc:
+        raise HTTPException(status_code=400, detail="CSV must be UTF-8 encoded") from exc
+
+    reader = csv.DictReader(io.StringIO(text, newline=""))
+    if reader.fieldnames != EXPECTED_COLUMNS:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "message": "CSV columns do not match the expected contract",
+                "expected_columns": EXPECTED_COLUMNS,
+                "received_columns": reader.fieldnames,
+            },
+        )
+
+    records: list[dict[str, str]] = []
+    seen_uuids: set[UUID] = set()
+    for row_number, row in enumerate(reader, start=2):
+        if None in row or any(value is None for value in row.values()):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Row {row_number} has a different number of columns",
+            )
+        values = {column: (row[column] or "").strip() for column in EXPECTED_COLUMNS}
+        missing = [column for column, value in values.items() if not value]
+        if missing:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Row {row_number} has empty values for: {', '.join(missing)}",
+            )
+
+        try:
+            record_uuid = UUID(values["uuid"])
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=400, detail=f"Row {row_number} has an invalid UUID"
+            ) from exc
+        if record_uuid in seen_uuids:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Row {row_number} duplicates UUID {record_uuid}",
+            )
+        seen_uuids.add(record_uuid)
+
+        if values["governance_status"] not in GovernanceStatus.__members__:
+            allowed = ", ".join(GovernanceStatus.__members__)
+            raise HTTPException(
+                status_code=400,
+                detail=f"Row {row_number} has invalid governance_status; use: {allowed}",
+            )
+        try:
+            datetime.fromisoformat(values["created_at"])
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Row {row_number} has an invalid created_at timestamp",
+            ) from exc
+        records.append(values)
+
+    if not records:
+        raise HTTPException(status_code=400, detail="CSV contains no data rows")
+    return records
+
+
 @router.post("/upload")
-async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db),):
-    if not file.filename:
-        raise HTTPException(status_code=400, detail="Filename is required")
-    if not file.filename.lower().endswith(".csv"):
+async def upload_csv(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+) -> dict[str, object]:
+    filename = file.filename or ""
+    if not filename.lower().endswith(".csv"):
         raise HTTPException(status_code=400, detail="CSV file is required")
-    # Read the file content into memory
+
     content = await file.read()
     if not content:
         raise HTTPException(status_code=400, detail="File content is required")
-    # File validation
-    file_hash = hashlib.sha256(content).hexdigest()
-    # Parse
-    try: 
-        df = pd.read_csv(io.BytesIO(content))
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Invalid CSV file: {e}")
+    records = parse_csv(content)
 
-class IngestService:
-    def __init__(self, prefix="api/ingest", tags=["ingest"], db: Session = Depends(get_db)):
-        self.prefix = prefix
-        self.tags = tags
-        self.db = db
+    upload = StagingUpload(
+        filename=filename,
+        status=ValidationStatus.VALIDATED,
+        record_count=len(records),
+        file_hash=hashlib.sha256(content).hexdigest(),
+    )
+    try:
+        with db.begin():
+            db.add(upload)
+            db.flush()
+            for row_number, values in enumerate(records, start=2):
+                db.add(
+                    StagingRecord(
+                        upload_uuid=upload.uuid,
+                        record_uuid=UUID(values["uuid"]),
+                        row_number=row_number,
+                        validation_status=ValidationStatus.VALIDATED,
+                        raw_data=values,
+                    )
+                )
+    except IntegrityError as exc:
+        raise HTTPException(
+            status_code=409,
+            detail="The upload conflicts with an existing staged record",
+        ) from exc
 
-    def set_file(self, file: UploadFile):
-        self.file = file
-
-    def get_router(self):
-        return APIRouter(prefix=self.prefix, tags=self.tags)
-
-    def get_file(self):
-        router = self.get_router()
-        @router.post("/upload")
-        async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db),):
-            self.set_file(file)
-            self._name_validation(file)
-            content = await file.read()
-            self._content_validation(content)
-            self.file_hash = hashlib.sha256(content).hexdigest()
-            try:
-                df = pd.read_csv(io.BytesIO(content))
-            except Exception as e:
-                raise HTTPException(status_code=400, detail=f"Invalid CSV file: {e}")
-            self._schema_validation(df)
-            self._uuid_validation(df)
-            # df has been promoted to an attribute after passing validation
-            record = self.create_staging_record()
-            return record
-        return router
-        
-    def create_staging_record(self):
-        upload = StagingUpload(
-            filename=self.file.filename,
-            uploaded_at=datetime.now(timezone.utc),
-            status=Status.VALIDATED,
-            record_count=len(self.df),
-            file_hash=self.file_hash,
-            )
-        self.db.add(upload)
-        self.db.flush()
-
-        for index, row in self.df.iterrows():
-            record = StagingRecord(
-                upload_uuid = upload.uuid,
-                record_uuid = UUID(str(row["uuid"])),
-                row_number = index+2,
-                validation_status=Status.PENDING,
-                raw_data = row.to_dict(),
-            )
-            self.db.add(record)
-        self.db.commit()
-        return {
+    return {
         "upload_uuid": str(upload.uuid),
         "filename": upload.filename,
         "record_count": upload.record_count,
-        "status": upload.status,
+        "status": upload.status.value,
         "file_hash": upload.file_hash,
     }
-
-    def _name_validation(self, file: UploadFile):
-        if not file.filename:
-            raise HTTPException(status_code=400, detail="Filename is required")
-        if not file.filename.lower().endswith(".csv"):
-            raise HTTPException(status_code=400, detail="CSV file is required")
-
-    def _content_validation(self, content: bytes):
-        if not content:
-            raise HTTPException(status_code=400, detail="File content is required")
-
-    def _schema_validation(self, df: pd.DataFrame):
-        if not all(column in df.columns for column in self.expected_columns):
-            raise HTTPException(status_code=400, detail="Invalid CSV schema")
-        self.df = df[self.expected_columns] 
-
-    def _uuid_validation(self, df: pd.DataFrame):
-        invalid_uuid_rows = []
-        for index, value in df["uuid"].items():
-            try:
-                UUID(str(value))
-            except (ValueError, TypeError, AttributeError):
-                invalid_uuid_rows.append(index+2)
-        if invalid_uuid_rows:
-            raise HTTPException(status_code=400, detail="Invalid UUID values")
-
-        duplicate_uuids = (df.loc[df["uuid"].duplicated(keep=False), "uuid"] .astype(str) .unique() .tolist())
-        if duplicate_uuids:
-            raise HTTPException(status_code=400, detail="Duplicate UUID values")
-
-
-class TestIngestion(IngestService):
-    def __init__(self):
-        super().__init__()
-        self.expected_columns = [
-            'uuid',
-            'name',
-            'phone',
-            'job',
-            'vin',
-            'city',
-            'governance_status',
-            'created_at'
-            ]
-
-

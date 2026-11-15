@@ -29,7 +29,7 @@
 </head>
 
 <body>
-<h1>TEST Data Ingestion</h1>
+<h1>Prototype Data Ingestion</h1>
 <h2>Upload CSV</h2>
 <form id="upload-form">
     <div class="upload-box">
@@ -108,12 +108,16 @@ function showError(message) {
 
 function addStagingRow(upload) {
     const row = document.createElement("tr");
-    row.innerHTML = `
-        <td>${upload.filename}</td>
-        <td>${upload.record_count}</td>
-        <td>${upload.status}</td>
-        <td>${upload.upload_uuid}</td>
-    `;
+    for (const value of [
+        upload.filename,
+        upload.record_count,
+        upload.status,
+        upload.upload_uuid,
+    ]) {
+        const cell = document.createElement("td");
+        cell.textContent = String(value);
+        row.appendChild(cell);
+    }
     stagingBody.prepend(row);
 }
 </script>

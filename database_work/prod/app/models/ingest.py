@@ -1,10 +1,11 @@
 from __future__ import annotations
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, JSON, Text, Uuid
+from sqlalchemy import DateTime, Enum, ForeignKey, Integer, JSON, Text, Uuid, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from enum_objects import ValidationStatus as Status
 from datetime import datetime, timezone
-from uuid import UUID, uuid4
-from database import Base
+from uuid import UUID
+
+from .database import Base
+from .enum_objects import ValidationStatus
 
 
 class StagingUpload(Base):
@@ -22,10 +23,10 @@ class StagingUpload(Base):
         default=lambda: datetime.now(timezone.utc),
     )
 
-    status: Mapped[str] = mapped_column(
-        Enum(Status),
+    status: Mapped[ValidationStatus] = mapped_column(
+        Enum(ValidationStatus, native_enum=False),
         nullable=False,
-        default=Status.PENDING,
+        default=ValidationStatus.PENDING,
     )
 
     record_count: Mapped[int] = mapped_column(
@@ -47,6 +48,9 @@ class StagingUpload(Base):
 
 class StagingRecord(Base):
     __tablename__ = "staging_record"
+    __table_args__ = (
+        UniqueConstraint("upload_uuid", "record_uuid", name="uq_staging_record_upload_record"),
+    )
     """
     Represents a single record within a staging upload
     
@@ -57,7 +61,7 @@ class StagingRecord(Base):
     """
 
     upload_uuid: Mapped[UUID] = mapped_column(
-        Uuid,
+        Uuid(as_uuid=True),
         ForeignKey(
             "staging_upload.uuid",
         ),
@@ -74,10 +78,10 @@ class StagingRecord(Base):
         nullable=False,
     )
 
-    validation_status: Mapped[str] = mapped_column(
-        Enum(Status),
+    validation_status: Mapped[ValidationStatus] = mapped_column(
+        Enum(ValidationStatus, native_enum=False),
         nullable=False,
-        default=Status.PENDING,
+        default=ValidationStatus.PENDING,
     )
 
     raw_data: Mapped[dict] = mapped_column(
