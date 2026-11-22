@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Transportation Optimization</title>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        svg {
+            border: 1px solid #ddd;
+        }
+
+        .route {
+            stroke: #999;
+            fill: none;
+        }
+
+        .route-used {
+            stroke: steelblue;
+        }
+
+        .plant {
+            fill: lightblue;
+            stroke: black;
+        }
+
+        .warehouse {
+            fill: lightgreen;
+            stroke: black;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Transportation Optimization</h1>
+
+<div id="objective"></div>
+
+<svg id="network" width="1200" height="700"></svg>
+
+<script src="visualization.js"></script>
+
+</body>
+</html>
