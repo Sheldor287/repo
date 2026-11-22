@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ERP Common Operating Picture</title>
+  <style>
+    :root { color-scheme: light; --ink:#182536; --muted:#5e6d7e; --line:#d7dee7; --panel:#fff; --blue:#1d5c91; --pale:#f2f6fa; }
+    * { box-sizing:border-box; }
+    body { margin:0; font:15px/1.45 system-ui,Segoe UI,sans-serif; color:var(--ink); background:#edf1f5; }
+    header { background:#17324e; color:white; padding:22px max(24px,calc((100% - 1280px)/2)); }
+    header h1 { margin:0 0 4px; font-size:24px; } header p { margin:0; color:#d5e2ee; }
+    main { max-width:1280px; margin:24px auto; padding:0 20px; }
+    .toolbar,.cards,.columns { display:grid; gap:14px; } .toolbar { grid-template-columns:1fr 1fr; align-items:end; margin-bottom:16px; }
+    .cards { grid-template-columns:repeat(3,minmax(0,1fr)); margin-bottom:18px; }
+    .columns { grid-template-columns:minmax(330px, .85fr) minmax(0,1.6fr); align-items:start; }
+    .panel,.card { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:18px; box-shadow:0 1px 2px #1020300c; }
+    .card small { color:var(--muted); display:block; } .card strong { display:block; font-size:28px; margin-top:4px; }
+    h2 { margin:0 0 12px; font-size:18px; } h3 { margin:17px 0 7px; font-size:15px; }
+    label { display:block; font-weight:600; margin:10px 0 4px; } input,select,textarea { width:100%; border:1px solid #aebbc9; border-radius:5px; padding:9px; font:inherit; background:white; color:var(--ink); }
+    textarea { min-height:220px; font:13px/1.45 Consolas,monospace; }
+    button { border:0; border-radius:5px; padding:9px 13px; color:white; background:var(--blue); font:inherit; cursor:pointer; }
+    button.secondary { color:var(--ink); background:#e3eaf1; } button.reject { background:#91413f; } button:disabled { opacity:.5; cursor:default; }
+    .row { display:flex; gap:8px; align-items:center; } .row > * { flex:1; }
+    .muted { color:var(--muted); } .message { min-height:22px; margin:9px 0; } .error { color:#a21d1d; } .success { color:#126235; }
+    .queue-item { border-top:1px solid var(--line); padding:12px 0; } .queue-item:first-child { border-top:0; }
+    .queue-item p { margin:4px 0; overflow-wrap:anywhere; } .queue-actions { display:flex; gap:8px; margin-top:8px; }
+    .table-wrap { overflow:auto; max-height:620px; } table { border-collapse:collapse; width:100%; font-size:13px; }
+    th,td { border-bottom:1px solid var(--line); padding:8px; text-align:left; vertical-align:top; } th { position:sticky; top:0; background:var(--pale); }
+    code { overflow-wrap:anywhere; } .contract { color:var(--muted); font-size:13px; }
+    @media (max-width:850px) { .columns { grid-template-columns:1fr; } .cards { grid-template-columns:1fr; } }
+    @media (max-width:600px) { .toolbar { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<header>
+  <h1>ERP Common Operating Picture</h1>
+  <p>Program-centered mock records across engineering, delivery, supply chain, contracts and finance.</p>
+</header>
+<main>
+  <section class="toolbar">
+    <div><label for="domain-filter">Domain view</label><select id="domain-filter"><option value="">All domains</option></select></div>
+    <div><label for="program-filter">Program view</label><input id="program-filter" placeholder="All programs; enter a program code to filter"></div>
+  </section>
+  <section class="cards">
+    <div class="card"><small>Current representations</small><strong id="record-count">0</strong></div>
+    <div class="card"><small>Programs represented</small><strong id="program-count">0</strong></div>
+    <div class="card"><small>Functional areas</small><strong id="area-count">0</strong></div>
+  </section>
+  <section class="columns">
+    <div>
+      <section class="panel">
+        <h2>Submit a domain batch</h2>
+        <p class="contract">JSON batches are checked against the selected notional contract, retained in staging with a content hash, then reviewed at batch level.</p>
+        <label for="entity-type">Record type</label><select id="entity-type"></select>
+        <div id="contract-hint" class="contract"></div>
+        <label for="source-system">Source system</label><input id="source-system" value="ERP Mock UI">
+        <label for="batch-json">Records JSON</label><textarea id="batch-json" spellcheck="false">[
+  {
+    "source_record_id": "ORG-001",
+    "data": {
+      "name": "Demo Organization",
+      "organization_code": "ORG-001",
+      "description": "Starter record for the ERP mock model",
+      "status": "active"
+    }
+  }
+]</textarea>
+        <button id="stage-button">Validate and stage batch</button>
+        <div id="stage-message" class="message" aria-live="polite"></div>
+      </section>
+      <section class="panel" style="margin-top:14px">
+        <h2>Governance review queue</h2>
+        <label for="reviewer">Reviewer</label><input id="reviewer" placeholder="Name or role (prototype only)">
+        <label for="reason">Decision reason</label><input id="reason" placeholder="Required for approval or rejection">
+        <div id="queue" class="muted">Loading staged batches…</div>
+      </section>
+    </div>
+    <section class="panel">
+      <h2>Promoted domain records</h2>
+      <div id="record-summary" class="muted">Organization-wide view</div>
+      <label style="font-weight:400"><input id="show-history" type="checkbox" style="width:auto"> Include earlier revisions</label>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Area / type</th><th>Program</th><th>Record</th><th>Rev</th><th>Authority</th><th>Source</th><th>Promoted</th><th>Details</th></tr></thead>
+        <tbody id="records"></tbody>
+      </table></div>
+    </section>
+  </section>
+</main>
+<script>
+let catalog = [];
+const byId = id => document.getElementById(id);
+const setMessage = (element, message, kind = "") => { element.textContent = message; element.className = `message ${kind}`; };
+
+async function loadCatalog() {
+  catalog = await (await fetch("/api/domains")).json();
+  const domainFilter = byId("domain-filter");
+  for (const domain of catalog) {
+    const option = document.createElement("option"); option.value = domain.key; option.textContent = domain.label; domainFilter.appendChild(option);
+  }
+  const entitySelect = byId("entity-type");
+  for (const domain of catalog) for (const entity of domain.entities) {
+    const option = document.createElement("option"); option.value = entity.key; option.textContent = `${domain.label} · ${entity.key}`; entitySelect.appendChild(option);
+  }
+  entitySelect.addEventListener("change", showContract);
+  showContract();
+}
+
+function showContract() {
+  const entity = catalog.flatMap(domain => domain.entities).find(item => item.key === byId("entity-type").value);
+  if (!entity) return;
+  byId("contract-hint").textContent = `Required: ${entity.required.join(", ")} · Contract v${entity.contract_version}`;
+}
+
+async function refresh() {
+  const [overviewResponse, recordsResponse, uploadsResponse] = await Promise.all([
+    fetch("/api/overview"),
+    fetch(`/api/records?history=${byId("show-history").checked}&limit=500${byId("domain-filter").value ? `&domain=${encodeURIComponent(byId("domain-filter").value)}` : ""}${byId("program-filter").value.trim() ? `&program_code=${encodeURIComponent(byId("program-filter").value.trim())}` : ""}`),
+    fetch("/api/ingest/uploads"),
+  ]);
+  const overview = await overviewResponse.json();
+  const records = await recordsResponse.json();
+  const uploads = await uploadsResponse.json();
+  byId("record-count").textContent = overview.record_count;
+  byId("program-count").textContent = overview.program_count;
+  byId("area-count").textContent = Object.keys(overview.domain_counts).length;
+  byId("record-summary").textContent = `${byId("domain-filter").selectedOptions[0]?.textContent || "All domains"} · ${byId("program-filter").value.trim() || "All programs"} · ${records.length} ${byId("show-history").checked ? "record versions" : "current records"} shown`;
+  renderRecords(records);
+  renderQueue(uploads.filter(item => item.domain));
+}
+
+function renderRecords(records) {
+  const body = byId("records"); body.replaceChildren();
+  for (const record of records) {
+    const row = document.createElement("tr");
+    const values = [
+      `${record.domain} / ${record.entity_type}`, record.program_code || "—",
+      `${record.display_name} (${record.source_record_id})`, record.revision, `${record.authority_status}${record.authoritative_system ? ` · ${record.authoritative_system}` : ""}`,
+      record.source_system, new Date(record.promoted_at).toLocaleString(), JSON.stringify(record.data),
+    ];
+    for (const value of values) { const cell = document.createElement("td"); cell.textContent = String(value); row.appendChild(cell); }
+    body.appendChild(row);
+  }
+}
+
+function renderQueue(uploads) {
+  const queue = byId("queue"); queue.replaceChildren();
+  const pending = uploads.filter(upload => upload.validation_status === "VALIDATED" && upload.governance_status === "PENDING");
+  for (const upload of pending) {
+    const item = document.createElement("div"); item.className = "queue-item";
+    const title = document.createElement("strong"); title.textContent = `${upload.entity_type} · ${upload.record_count} records`;
+    const details = document.createElement("p"); details.textContent = `Source: ${upload.source_system} · Hash: ${upload.file_hash}`;
+    const id = document.createElement("p"); id.textContent = `Batch ${upload.upload_uuid}`;
+    const actions = document.createElement("div"); actions.className = "queue-actions";
+    for (const decision of ["APPROVED", "REJECTED"]) {
+      const button = document.createElement("button"); button.textContent = decision === "APPROVED" ? "Approve and promote" : "Reject";
+      if (decision === "REJECTED") button.className = "reject";
+      button.addEventListener("click", () => decide(upload.upload_uuid, decision)); actions.appendChild(button);
+    }
+    item.append(title, details, id, actions); queue.appendChild(item);
+  }
+  for (const upload of uploads.filter(item => item.validation_status === "INVALID")) {
+    const item = document.createElement("div"); item.className = "queue-item";
+    const title = document.createElement("strong"); title.textContent = `${upload.entity_type} · INVALID · ${upload.record_count} records`;
+    const details = document.createElement("p"); details.textContent = upload.validation_errors.map(row => `row ${row.row_number}: ${row.errors.join("; ")}`).join(" | ");
+    item.append(title, details); queue.appendChild(item);
+  }
+  const completed = uploads.filter(item => item.governance_status === "APPROVED" || item.governance_status === "REJECTED");
+  for (const upload of completed) {
+    const item = document.createElement("div"); item.className = "queue-item";
+    const title = document.createElement("strong"); title.textContent = `${upload.entity_type} · ${upload.governance_status} · ${upload.promotion_status}`;
+    const decision = upload.decisions?.at(-1);
+    const details = document.createElement("p"); details.textContent = decision ? `${decision.decided_by}: ${decision.reason}` : "Decision record unavailable";
+    item.append(title, details); queue.appendChild(item);
+  }
+  if (!pending.length && !uploads.some(item => item.validation_status === "INVALID") && !completed.length) {
+    queue.textContent = "No domain batches have been submitted.";
+  } else if (!pending.length && !uploads.some(item => item.validation_status === "INVALID") && completed.length) {
+    const note = document.createElement("p"); note.className = "muted"; note.textContent = "No validated domain batches are awaiting review."; queue.prepend(note);
+  }
+}
+
+async function decide(uploadUuid, decision) {
+  const reviewer = byId("reviewer").value.trim(), reason = byId("reason").value.trim();
+  if (!reviewer || !reason) { alert("Enter a reviewer and reason before recording a governance decision."); return; }
+  const response = await fetch(`/api/ingest/uploads/${uploadUuid}/governance`, {
+    method: "POST", headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({decision, decided_by:reviewer, reason}),
+  });
+  const result = await response.json();
+  if (!response.ok) { alert(result.detail || "Governance decision failed."); return; }
+  await refresh();
+}
+
+byId("stage-button").addEventListener("click", async () => {
+  const message = byId("stage-message");
+  let records;
+  try { records = JSON.parse(byId("batch-json").value); }
+  catch (error) { setMessage(message, `JSON parse error: ${error.message}`, "error"); return; }
+  const entityType = byId("entity-type").value;
+  const entity = catalog.flatMap(domain => domain.entities).find(item => item.key === entityType);
+  const response = await fetch(`/api/ingest/domain/${encodeURIComponent(entityType)}`, {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({source_system:byId("source-system").value, contract_version:entity.contract_version, records}),
+  });
+  const result = await response.json();
+  if (!response.ok) { setMessage(message, result.detail || "Could not stage batch.", "error"); return; }
+  if (result.status === "INVALID") {
+    const errors = result.validation_errors.map(row => `row ${row.row_number}: ${row.errors.join("; ")}`).join(" | ");
+    setMessage(message, `Batch retained as INVALID. ${errors}`, "error");
+  } else setMessage(message, `Validated and staged ${result.record_count} ${entityType} records. Governance review is required before promotion.`, "success");
+  await refresh();
+});
+
+byId("domain-filter").addEventListener("change", () => refresh().catch(showLoadError));
+byId("program-filter").addEventListener("change", () => refresh().catch(showLoadError));
+byId("show-history").addEventListener("change", () => refresh().catch(showLoadError));
+function showLoadError(error) { console.error(error); byId("record-summary").textContent = "Could not load ERP records."; }
+
+loadCatalog().then(refresh).catch(showLoadError);
+</script>
+</body>
+</html>

@@ -25,6 +25,9 @@
         th {background: #f3f3f3;}
         .success {color: green;}
         .error {color: darkred;}
+        .actions {display: flex; gap: 8px;}
+        .review-controls {display: flex; gap: 8px; margin: 12px 0;}
+        .review-controls input {padding: 8px;}
     </style>
 </head>
 
@@ -43,12 +46,17 @@
 
 <div id="status"></div>
 <h2>Staging Area</h2>
+<div class="review-controls">
+    <input id="reviewer" type="text" placeholder="Reviewer name" required>
+    <input id="decision-reason" type="text" placeholder="Decision reason" required>
+</div>
 <table>
     <thead>
         <tr>
             <th>Filename</th>
             <th>Records</th>
-            <th>Status</th>
+            <th>Validation</th>
+            <th>Governance</th>
             <th>Upload UUID</th>
         </tr>
     </thead>
@@ -87,9 +95,9 @@ form.addEventListener("submit", async function(event) {
                 result.detail?.message || result.detail || "Upload failed."
             );
         }
-        showSuccess(`Successfully staged ${result.record_count} records.`);
+        showSuccess(`Successfully staged ${result.record_count} records. The batch is ready for governance review.`);
         form.reset();
-        addStagingRow(result);
+        await loadUploads();
     }
     catch (error) {
         showError(error.message);
@@ -106,20 +114,71 @@ function showError(message) {
     status.className = "error";
 }
 
+async function loadUploads() {
+    const response = await fetch("/api/ingest/uploads");
+    const uploads = await response.json();
+    stagingBody.replaceChildren();
+    for (const upload of uploads) addStagingRow(upload);
+}
+
 function addStagingRow(upload) {
     const row = document.createElement("tr");
     for (const value of [
         upload.filename,
         upload.record_count,
-        upload.status,
-        upload.upload_uuid,
+        upload.validation_status || upload.status,
     ]) {
         const cell = document.createElement("td");
         cell.textContent = String(value);
         row.appendChild(cell);
     }
-    stagingBody.prepend(row);
+    const governanceCell = document.createElement("td");
+    if ((upload.validation_status || upload.status) === "VALIDATED" && (upload.governance_status || "PENDING") === "PENDING") {
+        const actions = document.createElement("div");
+        actions.className = "actions";
+        for (const decision of ["APPROVED", "REJECTED"]) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.textContent = decision === "APPROVED" ? "Approve" : "Reject";
+            button.addEventListener("click", () => submitDecision(upload.upload_uuid, decision));
+            actions.appendChild(button);
+        }
+        governanceCell.appendChild(actions);
+    } else {
+        const latest = upload.decisions?.at(-1);
+        governanceCell.textContent = latest
+            ? `${latest.decision} by ${latest.decided_by}: ${latest.reason}`
+            : "No decision";
+    }
+    row.appendChild(governanceCell);
+    const uploadCell = document.createElement("td");
+    uploadCell.textContent = upload.upload_uuid;
+    row.appendChild(uploadCell);
+    stagingBody.appendChild(row);
 }
+
+async function submitDecision(uploadUuid, decision) {
+    const reviewer = document.getElementById("reviewer").value.trim();
+    const reason = document.getElementById("decision-reason").value.trim();
+    if (!reviewer || !reason) {
+        showError("Enter a reviewer name and decision reason first.");
+        return;
+    }
+    const response = await fetch(`/api/ingest/uploads/${uploadUuid}/governance`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({decision, decided_by: reviewer, reason}),
+    });
+    const result = await response.json();
+    if (!response.ok) {
+        showError(result.detail || "Governance decision failed.");
+        return;
+    }
+    showSuccess(`Batch ${result.governance_status.toLowerCase()}. Decision recorded for audit.`);
+    await loadUploads();
+}
+
+loadUploads().catch(() => showError("Could not load staged uploads."));
 </script>
 </body>
 </html>

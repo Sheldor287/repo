@@ -23,5 +23,14 @@ class ValidationStatus(str, enum.Enum):
     VALIDATED = "VALIDATED"
     INVALID = "INVALID"
     PENDING = "PENDING"
+    # Retained for reading legacy CSV rows; new domain batches keep governance
+    # and promotion state in their own columns.
     APPROVED = "APPROVED"
     REJECTED = "REJECTED"
+
+
+class PromotionStatus(str, enum.Enum):
+
+    NOT_PROMOTED = "NOT_PROMOTED"
+    PROMOTED = "PROMOTED"
+    FAILED = "FAILED"

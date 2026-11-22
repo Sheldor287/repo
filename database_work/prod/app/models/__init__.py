@@ -11,6 +11,7 @@ from .mbse.stereotype import Stereotype
 from .mbse.applied_stereotype import AppliedStereotype
 from .mbse.object_instance_property import ObjectInstanceProperty
 from .mbse.relationship_instance_property import RelationshipInstanceProperty
+from .ingest import DomainRecord
 
 __all__ = [
     "EngineeringModel",
@@ -25,4 +26,5 @@ __all__ = [
     "AppliedStereotype",
     "ObjectInstanceProperty",
     "RelationshipInstanceProperty",
+    "DomainRecord",
 ]
