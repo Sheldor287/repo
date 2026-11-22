@@ -1,14 +1,6 @@
-"""SQLAlchemy engine and request-scoped sessions.
-
-Set ``DATABASE_URL`` to select a database. The default is a local SQLite file.
-For example, PostgreSQL URLs can use ``postgresql+psycopg://...``.
-"""
-
 from __future__ import annotations
-
 import os
 from collections.abc import Generator
-
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine, make_url
 from sqlalchemy.orm import Session, sessionmaker

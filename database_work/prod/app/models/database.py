@@ -1,10 +1,8 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import MetaData, Uuid, Text, Enum, DateTime
+from sqlalchemy import MetaData, Uuid, Text, Enum, DateTime, VARCHAR
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
-
 from .enum_objects import GovernanceStatus, RecordType
-
 
 class Base(DeclarativeBase):
 
@@ -43,10 +41,32 @@ class GovernanceBase(Base):
 
     last_governance_review: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        #default=lambda: datetime.now(timezone.utc),
+        #nullable=True,
+    )
+
+class OrgStructureBase(Base):
+    __abstract__ = True
+
+    service: Mapped[str | None] = mapped_column(
+        Text,
         nullable=True,
     )
 
+    tier1: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    tier2: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    tier3: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
 
 class MBSE(Base):
     __abstract__ = True

@@ -1,0 +1,647 @@
+{"editor.fontFamily": "'JetBrains Mono', 'Fira Code', monospace",
+// Font size in pixels.
+"editor.fontSize": 13,
+// Controls the thickness of the font.
+"editor.fontWeight": "400",
+// Enables programming ligatures (e.g., =>, !=, >=).
+"editor.fontLigatures": true,
+// Number of spaces used for each indentation level.
+"editor.tabSize": 4,
+// Automatically inserts spaces instead of tab characters.
+"editor.insertSpaces": true,
+// Highlights the line where the cursor is located.
+"editor.renderLineHighlight": "all",
+// Displays line numbers.
+"editor.lineNumbers": "on",
+// Displays vertical indentation guides.
+"editor.guides.indentation": true,
+// Highlights matching brackets.
+"editor.bracketPairColorization.enabled": true,
+// Enables automatic bracket closing.
+"editor.autoClosingBrackets": "always",
+// ============================================================
+// 2. EDITOR APPEARANCE
+// ============================================================
+// Background color of the editor.
+"workbench.colorCustomizations": {
+    // Main editor background.
+    "editor.background": "#000000",
+    // Default text color.
+    "editor.foreground": "#CDD6F4",
+    // Current line background.
+    "editor.lineHighlightBackground": "#28283D",
+    // Line number color.
+    "editorLineNumber.foreground": "#6C7086",
+    // Active line number color.
+    "editorLineNumber.activeForeground": "#F5C2E7",
+    // Text selection background.
+    "editor.selectionBackground": "#45475A",
+    // Cursor color.
+    "editorCursor.foreground": "#49a7ff",
+    // Matching bracket border.
+    "editorBracketMatch.border": "#49a7ff",
+        // Cell status bar
+    "notebook.focusedCellShadow": "#000000",
+
+    // Notebook output
+    "notebook.outputContainerBackgroundColor": "#000000",
+
+    // Notebook selection
+    "notebook.selectedCellBackground": "#0b0b0f",
+
+    // Notebook scrollbar
+    "notebookScrollbarSlider.background": "#1b1b24",
+    "notebookScrollbarSlider.hoverBackground": "#585B70",
+    "notebookScrollbarSlider.activeBackground": "#6C7086",
+    // ========================================================
+    // 3. SIDEBAR AND EXPLORER
+    // ========================================================
+    // Sidebar background.
+    "sideBar.background": "#181825",
+    // Sidebar text.
+    "sideBar.foreground": "#CDD6F4",
+    // Sidebar section headers.
+    "sideBarSectionHeader.background": "#181825",
+    // Explorer indentation and tree guides.
+    "tree.indentGuidesStroke": "#45475A",
+    // Explorer item selection.
+    "list.activeSelectionBackground": "#313244",
+    // Explorer item text.
+    "list.activeSelectionForeground": "#F5C2E7",
+    // ========================================================
+    // 4. ACTIVITY BAR
+    // ========================================================
+    // Background of the vertical icon bar.
+    "activityBar.background": "#11111B",
+    // Default activity bar icon color.
+    "activityBar.foreground": "#CDD6F4",
+    // Active activity bar indicator.
+    "activityBar.activeBorder": "#F5C2E7",
+    // ========================================================
+    // 5. TITLE BAR
+    // ========================================================
+    // Window title bar background.
+    "titleBar.activeBackground": "#11111B",
+    // Window title bar text.
+    "titleBar.activeForeground": "#CDD6F4",
+    // ========================================================
+    // 6. TABS
+    // ========================================================
+    // Background of inactive tabs.
+    "tab.inactiveBackground": "#000000",
+    // Background of active tab.
+    "tab.activeBackground": "#000000",
+    // Text color of inactive tabs.
+    "tab.inactiveForeground": "#6C7086",
+    // Text color of active tab.
+    "tab.activeForeground": "#49a7ff",
+    // Border around the active tab.
+    "tab.activeBorderTop": "#49a7ff",
+    // ========================================================
+    // 7. STATUS BAR
+    // ========================================================
+    // Status bar background.
+    "statusBar.background": "#000000",
+    // Status bar text.
+    "statusBar.foreground": "#49a7ff",
+    // Background when debugging.
+    "statusBar.debuggingBackground": "#49a7ff",
+    // ========================================================
+    // 8. TERMINAL
+    // ========================================================
+    // Terminal background.
+    "terminal.background": "#000000",
+    // Terminal default text.
+    "terminal.foreground": "#CDD6F4",
+    // Terminal cursor.
+    "terminalCursor.foreground": "#49a7ff",
+    // Terminal ANSI colors.
+    "terminal.ansiBlack": "#45475A",
+    "terminal.ansiRed": "#F38BA8",
+    "terminal.ansiGreen": "#A6E3A1",
+    "terminal.ansiYellow": "#F9E2AF",
+    "terminal.ansiBlue": "#89B4FA",
+    "terminal.ansiMagenta": "#F5C2E7",
+    "terminal.ansiCyan": "#94E2D5",
+    "terminal.ansiWhite": "#BAC2DE",
+    // Bright ANSI colors.
+    "terminal.ansiBrightBlack": "#585B70",
+    "terminal.ansiBrightRed": "#F38BA8",
+    "terminal.ansiBrightGreen": "#A6E3A1",
+    "terminal.ansiBrightYellow": "#F9E2AF",
+    "terminal.ansiBrightBlue": "#89B4FA",
+    "terminal.ansiBrightMagenta": "#F5C2E7",
+    "terminal.ansiBrightCyan": "#94E2D5",
+    "terminal.ansiBrightWhite": "#A6ADC8"
+},
+// ============================================================
+// 9. SYNTAX HIGHLIGHTING
+// ============================================================
+// These settings control how different programming
+// language elements are displayed.
+
+"editor.tokenColorCustomizations": {
+    "textMateRules": [
+
+        // ----------------------------------------------------
+        // COMMENTS
+        // ----------------------------------------------------
+        // Python: # comment
+        // General: // comment, /* comment */
+
+        {
+            "scope": [
+                "comment",
+                "punctuation.definition.comment"
+            ],
+            "settings": {
+                "foreground": "#6C7086",
+                "fontStyle": "italic"
+            }
+        },
+
+        // ----------------------------------------------------
+        // KEYWORDS
+        // ----------------------------------------------------
+        // Examples: if, else, for, while, return, import,
+        // from, class, def, async, await
+
+        {
+            "scope": [
+                "keyword",
+                "storage.type",
+                "storage.modifier"
+            ],
+            "settings": {
+                "foreground": "#CBA6F7"
+            }
+        },
+
+        // ----------------------------------------------------
+        // STRINGS
+        // ----------------------------------------------------
+        // Examples: "hello", 'hello', `hello`
+
+        {
+            "scope": [
+                "string",
+                "string.quoted"
+            ],
+            "settings": {
+                "foreground": "#A6E3A1"
+            }
+        },
+
+        // ----------------------------------------------------
+        // NUMBERS
+        // ----------------------------------------------------
+        // Examples: 10, 3.14, 1000
+
+        {
+            "scope": [
+                "constant.numeric"
+            ],
+            "settings": {
+                "foreground": "#FAB387"
+            }
+        },
+
+        // ----------------------------------------------------
+        // BOOLEAN AND NULL VALUES
+        // ----------------------------------------------------
+        // Examples: True, False, None, null
+
+        {
+            "scope": [
+                "constant.language"
+            ],
+            "settings": {
+                "foreground": "#FAB387"
+            }
+        },
+
+        // ----------------------------------------------------
+        // MODULES AND NAMESPACES
+        // ----------------------------------------------------
+        // Examples: sqlalchemy, pandas, numpy, uuid
+        // Note: Requires the grammar to identify the token
+        // as a namespace or module.
+
+        {
+            "scope": [
+                "entity.name.namespace",
+                "support.module"
+            ],
+            "settings": {
+                "foreground": "#94E2D5",
+                "fontStyle": ""
+            }
+        },
+
+        // ----------------------------------------------------
+        // CLASSES AND TYPES
+        // ----------------------------------------------------
+        // Examples: DeclarativeBase, UUID, Base, DataFrame
+
+        {
+            "scope": [
+                "entity.name.class",
+                "entity.name.type",
+                "entity.other.inherited-class",
+                "support.class"
+            ],
+            "settings": {
+                "foreground": "#F9E2AF",
+                "fontStyle": ""
+            }
+        },
+
+        // ----------------------------------------------------
+        // FUNCTIONS
+        // ----------------------------------------------------
+        // Examples: print, len, mapped_column
+        // Does not color generic function calls.
+
+        {
+            "scope": [
+                "entity.name.function",
+                "support.function"
+            ],
+            "settings": {
+                "foreground": "#89B4FA",
+                "fontStyle": ""
+            }
+        },
+
+        // ----------------------------------------------------
+        // VARIABLES
+        // ----------------------------------------------------
+        // Examples: user, database, result, uuid
+
+        {
+            "scope": [
+                "variable",
+                "variable.other"
+            ],
+            "settings": {
+                "foreground": "#CDD6F4"
+            }
+        },
+
+        // ----------------------------------------------------
+        // CONSTANTS
+        // ----------------------------------------------------
+        // Examples: PI, MAX_VALUE, API_VERSION
+
+        {
+            "scope": [
+                "variable.other.constant",
+                "constant.other"
+            ],
+            "settings": {
+                "foreground": "#FAB387"
+            }
+        },
+
+        // ----------------------------------------------------
+        // FUNCTION PARAMETERS
+        // ----------------------------------------------------
+        // Examples: self, x, nullable, primary_key
+
+        {
+            "scope": [
+                "variable.parameter"
+            ],
+            "settings": {
+                "foreground": "#F2CDCD",
+                "fontStyle": ""
+            }
+        },
+
+        // ----------------------------------------------------
+        // OPERATORS
+        // ----------------------------------------------------
+        // Examples: +, -, =, !=, &&, ||
+
+        {
+            "scope": [
+                "keyword.operator"
+            ],
+            "settings": {
+                "foreground": "#89DCEB"
+            }
+        },
+
+        // ----------------------------------------------------
+        // PUNCTUATION
+        // ----------------------------------------------------
+        // Examples: brackets, commas, semicolons
+
+        {
+            "scope": [
+                "punctuation"
+            ],
+            "settings": {
+                "foreground": "#9399B2"
+            }
+        },
+
+        // ----------------------------------------------------
+        // BUILT-IN TYPES
+        // ----------------------------------------------------
+        // Examples: int, str, float, bool
+
+        {
+            "scope": [
+                "support.type",
+                "support.type.primitive"
+            ],
+            "settings": {
+                "foreground": "#94E2D5"
+            }
+        },
+
+        // ----------------------------------------------------
+        // DECORATORS AND ANNOTATIONS
+        // ----------------------------------------------------
+        // Examples: @property, @staticmethod
+
+        {
+            "scope": [
+                "meta.decorator",
+                "punctuation.decorator"
+            ],
+            "settings": {
+                "foreground": "#F5C2E7"
+            }
+        },
+
+        // ====================================================
+        // PYTHON-SPECIFIC TEXTMATE RULES
+        // ====================================================
+
+        // ----------------------------------------------------
+        // PYTHON IMPORT KEYWORDS
+        // ----------------------------------------------------
+        // Examples: from, import
+
+        {
+            "scope": [
+                "keyword.control.import.python"
+            ],
+            "settings": {
+                "foreground": "#CBA6F7"
+            }
+        },
+
+        // ----------------------------------------------------
+        // PYTHON INHERITED CLASSES
+        // ----------------------------------------------------
+        // Example: class User(DeclarativeBase):
+
+        {
+            "scope": [
+                "entity.other.inherited-class.python"
+            ],
+            "settings": {
+                "foreground": "#F9E2AF",
+                "fontStyle": ""
+            }
+        },
+
+        // ----------------------------------------------------
+        // PYTHON FUNCTION PARAMETERS
+        // ----------------------------------------------------
+
+        {
+            "scope": [
+                "variable.parameter.python"
+            ],
+            "settings": {
+                "foreground": "#F2CDCD",
+                "fontStyle": ""
+            }
+        },
+
+        // ----------------------------------------------------
+        // PYTHON FUNCTION DEFINITIONS
+        // ----------------------------------------------------
+
+        {
+            "scope": [
+                "entity.name.function.python"
+            ],
+            "settings": {
+                "foreground": "#89B4FA"
+            }
+        },
+
+        // ----------------------------------------------------
+        // PYTHON CLASS DEFINITIONS
+        // ----------------------------------------------------
+
+        {
+            "scope": [
+                "entity.name.class.python"
+            ],
+            "settings": {
+                "foreground": "#F9E2AF",
+                "fontStyle": ""
+            }
+        }
+    ]
+},
+
+// ============================================================
+// 10. SEMANTIC TOKEN COLORS
+// ============================================================
+// Semantic highlighting supplements TextMate rules.
+// It uses information from the language server to identify
+// what a token actually represents.
+
+"editor.semanticHighlighting.enabled": true,
+
+"editor.semanticTokenColorCustomizations": {
+    "enabled": true,
+
+    "rules": {
+
+        // ----------------------------------------------------
+        // VARIABLES
+        // ----------------------------------------------------
+
+        "variable": {
+            "foreground": "#CDD6F4",
+            "underline": false
+        },
+
+        // ----------------------------------------------------
+        // PARAMETERS
+        // ----------------------------------------------------
+
+        "parameter": {
+            "foreground": "#F2CDCD",
+            "italic": true,
+            "underline": false
+        },
+
+        // ----------------------------------------------------
+        // FUNCTIONS
+        // ----------------------------------------------------
+
+        "function": {
+            "foreground": "#89B4FA",
+            "underline": false
+        },
+
+        // ----------------------------------------------------
+        // METHODS
+        // ----------------------------------------------------
+
+        "method": {
+            "foreground": "#CBA6F7",
+            "underline": false
+        },
+
+        // ----------------------------------------------------
+        // CLASSES
+        // ----------------------------------------------------
+
+        "class": {
+            "foreground": "#F9E2AF",
+            "underline": false
+        },
+
+        // ----------------------------------------------------
+        // INTERFACES
+        // ----------------------------------------------------
+
+        "interface": {
+            "foreground": "#F9E2AF",
+            "underline": false
+        },
+
+        // ----------------------------------------------------
+        // PROPERTIES
+        // ----------------------------------------------------
+
+        "property": {
+            "foreground": "#94E2D5",
+            "underline": false
+        },
+
+        // ----------------------------------------------------
+        // MODULES AND NAMESPACES
+        // ----------------------------------------------------
+
+        "namespace": {
+            "foreground": "#94E2D5",
+            "underline": false
+        },
+
+        // ----------------------------------------------------
+        // ENUMS
+        // ----------------------------------------------------
+
+        "enum": {
+            "foreground": "#FAB387",
+            "underline": false
+        },
+
+        // ====================================================
+        // PYTHON-SPECIFIC SEMANTIC OVERRIDES
+        // ====================================================
+
+        "class:python": {
+            "foreground": "#F9E2AF",
+            "underline": false
+        },
+
+        "function:python": {
+            "foreground": "#89B4FA",
+            "underline": false
+        },
+
+        "method:python": {
+            "foreground": "#CBA6F7",
+            "underline": false
+        },
+
+        "namespace:python": {
+            "foreground": "#94E2D5",
+            "underline": false
+        },
+
+        "parameter:python": {
+            "foreground": "#F2CDCD",
+            "underline": false
+        },
+
+        "variable:python": {
+            "foreground": "#CDD6F4",
+            "underline": false
+        }
+    }
+},
+
+// ============================================================
+// 11. PYTHON-SPECIFIC EDITOR SETTINGS
+// ============================================================
+
+"[python]": {
+    "editor.semanticHighlighting.enabled": true
+},
+
+// ============================================================
+// 12. FILE EXPLORER AND EDITOR BEHAVIOR
+// ============================================================
+
+// Automatically saves files after a delay.
+
+"files.autoSave": "afterDelay",
+
+// Delay before automatically saving (milliseconds).
+
+"files.autoSaveDelay": 1000,
+
+// Controls whether whitespace is displayed.
+
+"editor.renderWhitespace": "selection",
+
+// Automatically formats code when saving.
+
+"editor.formatOnSave": true,
+
+// Enables minimap on the right side of the editor.
+
+"editor.minimap.enabled": true,
+
+// Controls the minimap's displayed scale.
+
+"editor.minimap.scale": 1,
+
+// ============================================================
+// 13. WORKBENCH SETTINGS
+// ============================================================
+
+// Controls the overall VS Code color theme.
+// Replace this with the name of an installed theme.
+
+//"workbench.colorTheme": "Default Dark Modern",
+
+// Controls the icon theme in the Explorer.
+
+//"workbench.iconTheme": "material-icon-theme",
+
+// Controls the position of the sidebar.
+
+"workbench.sideBar.location": "left",
+
+// Controls whether the editor tab bar is visible.
+
+"workbench.editor.showTabs": "multiple"
+
+// ============================================================
+// END OF TEMPLATE
+// ============================================================
+}
