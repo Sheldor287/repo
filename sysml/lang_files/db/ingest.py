@@ -6,6 +6,7 @@ import json
 import os
 import re
 import sys
+import traceback
 import uuid
 import zipfile
 from datetime import datetime, timezone
@@ -124,7 +125,7 @@ def artifact_record(entry: dict, path: Path | None) -> dict:
         "normative_status": entry.get("normative_status"),
         "url": entry.get("url") or "",
         "sha256": entry.get("sha256"),
-        "local_path": str(path.resolve()) if path else entry.get("local_path"),
+        "local_path": str(path.resolve().relative_to(Path.cwd())) if path else entry.get("local_path"),
         "object_uri": entry.get("object_uri"),
         "model_uri": None,
         "retrieved_at": entry.get("retrieved_at"),
@@ -582,7 +583,16 @@ def main() -> None:
         print(f"Ingestion failed (FileNotFoundError): {missing_path or 'the manifest or an input file was not found'}", file=sys.stderr)
         sys.exit(1)
     except Exception as exc:
-        print(f"Ingestion failed ({type(exc).__name__}). Check database connectivity and permissions.", file=sys.stderr)
+        frames = traceback.extract_tb(exc.__traceback__)
+        location = frames[-1] if frames else None
+        detail = str(exc)
+        pg_conn = os.environ.get("PG_CONN")
+        if pg_conn:
+            detail = detail.replace(pg_conn, "<PG_CONN>")
+        detail = re.sub(r"(?i)(postgres(?:ql)?(?:\+\w+)?://)[^@\s]+@", r"\1[REDACTED]@", detail)
+        detail = re.sub(r"(?i)(password|passfile|sslkey)=([^&\s]+)", r"\1=[REDACTED]", detail)
+        where = f" at {Path(location.filename).name}:{location.lineno} in {location.name}" if location else ""
+        print(f"Ingestion failed ({type(exc).__name__}){where}: {detail}", file=sys.stderr)
         sys.exit(1)
     print(json.dumps(result, indent=2))
 

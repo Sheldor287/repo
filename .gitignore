@@ -7,5 +7,5 @@
 __pycache__/
 *.log
 
-
+sysml/lang_files/data/language_artifacts.sqlite
 
