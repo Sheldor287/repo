@@ -46,8 +46,20 @@ def _text(cell: Any) -> str:
     return re.sub(r"\s+", " ", cell.get_text(" ", strip=True)).strip()
 
 
-def _filename(url: str) -> str:
-    name = unquote(Path(urlsplit(url).path).name)
+def _filename(url: str, description: str = "") -> str:
+    parts = urlsplit(url)
+    name = unquote(Path(parts.path).name)
+    if name.lower() in {"doc", "download", "file"}:
+        described = re.search(r"([A-Za-z0-9._-]+\.(?:xmi|json|kpar|sysml|xsd|cmof|dtd))\b", description, re.I)
+        if described:
+            name = described.group(1)
+    if name.lower() in {"doc", "download", "file"} or not Path(name).suffix:
+        query_name = unquote(Path(parts.query.rstrip("/")).name)
+        if Path(query_name).suffix:
+            if name.lower() in {"doc", "download", "file"}:
+                name = query_name
+            elif not Path(name).suffix:
+                name = query_name
     return name or "artifact"
 
 
@@ -102,7 +114,7 @@ def discover_artifacts(
                 version=version or None,
                 omg_file_id=file_id,
                 url=url,
-                filename=_filename(url),
+                filename=_filename(url, description),
                 format=format_ or Path(_filename(url)).suffix.lstrip(".").upper() or "UNKNOWN",
                 description=description,
                 normative_status=_normative_status(description),
@@ -163,6 +175,9 @@ def download_artifact(
             artifact.http_status = response.status_code
             response.raise_for_status()
             content = response.content
+            content_start = content.lstrip()[:256].lower()
+            if b"<meta" in content_start and (b"refresh" in content_start or b"url=" in content_start):
+                raise requests.HTTPError("OMG returned an HTML redirect wrapper instead of the artifact", response=response)
             temporary = path.with_name(path.name + ".part")
             temporary.write_bytes(content)
             temporary.replace(path)
