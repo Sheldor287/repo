@@ -1,0 +1,1035 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmlns:xmi="http://www.omg.org/spec/XMI/20110701"
+         xmlns:mofext="http://www.omg.org/spec/MOF/20110701"
+         xmlns:uml="http://www.omg.org/spec/UML/20110701"
+         xmlns:sysml="http://www.omg.org/spec/SysML/20120322/SysML">
+   <uml:Package URI="http://www.omg.org/spec/SysML/20120322/ISO-80000-1-SysML"
+                xmi:type="uml:Package"
+                xmi:id="_ISO-80000-1-SysML__0"
+                name="ISO-80000-1-SysML"
+                visibility="public">
+      <profileApplication xmi:type="uml:ProfileApplication"
+                          xmi:id="_ISO-80000-1-SysML_profileApplication__ProfileApplication._ISO-80000-1-SysML__0._SysML__0">
+         <appliedProfile href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML__0"/>
+      </profileApplication>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_length_PackageableElement"
+                       name="length">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_metre_PackageableElement"
+                       name="metre">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_mass_PackageableElement"
+                       name="mass">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_time_PackageableElement"
+                       name="time">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_electric_u002520current_PackageableElement"
+                       name="electric current">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_thermodynamic_u002520temperature_PackageableElement"
+                       name="thermodynamic temperature">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_amount_u002520of_u002520substance_PackageableElement"
+                       name="amount of substance">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_luminous_u002520intensity_PackageableElement"
+                       name="luminous intensity">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_kilogram_PackageableElement"
+                       name="kilogram">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_second_PackageableElement"
+                       name="second">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_ampere_PackageableElement"
+                       name="ampere">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_kelvin_PackageableElement"
+                       name="kelvin">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_mole_PackageableElement"
+                       name="mole">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_candela_PackageableElement"
+                       name="candela">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_radian_PackageableElement"
+                       name="radian">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_plane_u002520angle_PackageableElement"
+                       name="plane angle">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_steradian_PackageableElement"
+                       name="steradian">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_solid_u002520angle_PackageableElement"
+                       name="solid angle">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_frequency_PackageableElement"
+                       name="frequency">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_hertz_PackageableElement"
+                       name="hertz">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_force_PackageableElement"
+                       name="force">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_newton_PackageableElement"
+                       name="newton">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_pressure_PackageableElement"
+                       name="pressure">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_pascal_PackageableElement"
+                       name="pascal">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_energy_PackageableElement"
+                       name="energy">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_joule_PackageableElement"
+                       name="joule">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_power_PackageableElement"
+                       name="power">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_watt_PackageableElement"
+                       name="watt">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_electric_u002520charge_PackageableElement"
+                       name="electric charge">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_coulomb_PackageableElement"
+                       name="coulomb">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_electric_u002520potential_u002520difference_PackageableElement"
+                       name="electric potential difference">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_volt_PackageableElement"
+                       name="volt">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_capacitance_PackageableElement"
+                       name="capacitance">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_farad_PackageableElement"
+                       name="farad">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_electric_u002520resistance_PackageableElement"
+                       name="electric resistance">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_ohm_PackageableElement"
+                       name="ohm">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_electric_u002520conductance_PackageableElement"
+                       name="electric conductance">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_siemens_PackageableElement"
+                       name="siemens">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_magnetic_u002520flux_PackageableElement"
+                       name="magnetic flux">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_weber_PackageableElement"
+                       name="weber">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_magnetic_u002520flux_u002520density_PackageableElement"
+                       name="magnetic flux density">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_tesla_PackageableElement"
+                       name="tesla">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_inductance_PackageableElement"
+                       name="inductance">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_henry_PackageableElement"
+                       name="henry">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_Celsius_u002520temperature_PackageableElement"
+                       name="Celsius temperature">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_degree_u002520Celsius_PackageableElement"
+                       name="degree Celsius">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_luminous_u002520flux_PackageableElement"
+                       name="luminous flux">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_lumen_PackageableElement"
+                       name="lumen">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_illuminance_PackageableElement"
+                       name="illuminance">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_lux_PackageableElement"
+                       name="lux">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_activity_u002520_u0028of_u002520a_u002520radionuclide_u0029_PackageableElement"
+                       name="activity (of a radionuclide)">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_becquerel_PackageableElement"
+                       name="becquerel">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_absorbed_u002520dose_PackageableElement"
+                       name="absorbed dose">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_gray_PackageableElement"
+                       name="gray">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_dose_u002520equivalent_PackageableElement"
+                       name="dose equivalent">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_sievert_PackageableElement"
+                       name="sievert">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_catalytic_u002520activity_PackageableElement"
+                       name="catalytic activity">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-QuantityKind_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_katal_PackageableElement"
+                       name="katal">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_metre_u00255Bunit_u00255D_length_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_metre[unit]_length[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_metre_u00255Bunit_u00255D_length_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_metre_u00255Bunit_u00255D_length_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_metre_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_metre_u00255Bunit_u00255D_length_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_metre_u00255Bunit_u00255D_length_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_length_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_kilogram_u00255Bunit_u00255D_mass_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_kilogram[unit]_mass[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_kilogram_u00255Bunit_u00255D_mass_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_kilogram_u00255Bunit_u00255D_mass_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_kilogram_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_kilogram_u00255Bunit_u00255D_mass_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_kilogram_u00255Bunit_u00255D_mass_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_mass_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_second_u00255Bunit_u00255D_time_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_second[unit]_time[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_second_u00255Bunit_u00255D_time_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_second_u00255Bunit_u00255D_time_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_second_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_second_u00255Bunit_u00255D_time_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_second_u00255Bunit_u00255D_time_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_time_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_ampere_u00255Bunit_u00255D_electric_u002520current_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_ampere[unit]_electric current[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_ampere_u00255Bunit_u00255D_electric_u002520current_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_ampere_u00255Bunit_u00255D_electric_u002520current_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_ampere_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_ampere_u00255Bunit_u00255D_electric_u002520current_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_ampere_u00255Bunit_u00255D_electric_u002520current_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_electric_u002520current_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_kelvin_u00255Bunit_u00255D_thermodynamic_u002520temperature_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_kelvin[unit]_thermodynamic temperature[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_kelvin_u00255Bunit_u00255D_thermodynamic_u002520temperature_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_kelvin_u00255Bunit_u00255D_thermodynamic_u002520temperature_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_kelvin_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_kelvin_u00255Bunit_u00255D_thermodynamic_u002520temperature_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_kelvin_u00255Bunit_u00255D_thermodynamic_u002520temperature_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_thermodynamic_u002520temperature_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_mole_u00255Bunit_u00255D_amount_u002520of_u002520substance_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_mole[unit]_amount of substance[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_mole_u00255Bunit_u00255D_amount_u002520of_u002520substance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_mole_u00255Bunit_u00255D_amount_u002520of_u002520substance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_mole_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_mole_u00255Bunit_u00255D_amount_u002520of_u002520substance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_mole_u00255Bunit_u00255D_amount_u002520of_u002520substance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_amount_u002520of_u002520substance_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_candela_u00255Bunit_u00255D_luminous_u002520intensity_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_candela[unit]_luminous intensity[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_candela_u00255Bunit_u00255D_luminous_u002520intensity_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_candela_u00255Bunit_u00255D_luminous_u002520intensity_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_candela_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_candela_u00255Bunit_u00255D_luminous_u002520intensity_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_candela_u00255Bunit_u00255D_luminous_u002520intensity_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_luminous_u002520intensity_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_radian_u00255Bunit_u00255D_plane_u002520angle_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_radian[unit]_plane angle[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_radian_u00255Bunit_u00255D_plane_u002520angle_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_radian_u00255Bunit_u00255D_plane_u002520angle_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_radian_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_radian_u00255Bunit_u00255D_plane_u002520angle_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_radian_u00255Bunit_u00255D_plane_u002520angle_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_plane_u002520angle_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_steradian_u00255Bunit_u00255D_solid_u002520angle_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_steradian[unit]_solid angle[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_steradian_u00255Bunit_u00255D_solid_u002520angle_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_steradian_u00255Bunit_u00255D_solid_u002520angle_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_steradian_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_steradian_u00255Bunit_u00255D_solid_u002520angle_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_steradian_u00255Bunit_u00255D_solid_u002520angle_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_solid_u002520angle_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_hertz_u00255Bunit_u00255D_frequency_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_hertz[unit]_frequency[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_hertz_u00255Bunit_u00255D_frequency_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_hertz_u00255Bunit_u00255D_frequency_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_hertz_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_hertz_u00255Bunit_u00255D_frequency_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_hertz_u00255Bunit_u00255D_frequency_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_frequency_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_newton_u00255Bunit_u00255D_force_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_newton[unit]_force[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_newton_u00255Bunit_u00255D_force_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_newton_u00255Bunit_u00255D_force_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_newton_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_newton_u00255Bunit_u00255D_force_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_newton_u00255Bunit_u00255D_force_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_force_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_pascal_u00255Bunit_u00255D_pressure_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_pascal[unit]_pressure[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_pascal_u00255Bunit_u00255D_pressure_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_pascal_u00255Bunit_u00255D_pressure_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_pascal_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_pascal_u00255Bunit_u00255D_pressure_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_pascal_u00255Bunit_u00255D_pressure_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_pressure_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_joule_u00255Bunit_u00255D_energy_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_joule[unit]_energy[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_joule_u00255Bunit_u00255D_energy_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_joule_u00255Bunit_u00255D_energy_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_joule_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_joule_u00255Bunit_u00255D_energy_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_joule_u00255Bunit_u00255D_energy_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_energy_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_watt_u00255Bunit_u00255D_power_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_watt[unit]_power[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_watt_u00255Bunit_u00255D_power_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_watt_u00255Bunit_u00255D_power_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_watt_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_watt_u00255Bunit_u00255D_power_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_watt_u00255Bunit_u00255D_power_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_power_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_coulomb_u00255Bunit_u00255D_electric_u002520charge_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_coulomb[unit]_electric charge[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_coulomb_u00255Bunit_u00255D_electric_u002520charge_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_coulomb_u00255Bunit_u00255D_electric_u002520charge_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_coulomb_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_coulomb_u00255Bunit_u00255D_electric_u002520charge_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_coulomb_u00255Bunit_u00255D_electric_u002520charge_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_electric_u002520charge_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_volt_u00255Bunit_u00255D_electric_u002520potential_u002520difference_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_volt[unit]_electric potential difference[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_volt_u00255Bunit_u00255D_electric_u002520potential_u002520difference_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_volt_u00255Bunit_u00255D_electric_u002520potential_u002520difference_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_volt_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_volt_u00255Bunit_u00255D_electric_u002520potential_u002520difference_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_volt_u00255Bunit_u00255D_electric_u002520potential_u002520difference_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_electric_u002520potential_u002520difference_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_farad_u00255Bunit_u00255D_capacitance_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_farad[unit]_capacitance[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_farad_u00255Bunit_u00255D_capacitance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_farad_u00255Bunit_u00255D_capacitance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_farad_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_farad_u00255Bunit_u00255D_capacitance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_farad_u00255Bunit_u00255D_capacitance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_capacitance_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_ohm_u00255Bunit_u00255D_electric_u002520resistance_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_ohm[unit]_electric resistance[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_ohm_u00255Bunit_u00255D_electric_u002520resistance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_ohm_u00255Bunit_u00255D_electric_u002520resistance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_ohm_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_ohm_u00255Bunit_u00255D_electric_u002520resistance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_ohm_u00255Bunit_u00255D_electric_u002520resistance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_electric_u002520resistance_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_siemens_u00255Bunit_u00255D_electric_u002520conductance_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_siemens[unit]_electric conductance[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_siemens_u00255Bunit_u00255D_electric_u002520conductance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_siemens_u00255Bunit_u00255D_electric_u002520conductance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_siemens_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_siemens_u00255Bunit_u00255D_electric_u002520conductance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_siemens_u00255Bunit_u00255D_electric_u002520conductance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_electric_u002520conductance_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_weber_u00255Bunit_u00255D_magnetic_u002520flux_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_weber[unit]_magnetic flux[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_weber_u00255Bunit_u00255D_magnetic_u002520flux_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_weber_u00255Bunit_u00255D_magnetic_u002520flux_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_weber_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_weber_u00255Bunit_u00255D_magnetic_u002520flux_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_weber_u00255Bunit_u00255D_magnetic_u002520flux_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_magnetic_u002520flux_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_tesla_u00255Bunit_u00255D_magnetic_u002520flux_u002520density_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_tesla[unit]_magnetic flux density[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_tesla_u00255Bunit_u00255D_magnetic_u002520flux_u002520density_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_tesla_u00255Bunit_u00255D_magnetic_u002520flux_u002520density_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_tesla_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_tesla_u00255Bunit_u00255D_magnetic_u002520flux_u002520density_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_tesla_u00255Bunit_u00255D_magnetic_u002520flux_u002520density_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_magnetic_u002520flux_u002520density_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_henry_u00255Bunit_u00255D_inductance_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_henry[unit]_inductance[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_henry_u00255Bunit_u00255D_inductance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_henry_u00255Bunit_u00255D_inductance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_henry_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_henry_u00255Bunit_u00255D_inductance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_henry_u00255Bunit_u00255D_inductance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_inductance_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_degree_u002520Celsius_u00255Bunit_u00255D_Celsius_u002520temperature_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_degree Celsius[unit]_Celsius temperature[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_degree_u002520Celsius_u00255Bunit_u00255D_Celsius_u002520temperature_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_degree_u002520Celsius_u00255Bunit_u00255D_Celsius_u002520temperature_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_degree_u002520Celsius_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_degree_u002520Celsius_u00255Bunit_u00255D_Celsius_u002520temperature_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_degree_u002520Celsius_u00255Bunit_u00255D_Celsius_u002520temperature_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_Celsius_u002520temperature_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_lumen_u00255Bunit_u00255D_luminous_u002520flux_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_lumen[unit]_luminous flux[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_lumen_u00255Bunit_u00255D_luminous_u002520flux_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_lumen_u00255Bunit_u00255D_luminous_u002520flux_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_lumen_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_lumen_u00255Bunit_u00255D_luminous_u002520flux_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_lumen_u00255Bunit_u00255D_luminous_u002520flux_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_luminous_u002520flux_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_lux_u00255Bunit_u00255D_illuminance_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_lux[unit]_illuminance[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_lux_u00255Bunit_u00255D_illuminance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_lux_u00255Bunit_u00255D_illuminance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_lux_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_lux_u00255Bunit_u00255D_illuminance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_lux_u00255Bunit_u00255D_illuminance_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_illuminance_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_becquerel_u00255Bunit_u00255D_activity_u002520_u0028of_u002520a_u002520radionuclide_u0029_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_becquerel[unit]_activity (of a radionuclide)[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_becquerel_u00255Bunit_u00255D_activity_u002520_u0028of_u002520a_u002520radionuclide_u0029_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_becquerel_u00255Bunit_u00255D_activity_u002520_u0028of_u002520a_u002520radionuclide_u0029_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_becquerel_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_becquerel_u00255Bunit_u00255D_activity_u002520_u0028of_u002520a_u002520radionuclide_u0029_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_becquerel_u00255Bunit_u00255D_activity_u002520_u0028of_u002520a_u002520radionuclide_u0029_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_activity_u002520_u0028of_u002520a_u002520radionuclide_u0029_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_gray_u00255Bunit_u00255D_absorbed_u002520dose_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_gray[unit]_absorbed dose[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_gray_u00255Bunit_u00255D_absorbed_u002520dose_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_gray_u00255Bunit_u00255D_absorbed_u002520dose_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_gray_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_gray_u00255Bunit_u00255D_absorbed_u002520dose_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_gray_u00255Bunit_u00255D_absorbed_u002520dose_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_absorbed_u002520dose_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_sievert_u00255Bunit_u00255D_dose_u002520equivalent_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_sievert[unit]_dose equivalent[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_sievert_u00255Bunit_u00255D_dose_u002520equivalent_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_sievert_u00255Bunit_u00255D_dose_u002520equivalent_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_sievert_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_sievert_u00255Bunit_u00255D_dose_u002520equivalent_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_sievert_u00255Bunit_u00255D_dose_u002520equivalent_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_dose_u002520equivalent_PackageableElement"/>
+         </slot>
+      </packagedElement>
+      <packagedElement xmi:type="uml:InstanceSpecification"
+                       xmi:id="_ISO-80000-1-SysML_a_katal_u00255Bunit_u00255D_catalytic_u002520activity_u00255BquantityKind_u00255D_PackageableElement"
+                       name="a_katal[unit]_catalytic activity[quantityKind]">
+         <classifier href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement"/>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_katal_u00255Bunit_u00255D_catalytic_u002520activity_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_katal_u00255Bunit_u00255D_catalytic_u002520activity_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-A_unit_quantityKind_PackageableElement-unit_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_katal_PackageableElement"/>
+         </slot>
+         <slot xmi:type="uml:Slot"
+               xmi:id="_ISO-80000-1-SysML_a_katal_u00255Bunit_u00255D_catalytic_u002520activity_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property">
+            <definingFeature href="http://www.omg.org/spec/SysML/20120322/SysML.xmi#_SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property"/>
+            <value xmi:type="uml:InstanceValue"
+                   xmi:id="_ISO-80000-1-SysML_a_katal_u00255Bunit_u00255D_catalytic_u002520activity_u00255BquantityKind_u00255D_PackageableElement-slot__Slot._SysML_Blocks_PackageableElement-Unit_PackageableElement-quantityKind_Property-value__ValueSpecification.0"
+                   instance="_ISO-80000-1-SysML_catalytic_u002520activity_PackageableElement"/>
+         </slot>
+      </packagedElement>
+   </uml:Package>
+   <mofext:Tag xmi:type="mofext:Tag" xmi:id="_ISO-80000-1-SysML__1"
+               name="org.omg.xmi.nsPrefix"
+               value="ISO_80000_1_SysML"
+               element="_ISO-80000-1-SysML__0"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_catalytic_u002520activity_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_catalytic_u002520activity_PackageableElement"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_ampere_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_ampere_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_electric_u002520current_PackageableElement-appliedStereotypeInstance"
+               symbol="A"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_electric_u002520potential_u002520difference_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_electric_u002520potential_u002520difference_PackageableElement"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_watt_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_watt_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_power_PackageableElement-appliedStereotypeInstance"
+               symbol="W"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_newton_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_newton_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_force_PackageableElement-appliedStereotypeInstance"
+               symbol="N"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_luminous_u002520intensity_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_luminous_u002520intensity_PackageableElement"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_electric_u002520charge_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_electric_u002520charge_PackageableElement"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_power_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_power_PackageableElement"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_gray_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_gray_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_absorbed_u002520dose_PackageableElement-appliedStereotypeInstance"
+               symbol="Gy"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_dose_u002520equivalent_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_dose_u002520equivalent_PackageableElement"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_force_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_force_PackageableElement"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_weber_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_weber_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_magnetic_u002520flux_PackageableElement-appliedStereotypeInstance"
+               symbol="Wb"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_luminous_u002520flux_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_luminous_u002520flux_PackageableElement"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_metre_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_metre_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_length_PackageableElement-appliedStereotypeInstance"
+               symbol="m"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_pressure_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_pressure_PackageableElement"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_degree_u002520Celsius_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_degree_u002520Celsius_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_thermodynamic_u002520temperature_PackageableElement-appliedStereotypeInstance"
+               symbol="ºC"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_lumen_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_lumen_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_luminous_u002520flux_PackageableElement-appliedStereotypeInstance"
+               symbol="lm"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_becquerel_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_becquerel_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_activity_u002520_u0028of_u002520a_u002520radionuclide_u0029_PackageableElement-appliedStereotypeInstance"
+               symbol="Bq"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_solid_u002520angle_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_solid_u002520angle_PackageableElement"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_radian_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_radian_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_plane_u002520angle_PackageableElement-appliedStereotypeInstance"
+               symbol="rad"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_second_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_second_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_time_PackageableElement-appliedStereotypeInstance"
+               symbol="s"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_siemens_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_siemens_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_electric_u002520conductance_PackageableElement-appliedStereotypeInstance"
+               symbol="S"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_mole_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_mole_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_amount_u002520of_u002520substance_PackageableElement-appliedStereotypeInstance"
+               symbol="mol"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_henry_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_henry_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_inductance_PackageableElement-appliedStereotypeInstance"
+               symbol="H"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_pascal_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_pascal_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_pressure_PackageableElement-appliedStereotypeInstance"
+               symbol="Pa"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_length_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_length_PackageableElement"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_joule_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_joule_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_energy_PackageableElement-appliedStereotypeInstance"
+               symbol="J"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_activity_u002520_u0028of_u002520a_u002520radionuclide_u0029_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_activity_u002520_u0028of_u002520a_u002520radionuclide_u0029_PackageableElement"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_plane_u002520angle_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_plane_u002520angle_PackageableElement"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_volt_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_volt_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_electric_u002520potential_u002520difference_PackageableElement-appliedStereotypeInstance"
+               symbol="V"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_farad_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_farad_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_capacitance_PackageableElement-appliedStereotypeInstance"
+               symbol="F"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_coulomb_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_coulomb_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_electric_u002520charge_PackageableElement-appliedStereotypeInstance"
+               symbol="C"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_mass_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_mass_PackageableElement"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_electric_u002520conductance_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_electric_u002520conductance_PackageableElement"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_illuminance_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_illuminance_PackageableElement"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_frequency_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_frequency_PackageableElement"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_electric_u002520current_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_electric_u002520current_PackageableElement"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_absorbed_u002520dose_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_absorbed_u002520dose_PackageableElement"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_inductance_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_inductance_PackageableElement"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_katal_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_katal_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_catalytic_u002520activity_PackageableElement-appliedStereotypeInstance"
+               symbol="kat"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_time_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_time_PackageableElement"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_kelvin_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_kelvin_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_thermodynamic_u002520temperature_PackageableElement-appliedStereotypeInstance"
+               symbol="K"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_hertz_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_hertz_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_frequency_PackageableElement-appliedStereotypeInstance"
+               symbol="Hz"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_tesla_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_tesla_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_magnetic_u002520flux_u002520density_PackageableElement-appliedStereotypeInstance"
+               symbol="T"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_thermodynamic_u002520temperature_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_thermodynamic_u002520temperature_PackageableElement"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_energy_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_energy_PackageableElement"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_ohm_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_ohm_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_electric_u002520resistance_PackageableElement-appliedStereotypeInstance"
+               symbol="&lt;html&gt;&#xA;  &lt;head&gt;&#xA;&#x9;&#x9;&lt;style&gt;&#xA;&#x9;&#x9;&#x9;p {padding:0px; margin:0px;}&#xA;&#x9;&#x9;&lt;/style&gt;&#xA;&#x9;&lt;/head&gt;&#xA;&#xA;  &lt;body&gt;&#xA;    &lt;font face=&#34;Serif&#34;&gt;Ω&lt;/font&gt;&#xA;  &lt;/body&gt;&#xA;&#xA;&lt;/html&gt;&#xA;&#xA;"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_capacitance_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_capacitance_PackageableElement"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_lux_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_lux_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_illuminance_PackageableElement-appliedStereotypeInstance"
+               symbol="lx"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_amount_u002520of_u002520substance_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_amount_u002520of_u002520substance_PackageableElement"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_candela_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_candela_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_luminous_u002520intensity_PackageableElement-appliedStereotypeInstance"
+               symbol="cd"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_kilogram_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_kilogram_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_mass_PackageableElement-appliedStereotypeInstance"
+               symbol="kg"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_sievert_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_sievert_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_dose_u002520equivalent_PackageableElement-appliedStereotypeInstance"
+               symbol="Sv"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_Celsius_u002520temperature_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_Celsius_u002520temperature_PackageableElement"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_electric_u002520resistance_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_electric_u002520resistance_PackageableElement"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_magnetic_u002520flux_u002520density_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_magnetic_u002520flux_u002520density_PackageableElement"/>
+   <sysml:Unit xmi:id="_ISO-80000-1-SysML_steradian_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+               base_InstanceSpecification="_ISO-80000-1-SysML_steradian_PackageableElement"
+               quantityKind="_ISO-80000-1-SysML_solid_u002520angle_PackageableElement-appliedStereotypeInstance"
+               symbol="sr"/>
+   <sysml:QuantityKind xmi:id="_ISO-80000-1-SysML_magnetic_u002520flux_PackageableElement-appliedStereotypeInstance__InstanceSpecification"
+                       base_InstanceSpecification="_ISO-80000-1-SysML_magnetic_u002520flux_PackageableElement"/>
+</xmi:XMI>

@@ -1,0 +1,480 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xmi:XMI xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:uml="http://www.omg.org/spec/UML/20131001" xmlns:mofext="http://www.omg.org/spec/MOF/20131001">
+  <uml:Profile xmi:id="SysMLDI" xmi:uuid="org.omg.sysml.SysMLDI" xmi:type="uml:Profile">
+    <name>SysMLDI</name>
+    <URI>http://www.omg.org/spec/SysML/20150709/SysMLDI</URI>
+    <packageImport xmi:id="SysMLDI._packageImport.SysML" xmi:uuid="org.omg.sysml.SysMLDI._packageImport.SysML" xmi:type="uml:PackageImport">
+      <importedPackage href="http://www.omg.org/spec/SysML/20150709/SysML.xmi#SysML"/>
+    </packageImport>
+    <packageImport xmi:idref="SysMLDI._metamodelReference._0"/>
+    <packagedElement xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLActivityDiagram_base_UMLActivityDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLActivityDiagram_base_UMLActivityDiagram" xmi:type="uml:Extension">
+      <name>E_extension_SysMLActivityDiagram_base_UMLActivityDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLActivityDiagram_base_UMLActivityDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLActivityDiagram_base_UMLActivityDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram"/>
+</generalization>
+      <ownedEnd 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLActivityDiagram_base_UMLActivityDiagram_ownedEnd.extension_SysMLActivityDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLActivityDiagram_base_UMLActivityDiagram_ownedEnd.extension_SysMLActivityDiagram" xmi:type="uml:ExtensionEnd">
+        <name>extension_SysMLActivityDiagram</name>
+        <lowerValue 
+        xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLActivityDiagram_base_UMLActivityDiagram_ownedEnd.extension_SysMLActivityDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLActivityDiagram_base_UMLActivityDiagram_ownedEnd.extension_SysMLActivityDiagram_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type xmi:idref="SysMLDI.stereotype_packagedElement_SysMLActivityDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLActivityDiagram_base_UMLActivityDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram_ownedEnd.extension_SysMLBehaviorDiagram"/>
+</ownedEnd>
+      <memberEnd xmi:idref="SysMLDI.stereotype_packagedElement_SysMLActivityDiagram_ownedAttribute.base_UMLActivityDiagram"/>
+      <memberEnd xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLActivityDiagram_base_UMLActivityDiagram_ownedEnd.extension_SysMLActivityDiagram"/>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram" xmi:type="uml:Extension">
+      <name>E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram"/>
+</generalization>
+      <ownedEnd 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram_ownedEnd.extension_SysMLBehaviorDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram_ownedEnd.extension_SysMLBehaviorDiagram" xmi:type="uml:ExtensionEnd">
+        <name>extension_SysMLBehaviorDiagram</name>
+        <lowerValue 
+        xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram_ownedEnd.extension_SysMLBehaviorDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram_ownedEnd.extension_SysMLBehaviorDiagram_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type xmi:idref="SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram_ownedEnd.extension_SysMLDiagram"/>
+</ownedEnd>
+      <memberEnd xmi:idref="SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram_ownedAttribute.base_UMLBehaviorDiagram"/>
+      <memberEnd xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram_ownedEnd.extension_SysMLBehaviorDiagram"/>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLBlockDefinitionDiagram_base_UMLClassDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLBlockDefinitionDiagram_base_UMLClassDiagram" xmi:type="uml:Extension">
+      <name>E_extension_SysMLBlockDefinitionDiagram_base_UMLClassDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLBlockDefinitionDiagram_base_UMLClassDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLBlockDefinitionDiagram_base_UMLClassDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram"/>
+</generalization>
+      <ownedEnd 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLBlockDefinitionDiagram_base_UMLClassDiagram_ownedEnd.extension_SysMLBlockDefinitionDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLBlockDefinitionDiagram_base_UMLClassDiagram_ownedEnd.extension_SysMLBlockDefinitionDiagram" xmi:type="uml:ExtensionEnd">
+        <name>extension_SysMLBlockDefinitionDiagram</name>
+        <lowerValue 
+        xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLBlockDefinitionDiagram_base_UMLClassDiagram_ownedEnd.extension_SysMLBlockDefinitionDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLBlockDefinitionDiagram_base_UMLClassDiagram_ownedEnd.extension_SysMLBlockDefinitionDiagram_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type xmi:idref="SysMLDI.stereotype_packagedElement_SysMLBlockDefinitionDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLBlockDefinitionDiagram_base_UMLClassDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram_ownedEnd.extension_SysMLStructureDiagram"/>
+</ownedEnd>
+      <memberEnd xmi:idref="SysMLDI.stereotype_packagedElement_SysMLBlockDefinitionDiagram_ownedAttribute.base_UMLClassDiagram"/>
+      <memberEnd xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLBlockDefinitionDiagram_base_UMLClassDiagram_ownedEnd.extension_SysMLBlockDefinitionDiagram"/>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramElement_base_UMLDiagramElement" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLDiagramElement_base_UMLDiagramElement" xmi:type="uml:Extension">
+      <name>E_extension_SysMLDiagramElement_base_UMLDiagramElement</name>
+      <ownedEnd 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramElement_base_UMLDiagramElement_ownedEnd.extension_SysMLDiagramElement" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLDiagramElement_base_UMLDiagramElement_ownedEnd.extension_SysMLDiagramElement" xmi:type="uml:ExtensionEnd">
+        <name>extension_SysMLDiagramElement</name>
+        <lowerValue 
+        xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramElement_base_UMLDiagramElement_ownedEnd.extension_SysMLDiagramElement_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLDiagramElement_base_UMLDiagramElement_ownedEnd.extension_SysMLDiagramElement_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagramElement"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramElement_base_UMLDiagramElement"/>
+</ownedEnd>
+      <memberEnd xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagramElement_ownedAttribute.base_UMLDiagramElement"/>
+      <memberEnd xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramElement_base_UMLDiagramElement_ownedEnd.extension_SysMLDiagramElement"/>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations" xmi:type="uml:Extension">
+      <name>E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations</name>
+      <generalization 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram"/>
+</generalization>
+      <ownedEnd 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations_ownedEnd.extension_SysMLDiagramWithAssociations" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations_ownedEnd.extension_SysMLDiagramWithAssociations" xmi:type="uml:ExtensionEnd">
+        <name>extension_SysMLDiagramWithAssociations</name>
+        <lowerValue 
+        xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations_ownedEnd.extension_SysMLDiagramWithAssociations_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations_ownedEnd.extension_SysMLDiagramWithAssociations_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations"/>
+        <redefinedProperty xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram_ownedEnd.extension_SysMLDiagram"/>
+</ownedEnd>
+      <memberEnd xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations_ownedAttribute.base_UMLDiagramWithAssociations"/>
+      <memberEnd xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations_ownedEnd.extension_SysMLDiagramWithAssociations"/>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram" xmi:type="uml:Extension">
+      <name>E_extension_SysMLDiagram_base_UMLDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLDiagramElement_base_UMLDiagramElement" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLDiagramElement_base_UMLDiagramElement" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramElement_base_UMLDiagramElement"/>
+</generalization>
+      <ownedEnd xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram_ownedEnd.extension_SysMLDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram_ownedEnd.extension_SysMLDiagram" xmi:type="uml:ExtensionEnd">
+        <name>extension_SysMLDiagram</name>
+        <lowerValue 
+        xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram_ownedEnd.extension_SysMLDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram_ownedEnd.extension_SysMLDiagram_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramElement_base_UMLDiagramElement_ownedEnd.extension_SysMLDiagramElement"/>
+      </ownedEnd>
+      <memberEnd xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagram_ownedAttribute.base_UMLDiagram"/>
+      <memberEnd xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram_ownedEnd.extension_SysMLDiagram"/>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLInteractionDiagram_base_UMLInteractionDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLInteractionDiagram_base_UMLInteractionDiagram" xmi:type="uml:Extension">
+      <name>E_extension_SysMLInteractionDiagram_base_UMLInteractionDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLInteractionDiagram_base_UMLInteractionDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLInteractionDiagram_base_UMLInteractionDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram"/>
+</generalization>
+      <ownedEnd 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLInteractionDiagram_base_UMLInteractionDiagram_ownedEnd.extension_SysMLInteractionDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLInteractionDiagram_base_UMLInteractionDiagram_ownedEnd.extension_SysMLInteractionDiagram" xmi:type="uml:ExtensionEnd">
+        <name>extension_SysMLInteractionDiagram</name>
+        <lowerValue 
+        xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLInteractionDiagram_base_UMLInteractionDiagram_ownedEnd.extension_SysMLInteractionDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLInteractionDiagram_base_UMLInteractionDiagram_ownedEnd.extension_SysMLInteractionDiagram_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type xmi:idref="SysMLDI.stereotype_packagedElement_SysMLInteractionDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLInteractionDiagram_base_UMLInteractionDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram_ownedEnd.extension_SysMLBehaviorDiagram"/>
+</ownedEnd>
+      <memberEnd xmi:idref="SysMLDI.stereotype_packagedElement_SysMLInteractionDiagram_ownedAttribute.base_UMLInteractionDiagram"/>
+      <memberEnd xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLInteractionDiagram_base_UMLInteractionDiagram_ownedEnd.extension_SysMLInteractionDiagram"/>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLInternalBlockDiagram_base_UMLCompositeStructureDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLInternalBlockDiagram_base_UMLCompositeStructureDiagram" xmi:type="uml:Extension">
+      <name>E_extension_SysMLInternalBlockDiagram_base_UMLCompositeStructureDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLInternalBlockDiagram_base_UMLCompositeStructureDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLInternalBlockDiagram_base_UMLCompositeStructureDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram"/>
+</generalization>
+      <ownedEnd 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLInternalBlockDiagram_base_UMLCompositeStructureDiagram_ownedEnd.extension_SysMLInternalBlockDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLInternalBlockDiagram_base_UMLCompositeStructureDiagram_ownedEnd.extension_SysMLInternalBlockDiagram" xmi:type="uml:ExtensionEnd">
+        <name>extension_SysMLInternalBlockDiagram</name>
+        <lowerValue 
+        xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLInternalBlockDiagram_base_UMLCompositeStructureDiagram_ownedEnd.extension_SysMLInternalBlockDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLInternalBlockDiagram_base_UMLCompositeStructureDiagram_ownedEnd.extension_SysMLInternalBlockDiagram_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type xmi:idref="SysMLDI.stereotype_packagedElement_SysMLInternalBlockDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLInternalBlockDiagram_base_UMLCompositeStructureDiagram"/>
+</ownedEnd>
+      <memberEnd xmi:idref="SysMLDI.stereotype_packagedElement_SysMLInternalBlockDiagram_ownedAttribute.base_UMLCompositeStructureDiagram"/>
+      <memberEnd xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLInternalBlockDiagram_base_UMLCompositeStructureDiagram_ownedEnd.extension_SysMLInternalBlockDiagram"/>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLPackageDiagram_base_UMLPackageDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLPackageDiagram_base_UMLPackageDiagram" xmi:type="uml:Extension">
+      <name>E_extension_SysMLPackageDiagram_base_UMLPackageDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLPackageDiagram_base_UMLPackageDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLPackageDiagram_base_UMLPackageDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram"/>
+</generalization>
+      <ownedEnd 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLPackageDiagram_base_UMLPackageDiagram_ownedEnd.extension_SysMLPackageDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLPackageDiagram_base_UMLPackageDiagram_ownedEnd.extension_SysMLPackageDiagram" xmi:type="uml:ExtensionEnd">
+        <name>extension_SysMLPackageDiagram</name>
+        <lowerValue 
+        xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLPackageDiagram_base_UMLPackageDiagram_ownedEnd.extension_SysMLPackageDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLPackageDiagram_base_UMLPackageDiagram_ownedEnd.extension_SysMLPackageDiagram_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type xmi:idref="SysMLDI.stereotype_packagedElement_SysMLPackageDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLPackageDiagram_base_UMLPackageDiagram"/>
+</ownedEnd>
+      <memberEnd xmi:idref="SysMLDI.stereotype_packagedElement_SysMLPackageDiagram_ownedAttribute.base_UMLPackageDiagram"/>
+      <memberEnd xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLPackageDiagram_base_UMLPackageDiagram_ownedEnd.extension_SysMLPackageDiagram"/>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLRequirementDiagram_base_UMLClassDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLRequirementDiagram_base_UMLClassDiagram" xmi:type="uml:Extension">
+      <name>E_extension_SysMLRequirementDiagram_base_UMLClassDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLRequirementDiagram_base_UMLClassDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLRequirementDiagram_base_UMLClassDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram"/>
+</generalization>
+      <ownedEnd 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLRequirementDiagram_base_UMLClassDiagram_ownedEnd.extension_SysMLRequirementDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLRequirementDiagram_base_UMLClassDiagram_ownedEnd.extension_SysMLRequirementDiagram" xmi:type="uml:ExtensionEnd">
+        <name>extension_SysMLRequirementDiagram</name>
+        <lowerValue 
+        xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLRequirementDiagram_base_UMLClassDiagram_ownedEnd.extension_SysMLRequirementDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLRequirementDiagram_base_UMLClassDiagram_ownedEnd.extension_SysMLRequirementDiagram_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type xmi:idref="SysMLDI.stereotype_packagedElement_SysMLRequirementDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLRequirementDiagram_base_UMLClassDiagram"/>
+</ownedEnd>
+      <memberEnd xmi:idref="SysMLDI.stereotype_packagedElement_SysMLRequirementDiagram_ownedAttribute.base_UMLClassDiagram"/>
+      <memberEnd xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLRequirementDiagram_base_UMLClassDiagram_ownedEnd.extension_SysMLRequirementDiagram"/>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLStateMachineDiagram_base_UMLStateMachineDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLStateMachineDiagram_base_UMLStateMachineDiagram" xmi:type="uml:Extension">
+      <name>E_extension_SysMLStateMachineDiagram_base_UMLStateMachineDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLStateMachineDiagram_base_UMLStateMachineDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLStateMachineDiagram_base_UMLStateMachineDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram"/>
+</generalization>
+      <ownedEnd 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLStateMachineDiagram_base_UMLStateMachineDiagram_ownedEnd.extension_SysMLStateMachineDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLStateMachineDiagram_base_UMLStateMachineDiagram_ownedEnd.extension_SysMLStateMachineDiagram" xmi:type="uml:ExtensionEnd">
+        <name>extension_SysMLStateMachineDiagram</name>
+        <lowerValue 
+        xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLStateMachineDiagram_base_UMLStateMachineDiagram_ownedEnd.extension_SysMLStateMachineDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLStateMachineDiagram_base_UMLStateMachineDiagram_ownedEnd.extension_SysMLStateMachineDiagram_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type xmi:idref="SysMLDI.stereotype_packagedElement_SysMLStateMachineDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLStateMachineDiagram_base_UMLStateMachineDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram_ownedEnd.extension_SysMLBehaviorDiagram"/>
+</ownedEnd>
+      <memberEnd xmi:idref="SysMLDI.stereotype_packagedElement_SysMLStateMachineDiagram_ownedAttribute.base_UMLStateMachineDiagram"/>
+      <memberEnd xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLStateMachineDiagram_base_UMLStateMachineDiagram_ownedEnd.extension_SysMLStateMachineDiagram"/>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram" xmi:type="uml:Extension">
+      <name>E_extension_SysMLStructureDiagram_base_UMLStructureDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations"/>
+</generalization>
+      <ownedEnd 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram_ownedEnd.extension_SysMLStructureDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram_ownedEnd.extension_SysMLStructureDiagram" xmi:type="uml:ExtensionEnd">
+        <name>extension_SysMLStructureDiagram</name>
+        <lowerValue 
+        xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram_ownedEnd.extension_SysMLStructureDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram_ownedEnd.extension_SysMLStructureDiagram_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type xmi:idref="SysMLDI.stereotype_packagedElement_SysMLStructureDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations_ownedEnd.extension_SysMLDiagramWithAssociations"/>
+</ownedEnd>
+      <memberEnd xmi:idref="SysMLDI.stereotype_packagedElement_SysMLStructureDiagram_ownedAttribute.base_UMLStructureDiagram"/>
+      <memberEnd xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram_ownedEnd.extension_SysMLStructureDiagram"/>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLUseCaseDiagram_base_UMLUseCaseDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLUseCaseDiagram_base_UMLUseCaseDiagram" xmi:type="uml:Extension">
+      <name>E_extension_SysMLUseCaseDiagram_base_UMLUseCaseDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLUseCaseDiagram_base_UMLUseCaseDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLUseCaseDiagram_base_UMLUseCaseDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram"/>
+</generalization>
+      <generalization 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLUseCaseDiagram_base_UMLUseCaseDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLUseCaseDiagram_base_UMLUseCaseDiagram._generalization.SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations"/>
+</generalization>
+      <ownedEnd 
+      xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLUseCaseDiagram_base_UMLUseCaseDiagram_ownedEnd.extension_SysMLUseCaseDiagram" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLUseCaseDiagram_base_UMLUseCaseDiagram_ownedEnd.extension_SysMLUseCaseDiagram" xmi:type="uml:ExtensionEnd">
+        <name>extension_SysMLUseCaseDiagram</name>
+        <lowerValue 
+        xmi:id="SysMLDI.extension_packagedElement_E_extension_SysMLUseCaseDiagram_base_UMLUseCaseDiagram_ownedEnd.extension_SysMLUseCaseDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.extension_packagedElement_E_extension_SysMLUseCaseDiagram_base_UMLUseCaseDiagram_ownedEnd.extension_SysMLUseCaseDiagram_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type xmi:idref="SysMLDI.stereotype_packagedElement_SysMLUseCaseDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLUseCaseDiagram_base_UMLUseCaseDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram_ownedEnd.extension_SysMLBehaviorDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations_ownedEnd.extension_SysMLDiagramWithAssociations"/>
+</ownedEnd>
+      <memberEnd xmi:idref="SysMLDI.stereotype_packagedElement_SysMLUseCaseDiagram_ownedAttribute.base_UMLUseCaseDiagram"/>
+      <memberEnd xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLUseCaseDiagram_base_UMLUseCaseDiagram_ownedEnd.extension_SysMLUseCaseDiagram"/>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.stereotype_packagedElement_SysMLActivityDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLActivityDiagram" xmi:type="uml:Stereotype">
+      <name>SysMLActivityDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.stereotype_packagedElement_SysMLActivityDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLActivityDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram"/>
+</generalization>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLActivityDiagram_ownedAttribute.base_UMLActivityDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLActivityDiagram_ownedAttribute.base_UMLActivityDiagram" xmi:type="uml:Property">
+        <name>base_UMLActivityDiagram</name>
+        <lowerValue xmi:id="SysMLDI.stereotype_packagedElement_SysMLActivityDiagram_ownedAttribute.base_UMLActivityDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLActivityDiagram_ownedAttribute.base_UMLActivityDiagram_lowerValue" xmi:type="uml:LiteralInteger"/>
+        <type href="http://www.omg.org/spec/UML/20131001/UMLDI.xmi#UMLActivityDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLActivityDiagram_base_UMLActivityDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram_ownedAttribute.base_UMLBehaviorDiagram"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram" xmi:type="uml:Stereotype">
+      <name>SysMLBehaviorDiagram</name>
+      <isAbstract>true</isAbstract>
+      <generalization 
+      xmi:id="SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagram"/>
+</generalization>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram_ownedAttribute.base_UMLBehaviorDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram_ownedAttribute.base_UMLBehaviorDiagram" xmi:type="uml:Property">
+        <name>base_UMLBehaviorDiagram</name>
+        <lowerValue xmi:id="SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram_ownedAttribute.base_UMLBehaviorDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram_ownedAttribute.base_UMLBehaviorDiagram_lowerValue" xmi:type="uml:LiteralInteger"/>
+        <type href="http://www.omg.org/spec/UML/20131001/UMLDI.xmi#UMLBehaviorDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLBehaviorDiagram_base_UMLBehaviorDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagram_ownedAttribute.base_UMLDiagram"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.stereotype_packagedElement_SysMLBlockDefinitionDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLBlockDefinitionDiagram" xmi:type="uml:Stereotype">
+      <name>SysMLBlockDefinitionDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.stereotype_packagedElement_SysMLBlockDefinitionDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLStructureDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLBlockDefinitionDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLStructureDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.stereotype_packagedElement_SysMLStructureDiagram"/>
+</generalization>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLBlockDefinitionDiagram_ownedAttribute.base_UMLClassDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLBlockDefinitionDiagram_ownedAttribute.base_UMLClassDiagram" xmi:type="uml:Property">
+        <name>base_UMLClassDiagram</name>
+        <lowerValue xmi:id="SysMLDI.stereotype_packagedElement_SysMLBlockDefinitionDiagram_ownedAttribute.base_UMLClassDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLBlockDefinitionDiagram_ownedAttribute.base_UMLClassDiagram_lowerValue" xmi:type="uml:LiteralInteger"/>
+        <type href="http://www.omg.org/spec/UML/20131001/UMLDI.xmi#UMLClassDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLBlockDefinitionDiagram_base_UMLClassDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.stereotype_packagedElement_SysMLStructureDiagram_ownedAttribute.base_UMLStructureDiagram"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagram" xmi:type="uml:Stereotype">
+      <name>SysMLDiagram</name>
+      <isAbstract>true</isAbstract>
+      <generalization 
+      xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLDiagramElement" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLDiagramElement" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagramElement"/>
+</generalization>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagram_ownedAttribute.base_UMLDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagram_ownedAttribute.base_UMLDiagram" xmi:type="uml:Property">
+        <name>base_UMLDiagram</name>
+        <lowerValue xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagram_ownedAttribute.base_UMLDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagram_ownedAttribute.base_UMLDiagram_lowerValue" xmi:type="uml:LiteralInteger"/>
+        <type href="http://www.omg.org/spec/UML/20131001/UMLDI.xmi#UMLDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagram_base_UMLDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagramElement_ownedAttribute.base_UMLDiagramElement"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagram_ownedAttribute.defaultNamespace" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagram_ownedAttribute.defaultNamespace" xmi:type="uml:Property">
+        <name>defaultNamespace</name>
+        <type href="http://www.omg.org/spec/UML/20131001/UML.xmi#Namespace"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagram_ownedAttribute.isLineJogShown" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagram_ownedAttribute.isLineJogShown" xmi:type="uml:Property">
+        <name>isLineJogShown</name>
+        <defaultValue xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagram_ownedAttribute.isLineJogShown_defaultValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagram_ownedAttribute.isLineJogShown_defaultValue" xmi:type="uml:LiteralBoolean"/>
+        <type href="http://www.omg.org/spec/UML/20131001/PrimitiveTypes.xmi#Boolean"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagramElement" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagramElement" xmi:type="uml:Stereotype">
+      <name>SysMLDiagramElement</name>
+      <isAbstract>true</isAbstract>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagramElement_ownedAttribute.base_UMLDiagramElement" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagramElement_ownedAttribute.base_UMLDiagramElement" xmi:type="uml:Property">
+        <name>base_UMLDiagramElement</name>
+        <lowerValue xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagramElement_ownedAttribute.base_UMLDiagramElement_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagramElement_ownedAttribute.base_UMLDiagramElement_lowerValue" xmi:type="uml:LiteralInteger"/>
+        <type href="http://www.omg.org/spec/UML/20131001/UMLDI.xmi#UMLDiagramElement"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramElement_base_UMLDiagramElement"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagramElement_ownedAttribute.isDecompositionSymbolShown" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagramElement_ownedAttribute.isDecompositionSymbolShown" xmi:type="uml:Property">
+        <name>isDecompositionSymbolShown</name>
+        <defaultValue xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagramElement_ownedAttribute.isDecompositionSymbolShown_defaultValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagramElement_ownedAttribute.isDecompositionSymbolShown_defaultValue" xmi:type="uml:LiteralBoolean"/>
+        <type href="http://www.omg.org/spec/UML/20131001/PrimitiveTypes.xmi#Boolean"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations" xmi:type="uml:Stereotype">
+      <name>SysMLDiagramWithAssociations</name>
+      <isAbstract>true</isAbstract>
+      <generalization 
+      xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations._generalization.SysMLDI.stereotype_packagedElement_SysMLDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations._generalization.SysMLDI.stereotype_packagedElement_SysMLDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagram"/>
+</generalization>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations_ownedAttribute.base_UMLDiagramWithAssociations" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations_ownedAttribute.base_UMLDiagramWithAssociations" xmi:type="uml:Property">
+        <name>base_UMLDiagramWithAssociations</name>
+        <lowerValue 
+        xmi:id="SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations_ownedAttribute.base_UMLDiagramWithAssociations_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations_ownedAttribute.base_UMLDiagramWithAssociations_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type href="http://www.omg.org/spec/UML/20131001/UMLDI.xmi#UMLDiagramWithAssociations"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLDiagramWithAssociations_base_UMLDiagramWithAssociations"/>
+        <redefinedProperty xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagram_ownedAttribute.base_UMLDiagram"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.stereotype_packagedElement_SysMLInteractionDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLInteractionDiagram" xmi:type="uml:Stereotype">
+      <name>SysMLInteractionDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.stereotype_packagedElement_SysMLInteractionDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLInteractionDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram"/>
+</generalization>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLInteractionDiagram_ownedAttribute.base_UMLInteractionDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLInteractionDiagram_ownedAttribute.base_UMLInteractionDiagram" xmi:type="uml:Property">
+        <name>base_UMLInteractionDiagram</name>
+        <lowerValue 
+        xmi:id="SysMLDI.stereotype_packagedElement_SysMLInteractionDiagram_ownedAttribute.base_UMLInteractionDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLInteractionDiagram_ownedAttribute.base_UMLInteractionDiagram_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type href="http://www.omg.org/spec/UML/20131001/UMLDI.xmi#UMLInteractionDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLInteractionDiagram_base_UMLInteractionDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram_ownedAttribute.base_UMLBehaviorDiagram"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.stereotype_packagedElement_SysMLInternalBlockDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLInternalBlockDiagram" xmi:type="uml:Stereotype">
+      <name>SysMLInternalBlockDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.stereotype_packagedElement_SysMLInternalBlockDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLStructureDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLInternalBlockDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLStructureDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.stereotype_packagedElement_SysMLStructureDiagram"/>
+</generalization>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLInternalBlockDiagram_ownedAttribute.base_UMLCompositeStructureDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLInternalBlockDiagram_ownedAttribute.base_UMLCompositeStructureDiagram" xmi:type="uml:Property">
+        <name>base_UMLCompositeStructureDiagram</name>
+        <lowerValue 
+        xmi:id="SysMLDI.stereotype_packagedElement_SysMLInternalBlockDiagram_ownedAttribute.base_UMLCompositeStructureDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLInternalBlockDiagram_ownedAttribute.base_UMLCompositeStructureDiagram_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type href="http://www.omg.org/spec/UML/20131001/UMLDI.xmi#UMLCompositeStructureDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLInternalBlockDiagram_base_UMLCompositeStructureDiagram"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.stereotype_packagedElement_SysMLPackageDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLPackageDiagram" xmi:type="uml:Stereotype">
+      <name>SysMLPackageDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.stereotype_packagedElement_SysMLPackageDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLStructureDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLPackageDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLStructureDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.stereotype_packagedElement_SysMLStructureDiagram"/>
+</generalization>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLPackageDiagram_ownedAttribute.base_UMLPackageDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLPackageDiagram_ownedAttribute.base_UMLPackageDiagram" xmi:type="uml:Property">
+        <name>base_UMLPackageDiagram</name>
+        <lowerValue xmi:id="SysMLDI.stereotype_packagedElement_SysMLPackageDiagram_ownedAttribute.base_UMLPackageDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLPackageDiagram_ownedAttribute.base_UMLPackageDiagram_lowerValue" xmi:type="uml:LiteralInteger"/>
+        <type href="http://www.omg.org/spec/UML/20131001/UMLDI.xmi#UMLPackageDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLPackageDiagram_base_UMLPackageDiagram"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.stereotype_packagedElement_SysMLParametricDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLParametricDiagram" xmi:type="uml:Stereotype">
+      <name>SysMLParametricDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.stereotype_packagedElement_SysMLParametricDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLInternalBlockDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLParametricDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLInternalBlockDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.stereotype_packagedElement_SysMLInternalBlockDiagram"/>
+</generalization>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLParametricDiagram_ownedAttribute.isConstraintPropertyRounded" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLParametricDiagram_ownedAttribute.isConstraintPropertyRounded" xmi:type="uml:Property">
+        <name>isConstraintPropertyRounded</name>
+        <defaultValue 
+        xmi:id="SysMLDI.stereotype_packagedElement_SysMLParametricDiagram_ownedAttribute.isConstraintPropertyRounded_defaultValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLParametricDiagram_ownedAttribute.isConstraintPropertyRounded_defaultValue" xmi:type="uml:LiteralBoolean">
+</defaultValue>
+        <type href="http://www.omg.org/spec/UML/20131001/PrimitiveTypes.xmi#Boolean"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.stereotype_packagedElement_SysMLRequirementDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLRequirementDiagram" xmi:type="uml:Stereotype">
+      <name>SysMLRequirementDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.stereotype_packagedElement_SysMLRequirementDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLStructureDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLRequirementDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLStructureDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.stereotype_packagedElement_SysMLStructureDiagram"/>
+</generalization>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLRequirementDiagram_ownedAttribute.base_UMLClassDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLRequirementDiagram_ownedAttribute.base_UMLClassDiagram" xmi:type="uml:Property">
+        <name>base_UMLClassDiagram</name>
+        <lowerValue xmi:id="SysMLDI.stereotype_packagedElement_SysMLRequirementDiagram_ownedAttribute.base_UMLClassDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLRequirementDiagram_ownedAttribute.base_UMLClassDiagram_lowerValue" xmi:type="uml:LiteralInteger"/>
+        <type href="http://www.omg.org/spec/UML/20131001/UMLDI.xmi#UMLClassDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLRequirementDiagram_base_UMLClassDiagram"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.stereotype_packagedElement_SysMLStateMachineDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLStateMachineDiagram" xmi:type="uml:Stereotype">
+      <name>SysMLStateMachineDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.stereotype_packagedElement_SysMLStateMachineDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLStateMachineDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram"/>
+</generalization>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLStateMachineDiagram_ownedAttribute.base_UMLStateMachineDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLStateMachineDiagram_ownedAttribute.base_UMLStateMachineDiagram" xmi:type="uml:Property">
+        <name>base_UMLStateMachineDiagram</name>
+        <lowerValue 
+        xmi:id="SysMLDI.stereotype_packagedElement_SysMLStateMachineDiagram_ownedAttribute.base_UMLStateMachineDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLStateMachineDiagram_ownedAttribute.base_UMLStateMachineDiagram_lowerValue" xmi:type="uml:LiteralInteger">
+</lowerValue>
+        <type href="http://www.omg.org/spec/UML/20131001/UMLDI.xmi#UMLStateMachineDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLStateMachineDiagram_base_UMLStateMachineDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram_ownedAttribute.base_UMLBehaviorDiagram"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.stereotype_packagedElement_SysMLStructureDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLStructureDiagram" xmi:type="uml:Stereotype">
+      <name>SysMLStructureDiagram</name>
+      <isAbstract>true</isAbstract>
+      <generalization 
+      xmi:id="SysMLDI.stereotype_packagedElement_SysMLStructureDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLStructureDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations"/>
+</generalization>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLStructureDiagram_ownedAttribute.base_UMLStructureDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLStructureDiagram_ownedAttribute.base_UMLStructureDiagram" xmi:type="uml:Property">
+        <name>base_UMLStructureDiagram</name>
+        <lowerValue xmi:id="SysMLDI.stereotype_packagedElement_SysMLStructureDiagram_ownedAttribute.base_UMLStructureDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLStructureDiagram_ownedAttribute.base_UMLStructureDiagram_lowerValue" xmi:type="uml:LiteralInteger"/>
+        <type href="http://www.omg.org/spec/UML/20131001/UMLDI.xmi#UMLStructureDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLStructureDiagram_base_UMLStructureDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations_ownedAttribute.base_UMLDiagramWithAssociations"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:id="SysMLDI.stereotype_packagedElement_SysMLUseCaseDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLUseCaseDiagram" xmi:type="uml:Stereotype">
+      <name>SysMLUseCaseDiagram</name>
+      <generalization 
+      xmi:id="SysMLDI.stereotype_packagedElement_SysMLUseCaseDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLUseCaseDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram"/>
+</generalization>
+      <generalization 
+      xmi:id="SysMLDI.stereotype_packagedElement_SysMLUseCaseDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLUseCaseDiagram._generalization.SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations" xmi:type="uml:Generalization">
+        <general xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagramWithAssociations"/>
+</generalization>
+      <ownedAttribute xmi:id="SysMLDI.stereotype_packagedElement_SysMLUseCaseDiagram_ownedAttribute.base_UMLUseCaseDiagram" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLUseCaseDiagram_ownedAttribute.base_UMLUseCaseDiagram" xmi:type="uml:Property">
+        <name>base_UMLUseCaseDiagram</name>
+        <lowerValue xmi:id="SysMLDI.stereotype_packagedElement_SysMLUseCaseDiagram_ownedAttribute.base_UMLUseCaseDiagram_lowerValue" xmi:uuid="org.omg.sysml.SysMLDI.stereotype_packagedElement_SysMLUseCaseDiagram_ownedAttribute.base_UMLUseCaseDiagram_lowerValue" xmi:type="uml:LiteralInteger"/>
+        <type href="http://www.omg.org/spec/UML/20131001/UMLDI.xmi#UMLUseCaseDiagram"/>
+        <association xmi:idref="SysMLDI.extension_packagedElement_E_extension_SysMLUseCaseDiagram_base_UMLUseCaseDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.stereotype_packagedElement_SysMLBehaviorDiagram_ownedAttribute.base_UMLBehaviorDiagram"/>
+        <redefinedProperty xmi:idref="SysMLDI.stereotype_packagedElement_SysMLDiagram_ownedAttribute.base_UMLDiagram"/>
+      </ownedAttribute>
+    </packagedElement>
+    <metamodelReference xmi:id="SysMLDI._metamodelReference._0" xmi:uuid="org.omg.sysml.SysMLDI._metamodelReference._0" xmi:type="uml:PackageImport">
+      <importedPackage href="http://www.omg.org/spec/UML/20131001/UMLDI.xmi#_0"/>
+    </metamodelReference>
+  </uml:Profile>
+  <mofext:Tag xmi:id="SysMLDI_mofext.Tag" xmi:uuid="org.omg.sysml.SysMLDI_mofext.Tag" xmi:type="mofext:Tag" name="org.omg.xmi.nsPrefix" value="SysMLDI">
+    <element xmi:idref="SysMLDI"/>
+  </mofext:Tag>
+</xmi:XMI>

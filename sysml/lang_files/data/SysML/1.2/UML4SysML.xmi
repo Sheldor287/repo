@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cmof="http://schema.omg.org/spec/MOF/2.0/cmof.xml">
+  <cmof:Package xmi:id="_0" name="UML4SysML" uri="http://www.omg.org/spec/SysML/20100301/UML4SysML">
+    <ownedMember xmi:type="cmof:Package" xmi:id="Actions" name="Actions">
+      <ownedMember xmi:type="cmof:Package" xmi:id="Actions-BasicActions" name="BasicActions">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Actions-BasicActions-_packageMerge.0" receivingPackage="Actions-BasicActions">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Actions-BasicActions"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="Actions-StructuredActions" name="StructuredActions">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Actions-StructuredActions-_packageMerge.0" receivingPackage="Actions-StructuredActions">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Actions-StructuredActions"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="Actions-IntermediateActions" name="IntermediateActions">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Actions-IntermediateActions-_packageMerge.0" receivingPackage="Actions-IntermediateActions">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Actions-IntermediateActions"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="Actions-CompleteActions" name="CompleteActions">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Actions-CompleteActions-_packageMerge.0" receivingPackage="Actions-CompleteActions">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Actions-CompleteActions"/>
+        </packageMerge>
+      </ownedMember>
+    </ownedMember>
+    <ownedMember xmi:type="cmof:Package" xmi:id="Activities" name="Activities">
+      <ownedMember xmi:type="cmof:Package" xmi:id="Activities-BasicActivities" name="BasicActivities">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Activities-BasicActivities-_packageMerge.0" receivingPackage="Activities-BasicActivities">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Activities-BasicActivities"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="Activities-FundamentalActivities" name="FundamentalActivities">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Activities-FundamentalActivities-_packageMerge.0" receivingPackage="Activities-FundamentalActivities">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Activities-FundamentalActivities"/>
+        </packageMerge>
+        <ownedMember xmi:type="cmof:Class" xmi:id="Activities-FundamentalActivities-Activity" name="Activity" superClass="Activities-FundamentalActivities-Behavior">
+          <ownedRule xmi:type="cmof:Constraint" xmi:id="Activities-FundamentalActivities-Activity-part_end_name" name="part_end_name" constrainedElement="Activities-FundamentalActivities-Activity" namespace="Activities-FundamentalActivities-Activity">
+            <specification xmi:type="cmof:OpaqueExpression" xmi:id="Activities-FundamentalActivities-Activity-part_end_name-_specification">
+              <language>OCL</language>
+              <body>self.ownedAttribute->forAll(a | (a.type.oclIsKindOf(Activity) and&#xD;                                                 a.aggregation= #composite)&#xD;    implies self.node->exists(n | n.oclIsKindOf(CallBehaviorAction)&#xD;        and n.oclAsType(CallBehaviorAction).isSynchronous= #true and a.type = n.behavior and&#xD;        (( n.name->notEmpty() and n.name=a.name) or ( n.name->empty()&#xD;        and  n.oclAsType(CallBehaviorAction).behavior.name = a.name)))&#xD;</body>
+            </specification>
+          </ownedRule>
+          <ownedAttribute xmi:type="cmof:Property" xmi:id="Activities-FundamentalActivities-Activity-node" name="node" type="Activities-FundamentalActivities-ActivityNode" upper="*" lower="0" association="Activities-FundamentalActivities-A_node_activity"/>
+        </ownedMember>
+        <ownedMember xmi:type="cmof:Class" xmi:id="Activities-FundamentalActivities-ActivityNode" name="ActivityNode" isAbstract="true">
+          <ownedAttribute xmi:type="cmof:Property" xmi:id="Activities-FundamentalActivities-ActivityNode-activity" name="activity" type="Activities-FundamentalActivities-Activity" lower="0" association="Activities-FundamentalActivities-A_node_activity"/>
+          <superClass xmi:type="cmof:Class" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Classes-Kernel-NamedElement"/>
+        </ownedMember>
+        <ownedMember xmi:type="cmof:Class" xmi:id="Activities-FundamentalActivities-Action" name="Action" isAbstract="true" superClass="Activities-FundamentalActivities-ActivityNode"/>
+        <ownedMember xmi:type="cmof:Class" xmi:id="Activities-FundamentalActivities-CallBehaviorAction" name="CallBehaviorAction" superClass="Activities-FundamentalActivities-CallAction">
+          <ownedAttribute xmi:type="cmof:Property" xmi:id="Activities-FundamentalActivities-CallBehaviorAction-behavior" name="behavior" type="Activities-FundamentalActivities-Behavior" association="Activities-FundamentalActivities-A_behavior_callBehaviorAction"/>
+        </ownedMember>
+        <ownedMember xmi:type="cmof:Class" xmi:id="Activities-FundamentalActivities-CallAction" name="CallAction" isAbstract="true" superClass="Activities-FundamentalActivities-Action">
+          <ownedAttribute xmi:type="cmof:Property" xmi:id="Activities-FundamentalActivities-CallAction-isSynchronous" name="isSynchronous" default="true">
+            <ownedComment xmi:type="cmof:Comment" xmi:id="Activities-FundamentalActivities-CallAction-isSynchronous-_ownedComment.0" annotatedElement="Activities-FundamentalActivities-CallAction-isSynchronous">
+              <body>If true, the call is synchronous and the caller waits for completion of the invoked behavior.&#xD;
+If false, the call is asynchronous and the caller proceeds immediately and does not expect a return values.&#xD;
+</body>
+            </ownedComment>
+            <type xmi:type="cmof:PrimitiveType" href="http://www.omg.org/spec/UML/20090901/Infrastructure.cmof#Core-PrimitiveTypes-Boolean"/>
+          </ownedAttribute>
+        </ownedMember>
+        <ownedMember xmi:type="cmof:Class" xmi:id="Activities-FundamentalActivities-Behavior" name="Behavior" isAbstract="true">
+          <superClass xmi:type="cmof:Class" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Classes-Kernel-Class"/>
+        </ownedMember>
+        <ownedMember xmi:type="cmof:Association" xmi:id="Activities-FundamentalActivities-A_behavior_callBehaviorAction" name="A_behavior_callBehaviorAction" memberEnd="Activities-FundamentalActivities-CallBehaviorAction-behavior Activities-FundamentalActivities-A_behavior_callBehaviorAction-callBehaviorAction">
+          <ownedEnd xmi:type="cmof:Property" xmi:id="Activities-FundamentalActivities-A_behavior_callBehaviorAction-callBehaviorAction" name="callBehaviorAction" type="Activities-FundamentalActivities-CallBehaviorAction" upper="*" lower="0" owningAssociation="Activities-FundamentalActivities-A_behavior_callBehaviorAction" association="Activities-FundamentalActivities-A_behavior_callBehaviorAction"/>
+        </ownedMember>
+        <ownedMember xmi:type="cmof:Association" xmi:id="Activities-FundamentalActivities-A_node_activity" name="A_node_activity" memberEnd="Activities-FundamentalActivities-Activity-node Activities-FundamentalActivities-ActivityNode-activity"/>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="Activities-IntermediateActivities" name="IntermediateActivities">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Activities-IntermediateActivities-_packageMerge.0" receivingPackage="Activities-IntermediateActivities">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Activities-IntermediateActivities"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="Activities-StructuredActivities" name="StructuredActivities">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Activities-StructuredActivities-_packageMerge.0" receivingPackage="Activities-StructuredActivities"/>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="Activities-CompleteActivities" name="CompleteActivities">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Activities-CompleteActivities-_packageMerge.0" receivingPackage="Activities-CompleteActivities">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Activities-CompleteActivities"/>
+        </packageMerge>
+      </ownedMember>
+    </ownedMember>
+    <ownedMember xmi:type="cmof:Package" xmi:id="Classes" name="Classes">
+      <ownedMember xmi:type="cmof:Package" xmi:id="Classes-Kernel" name="Kernel">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Classes-Kernel-_packageMerge.0" receivingPackage="Classes-Kernel">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Classes-Kernel"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="Classes-Dependencies" name="Dependencies">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Classes-Dependencies-_packageMerge.0" receivingPackage="Classes-Dependencies">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Classes-Dependencies"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="Classes-Interfaces" name="Interfaces">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Classes-Interfaces-_packageMerge.0" receivingPackage="Classes-Interfaces">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Classes-Interfaces"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="Classes-PowerTypes" name="PowerTypes">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Classes-PowerTypes-_packageMerge.0" receivingPackage="Classes-PowerTypes">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Classes-PowerTypes"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="Classes-AssociationClasses" name="AssociationClasses">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Classes-AssociationClasses-_packageMerge.0" receivingPackage="Classes-AssociationClasses">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Classes-AssociationClasses"/>
+        </packageMerge>
+      </ownedMember>
+    </ownedMember>
+    <ownedMember xmi:type="cmof:Package" xmi:id="CommonBehaviors" name="CommonBehaviors">
+      <ownedMember xmi:type="cmof:Package" xmi:id="CommonBehaviors-BasicBehaviors" name="BasicBehaviors">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="CommonBehaviors-BasicBehaviors-_packageMerge.0" receivingPackage="CommonBehaviors-BasicBehaviors">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#CommonBehaviors-BasicBehaviors"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="CommonBehaviors-Communications" name="Communications">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="CommonBehaviors-Communications-_packageMerge.0" receivingPackage="CommonBehaviors-Communications">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#CommonBehaviors-Communications"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="CommonBehaviors-SimpleTime" name="SimpleTime">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="CommonBehaviors-SimpleTime-_packageMerge.0" receivingPackage="CommonBehaviors-SimpleTime">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#CommonBehaviors-SimpleTime"/>
+        </packageMerge>
+      </ownedMember>
+    </ownedMember>
+    <ownedMember xmi:type="cmof:Package" xmi:id="CompositeStructures" name="CompositeStructures">
+      <ownedMember xmi:type="cmof:Package" xmi:id="CompositeStructures-InternalStructures" name="InternalStructures">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="CompositeStructures-InternalStructures-_packageMerge.0" receivingPackage="CompositeStructures-InternalStructures">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#CompositeStructures-InternalStructures"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="CompositeStructures-InvocationActions" name="InvocationActions">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="CompositeStructures-InvocationActions-_packageMerge.0" receivingPackage="CompositeStructures-InvocationActions">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#CompositeStructures-InvocationActions"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="CompositeStructures-Ports" name="Ports">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="CompositeStructures-Ports-_packageMerge.0" receivingPackage="CompositeStructures-Ports">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#CompositeStructures-Ports"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="CompositeStructures-StructuredClasses" name="StructuredClasses">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="CompositeStructures-StructuredClasses-_packageMerge.0" receivingPackage="CompositeStructures-StructuredClasses">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#CompositeStructures-StructuredClasses"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="CompositeStructures-StructuredActivities" name="StructuredActivities">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="CompositeStructures-StructuredActivities-_packageMerge.0" receivingPackage="CompositeStructures-StructuredActivities">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#CompositeStructures-StructuredActivities"/>
+        </packageMerge>
+      </ownedMember>
+    </ownedMember>
+    <ownedMember xmi:type="cmof:Package" xmi:id="Interactions" name="Interactions">
+      <ownedMember xmi:type="cmof:Package" xmi:id="Interactions-BasicInteractions" name="BasicInteractions">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Interactions-BasicInteractions-_packageMerge.0" receivingPackage="Interactions-BasicInteractions">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Interactions-BasicInteractions"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="Interactions-Fragments" name="Fragments">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="Interactions-Fragments-_packageMerge.0" receivingPackage="Interactions-Fragments">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#Interactions-Fragments"/>
+        </packageMerge>
+      </ownedMember>
+    </ownedMember>
+    <ownedMember xmi:type="cmof:Package" xmi:id="UseCases" name="UseCases">
+      <packageMerge xmi:type="cmof:PackageMerge" xmi:id="UseCases-_packageMerge.0" receivingPackage="UseCases">
+        <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#UseCases"/>
+      </packageMerge>
+    </ownedMember>
+    <ownedMember xmi:type="cmof:Package" xmi:id="AuxiliaryConstructs" name="AuxiliaryConstructs">
+      <ownedMember xmi:type="cmof:Package" xmi:id="AuxiliaryConstructs-Profiles" name="Profiles">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="AuxiliaryConstructs-Profiles-_packageMerge.0" receivingPackage="AuxiliaryConstructs-Profiles">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#AuxiliaryConstructs-Profiles"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="AuxiliaryConstructs-Models" name="Models">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="AuxiliaryConstructs-Models-_packageMerge.0" receivingPackage="AuxiliaryConstructs-Models">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#AuxiliaryConstructs-Models"/>
+        </packageMerge>
+      </ownedMember>
+      <ownedMember xmi:type="cmof:Package" xmi:id="AuxiliaryConstructs-InformationFlows" name="InformationFlows">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="AuxiliaryConstructs-InformationFlows-_packageMerge.0" receivingPackage="AuxiliaryConstructs-InformationFlows">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#AuxiliaryConstructs-InformationFlows"/>
+        </packageMerge>
+      </ownedMember>
+    </ownedMember>
+    <ownedMember xmi:type="cmof:Package" xmi:id="StateMachines" name="StateMachines">
+      <ownedMember xmi:type="cmof:Package" xmi:id="StateMachines-BehaviorStateMachines" name="BehaviorStateMachines">
+        <packageMerge xmi:type="cmof:PackageMerge" xmi:id="StateMachines-BehaviorStateMachines-_packageMerge.0" receivingPackage="StateMachines-BehaviorStateMachines">
+          <mergedPackage xmi:type="cmof:Package" href="http://www.omg.org/spec/UML/20090901/Superstructure.cmof#StateMachines-BehaviorStateMachines"/>
+        </packageMerge>
+      </ownedMember>
+    </ownedMember>
+  </cmof:Package>
+  <cmof:Tag xmi:id="_2" name="org.omg.xmi.nsPrefix" value="uml4sysml" element="_0"/>
+  <cmof:Tag xmi:id="_3" name="org.omg.xmi.nsURI" value="http://www.omg.org/spec/SysML/20100301/UML4SysML" element="_0"/>
+</xmi:XMI>

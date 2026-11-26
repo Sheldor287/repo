@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:cmof="http://schema.omg.org/spec/MOF/2.0/cmof.xml">
+  <cmof:Package xmi:id="_0" name="Blocks" uri="http://www.omg.org/spec/SysML/20100301/Blocks">
+    <ownedMember xmi:type="cmof:DataType" xmi:id="Boolean" name="Boolean"/>
+    <ownedMember xmi:type="cmof:DataType" xmi:id="String" name="String"/>
+    <ownedMember xmi:type="cmof:DataType" xmi:id="Number" name="Number"/>
+    <ownedMember xmi:type="cmof:DataType" xmi:id="Integer" name="Integer" general="Number"/>
+    <ownedMember xmi:type="cmof:DataType" xmi:id="Real" name="Real" general="Number"/>
+    <ownedMember xmi:type="cmof:DataType" xmi:id="Complex" name="Complex" general="Number">
+      <ownedAttribute xmi:type="cmof:Property" xmi:id="Complex-realPart" name="realPart" type="Real" datatype="Complex"/>
+      <ownedAttribute xmi:type="cmof:Property" xmi:id="Complex-imaginaryPart" name="imaginaryPart" type="Real" datatype="Complex"/>
+    </ownedMember>
+  </cmof:Package>
+  <cmof:Tag xmi:id="_2" name="org.omg.xmi.nsPrefix" value="blocks" element="_0"/>
+  <cmof:Tag xmi:id="_3" name="org.omg.xmi.nsURI" value="http://www.omg.org/spec/SysML/20100301/Blocks" element="_0"/>
+</xmi:XMI>
